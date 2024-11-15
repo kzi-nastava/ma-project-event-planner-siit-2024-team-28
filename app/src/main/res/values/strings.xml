@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">EventPlanner</string>
+    <string name="events_button">Events</string>
+    <string name="solutions_button">Solutions</string>
+    <string name="event_name">Event</string>
+    <string name="event_description">Event description</string>
+    <string name="solution_name">Solution</string>
+    <string name="solution_description">Solution description</string>
 </resources>
