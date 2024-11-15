@@ -8,18 +8,24 @@
     android:orientation="vertical"
     >
 
+
     <TextView
-        android:id="@+id/top_events_textview"
+        android:id="@+id/all_events_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/top_solutions"
         android:gravity="center"
+        android:text="@string/all_events"
         android:textSize="40sp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"/>
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/solution_card" />
+        tools:listitem="@layout/event_card" />
 
 </LinearLayout>

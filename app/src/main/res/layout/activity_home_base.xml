@@ -30,6 +30,7 @@
     </LinearLayout>
 
     <androidx.fragment.app.FragmentContainerView
+        android:name="com.eventplanner.fragments.events.TopEventsFragment"
         android:id="@+id/fragment_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

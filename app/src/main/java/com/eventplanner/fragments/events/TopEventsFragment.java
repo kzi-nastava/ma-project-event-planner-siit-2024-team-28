@@ -43,7 +43,7 @@ public class TopEventsFragment extends Fragment {
 
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            events.add(new Event("Event " + (i + 1), "Description for event " + (i + 1)));
+            events.add(new Event((i + 1) + ". Event ", "Description for event"));
         }
         EventListAdapter adapter = new EventListAdapter(getContext(), events);
         listView.setAdapter(adapter);

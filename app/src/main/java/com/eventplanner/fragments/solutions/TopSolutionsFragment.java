@@ -43,7 +43,7 @@ public class TopSolutionsFragment extends Fragment {
 
         List<Solution> solutions = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            solutions.add(new Solution("Solution " + (i + 1), "Description for solution " + (i + 1)));
+            solutions.add(new Solution((i + 1) + ". Solution", "Description for solution " + (i + 1)));
         }
         SolutionListAdapter adapter = new SolutionListAdapter(getContext(), solutions);
         listView.setAdapter(adapter);
