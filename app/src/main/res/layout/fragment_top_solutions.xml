@@ -22,4 +22,18 @@
         android:layout_height="wrap_content"
         tools:listitem="@layout/solution_card" />
 
+    <Button
+        android:id="@+id/browse_services_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/browse_services_button" />
+
+    <Button
+        android:id="@+id/browse_products_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/browse_products_button" />
+
 </LinearLayout>

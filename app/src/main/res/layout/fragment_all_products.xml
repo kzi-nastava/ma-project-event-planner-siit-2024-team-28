@@ -12,6 +12,6 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/event_card"/>
+        tools:listitem="@layout/solution_card"/>
 
 </LinearLayout>

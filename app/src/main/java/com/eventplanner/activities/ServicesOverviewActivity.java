@@ -58,7 +58,7 @@ public class ServicesOverviewActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i("ServicesOverviewActivity", "Filter button clicked");
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ServicesOverviewActivity.this);
-                View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter, null);
+                View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_services, null);
 
                 /*
                  *  filling filter dialog with radiobuttons

@@ -33,7 +33,7 @@
     <string name="fixed">fixed</string>
     <string name="min_max">min-max</string>
     <string name="reservation_deadline_input">Reservation deadline (in days):</string>
-    <string name="cancellation_deadline_input">Cancelation deadline (in days):</string>
+    <string name="cancellation_deadline_input">Cancellation deadline (in days):</string>
     <string name="confirmation_input">Method of confirmation:</string>
     <string name="auto">auto</string>
     <string name="sort">Sort</string>
@@ -47,5 +47,15 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tristique commodo malesuada. Nullam in aliquet nisl. In dui augue, luctus in sem vitae, condimentum fermentum nulla. Quisque molestie maximus varius. Vivamus molestie sem dolor, in rhoncus felis dapibus ac. Integer eu lobortis felis.</string>
+    <string name="filter">Filter</string>
+    <string name="home_browse_button">Browse</string>
+    <string name="browse_events_button">browse all events</string>
+    <string name="browse_services_button">browse all services</string>
+    <string name="browse_products_button">browse all products</string>
+    <string name="all_solutions">All Solutions</string>
+    <string name="all_products">All Products</string>
+    <string name="all_services">All Services</string>
+    <string name="next_text"><![CDATA[>]]></string>
+    <string name="previous_text"><![CDATA[<]]></string>
 
 </resources>
