@@ -54,4 +54,22 @@
         android:label="Service overview"
         tools:layout="@layout/fragment_services_overview"
         />
+    <fragment
+        android:id="@+id/nav_all_events"
+        android:name="com.eventplanner.fragments.events.AllEventsFragment"
+        android:label="All events"
+        tools:layout="@layout/fragment_all_events"
+        />
+    <fragment
+        android:id="@+id/nav_all_products"
+        android:name="com.eventplanner.fragments.solutions.AllProductsFragment"
+        android:label="All products"
+        tools:layout="@layout/fragment_all_products"
+        />
+    <fragment
+        android:id="@+id/nav_all_services"
+        android:name="com.eventplanner.fragments.solutions.AllServicesFragment"
+        android:label="All services"
+        tools:layout="@layout/fragment_all_services"
+        />
 </navigation>

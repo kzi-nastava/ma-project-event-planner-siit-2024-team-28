@@ -1,6 +1,5 @@
 package com.eventplanner.fragments.events;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +9,10 @@ import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
-import com.eventplanner.activities.events.AllEventsActivity;
 import com.eventplanner.adapters.events.EventListAdapter;
 import com.eventplanner.model.events.Event;
 
@@ -48,12 +48,9 @@ public class TopEventsFragment extends Fragment {
         listView.setAdapter(adapter);
 
         Button browseButton = rootView.findViewById(R.id.browse_events_button);
-        browseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AllEventsActivity.class);
-                startActivity(intent);
-            }
+        browseButton.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
+            navController.navigate(R.id.nav_all_events);
         });
 
         return rootView;

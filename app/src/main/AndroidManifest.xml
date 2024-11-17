@@ -13,24 +13,6 @@
         android:theme="@style/Theme.EventPlanner"
         tools:targetApi="31" >
         <activity
-            android:name=".fragments.home.HomeFragment"
-            android:exported="false" />
-        <activity
-            android:name=".fragments.registration.BusinessOwnerRegistrationFragment"
-            android:exported="false" />
-        <activity
-            android:name=".fragments.registration.EventOrganizerRegistrationFragment"
-            android:exported="false" />
-        <activity
-            android:name=".fragments.registration.RegistrationFragment"
-            android:exported="false" />
-        <activity
-            android:name=".fragments.services.ServicesOverviewActivity"
-            android:exported="false" />
-        <activity
-            android:name=".fragments.services.ServiceCreationActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.HomeActivity"
             android:exported="true" >
             <intent-filter>
@@ -39,15 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.events.AllEventsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.solutions.AllProductsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.solutions.AllServicesActivity"
-            android:exported="false" />
     </application>
 
 </manifest>

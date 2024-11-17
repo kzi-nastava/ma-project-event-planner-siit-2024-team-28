@@ -50,7 +50,7 @@ public class ServicesOverviewFragment extends Fragment {
         filterButton.setOnClickListener(v -> {
             Log.i("ServicesOverviewFragment", "Filter button clicked");
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-            View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter, null);
+            View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_services, null);
 
             // Populate the BottomSheetDialog with RadioButtons
             String[] eventTypes = getResources().getStringArray(R.array.event_types);
