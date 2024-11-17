@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_home"
+            android:title="@string/home"
+            android:orderInCategory="100" />
+        <item android:id="@+id/nav_registration"
+            android:title="@string/navbar_register"
+            android:orderInCategory="200" />
+        <item android:id="@+id/nav_login"
+            android:title="@string/navbar_login"
+            android:orderInCategory="300"/>
+        <item android:id="@+id/nav_service_overview"
+            android:title="@string/my_services"
+            android:orderInCategory="400"/>
+    </group>
+</menu>
