@@ -40,7 +40,6 @@ public class TopSolutionsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_top_solutions, container, false);
-        Toast.makeText(getActivity(), "Top s", Toast.LENGTH_SHORT).show();
 
         ListView listView = rootView.findViewById(android.R.id.list);
 
