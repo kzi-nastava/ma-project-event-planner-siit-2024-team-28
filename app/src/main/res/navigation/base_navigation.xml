@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/base_navigation"
+    app:startDestination="@id/nav_home"
+    >
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.eventplanner.fragments.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_registration"
+            app:destination="@id/nav_registration" />
+        <action
+            android:id="@+id/action_home_to_login"
+            app:destination="@id/nav_login" />
+        <action
+            android:id="@+id/action_home_to_services_overview"
+            app:destination="@id/nav_service_overview" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_top_events"
+        android:name="com.eventplanner.fragments.events.TopEventsFragment"
+        android:label="Top events"
+        tools:layout="@layout/fragment_top_events"
+        />
+    <fragment
+        android:id="@+id/nav_top_solutions"
+        android:name="com.eventplanner.fragments.solutions.TopSolutionsFragment"
+        android:label="Top solutions"
+        tools:layout="@layout/fragment_top_solutions"
+        />
+    <fragment
+        android:id="@+id/nav_registration"
+        android:name="com.eventplanner.fragments.auth.RegistrationFragment"
+        android:label="Registration"
+        tools:layout="@layout/fragment_registration"
+        />
+    <fragment
+        android:id="@+id/nav_business_owner_registration"
+        android:name="com.eventplanner.fragments.auth.BusinessOwnerRegistrationFragment"
+        android:label="Business owner registration"
+        tools:layout="@layout/fragment_business_owner_registration"
+        />
+    <fragment
+        android:id="@+id/nav_event_organizer_registration"
+        android:name="com.eventplanner.fragments.auth.EventOrganizerRegistrationFragment"
+        android:label="Event organizer registration"
+        tools:layout="@layout/fragment_event_organizer_registration"
+        />
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="com.eventplanner.fragments.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login"
+        />
+    <fragment
+        android:id="@+id/nav_service_creation"
+        android:name="com.eventplanner.fragments.services.ServiceCreationFragment"
+        android:label="Service creation"
+        tools:layout="@layout/fragment_service_creation"
+        />
+    <fragment
+        android:id="@+id/nav_service_overview"
+        android:name="com.eventplanner.fragments.services.ServicesOverviewFragment"
+        android:label="Service overview"
+        tools:layout="@layout/fragment_services_overview"
+        />
+    <fragment
+        android:id="@+id/nav_all_events"
+        android:name="com.eventplanner.fragments.events.AllEventsFragment"
+        android:label="All events"
+        tools:layout="@layout/fragment_all_events"
+        />
+    <fragment
+        android:id="@+id/nav_all_products"
+        android:name="com.eventplanner.fragments.solutions.AllProductsFragment"
+        android:label="All products"
+        tools:layout="@layout/fragment_all_products"
+        />
+    <fragment
+        android:id="@+id/nav_all_services"
+        android:name="com.eventplanner.fragments.solutions.AllServicesFragment"
+        android:label="All services"
+        tools:layout="@layout/fragment_all_services"
+        />
+</navigation>
