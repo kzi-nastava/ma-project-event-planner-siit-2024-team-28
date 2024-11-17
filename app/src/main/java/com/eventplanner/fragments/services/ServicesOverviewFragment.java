@@ -1,6 +1,5 @@
 package com.eventplanner.fragments.services;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +18,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -37,12 +38,12 @@ public class ServicesOverviewFragment extends Fragment {
             return insets;
         });
 
+        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
+
         // Set up add services button to navigate to ServiceCreationActivity
         Button addServicesButton = view.findViewById(R.id.button_add_service);
         addServicesButton.setOnClickListener(v -> {
-            Log.i("ServicesOverviewFragment", "Add services button clicked");
-            Intent intent = new Intent(getActivity(), ServiceCreationFragment.class);
-            startActivity(intent);
+            navController.navigate(R.id.nav_service_creation);
         });
 
         // Set up filter button to show BottomSheetDialog
@@ -81,8 +82,7 @@ public class ServicesOverviewFragment extends Fragment {
             View itemView = inflater.inflate(R.layout.service_card, linearLayoutContainer, false);
             ImageButton imageButton = itemView.findViewById(R.id.edit_button);
             imageButton.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), ServiceCreationFragment.class);
-                startActivity(intent);
+                navController.navigate(R.id.nav_service_creation);
             });
             linearLayoutContainer.addView(itemView);
         }

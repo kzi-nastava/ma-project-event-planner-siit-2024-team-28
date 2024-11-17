@@ -8,17 +8,9 @@
     tools:openDrawer="start"
     android:id="@+id/drawer_layout">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        >
-
-        <include
-            layout="@layout/activity_home_content"
-            />
-
-    </ScrollView>
+    <include
+        layout="@layout/activity_home_content"
+    />
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
