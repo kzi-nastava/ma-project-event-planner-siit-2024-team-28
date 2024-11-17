@@ -1,4 +1,4 @@
-package com.eventplanner.fragments.registration;
+package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;

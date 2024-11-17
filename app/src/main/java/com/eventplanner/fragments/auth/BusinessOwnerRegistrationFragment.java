@@ -1,4 +1,4 @@
-package com.eventplanner.fragments.registration;
+package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,10 +15,6 @@ import com.eventplanner.R;
 
 public class BusinessOwnerRegistrationFragment extends Fragment {
     private EditText email, password, repeatPassword, organizationName, address, phoneNumber, description;
-
-    public BusinessOwnerRegistrationFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
