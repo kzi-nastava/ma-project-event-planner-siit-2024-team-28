@@ -52,6 +52,12 @@
         tools:layout="@layout/fragment_event_organizer_registration"
         />
     <fragment
+        android:id="@+id/nav_login"
+        android:name="com.eventplanner.fragments.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login"
+        />
+    <fragment
         android:id="@+id/nav_service_creation"
         android:name="com.eventplanner.fragments.services.ServiceCreationFragment"
         android:label="Service creation"

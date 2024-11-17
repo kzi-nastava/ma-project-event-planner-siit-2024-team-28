@@ -19,7 +19,7 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_event_organizer_registration, container, false);
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         // Initialize views
         email = view.findViewById(R.id.email);
