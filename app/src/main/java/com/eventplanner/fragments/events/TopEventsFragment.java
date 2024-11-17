@@ -1,9 +1,7 @@
 package com.eventplanner.fragments.events;
 
-import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +21,10 @@ public class TopEventsFragment extends Fragment {
     public TopEventsFragment() {
         // Required empty public constructor
     }
-    public static TopEventsFragment newInstance() {
-        TopEventsFragment fragment = new TopEventsFragment();
-        return fragment;
-    }
 
+    public static TopEventsFragment newInstance() {
+        return new TopEventsFragment();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

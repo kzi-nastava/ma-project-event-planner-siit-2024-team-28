@@ -13,7 +13,6 @@
         <item>Party</item>
         <item>Conference</item>
     </string-array>
-
     <string name="settings">Settings</string>
     <string name="language">Language</string>
     <string name="select_category_service">Select the category of the service:</string>
@@ -44,5 +43,8 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tristique commodo malesuada. Nullam in aliquet nisl. In dui augue, luctus in sem vitae, condimentum fermentum nulla. Quisque molestie maximus varius. Vivamus molestie sem dolor, in rhoncus felis dapibus ac. Integer eu lobortis felis.</string>
-
+    <string name="register_eventOrganizer">Event Organizer</string>
+    <string name="register_businessOwner">Business Owner</string>
+    <string name="navbar_register">Register</string>
+    <string name="navbar_login">Login</string>
 </resources>

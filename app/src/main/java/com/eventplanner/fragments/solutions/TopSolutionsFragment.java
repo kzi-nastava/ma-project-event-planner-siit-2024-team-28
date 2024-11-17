@@ -1,9 +1,6 @@
 package com.eventplanner.fragments.solutions;
 
-import static android.content.ContentValues.TAG;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,16 +20,14 @@ public class TopSolutionsFragment extends Fragment {
     public TopSolutionsFragment() {
         // Required empty public constructor
     }
-    public static TopSolutionsFragment newInstance() {
-        TopSolutionsFragment fragment = new TopSolutionsFragment();
-        return fragment;
-    }
 
+    public static TopSolutionsFragment newInstance() {
+        return new TopSolutionsFragment();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
