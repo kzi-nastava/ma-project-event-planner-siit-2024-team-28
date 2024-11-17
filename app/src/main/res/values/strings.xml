@@ -6,6 +6,9 @@
     <string name="event_description">Event description</string>
     <string name="solution_name">Solution</string>
     <string name="solution_description">Solution description</string>
+    <string name="top_events">🏆Top events🏆</string>
+    <string name="top_solutions">🏆Top solutions🏆</string>
+    <string name="all_events">All Events\n</string>
     <string-array name="event_types">
         <item>Wedding</item>
         <item>Birthday</item>
@@ -29,7 +32,7 @@
     <string name="fixed">fixed</string>
     <string name="min_max">min-max</string>
     <string name="reservation_deadline_input">Reservation deadline (in days):</string>
-    <string name="cancellation_deadline_input">Cancelation deadline (in days):</string>
+    <string name="cancellation_deadline_input">Cancellation deadline (in days):</string>
     <string name="confirmation_input">Method of confirmation:</string>
     <string name="auto">auto</string>
     <string name="sort">Sort</string>
@@ -47,4 +50,14 @@
     <string name="register_businessOwner">Business Owner</string>
     <string name="navbar_register">Register</string>
     <string name="navbar_login">Login</string>
+    <string name="filter">Filter</string>
+    <string name="home_browse_button">Browse</string>
+    <string name="browse_events_button">browse all events</string>
+    <string name="browse_services_button">browse all services</string>
+    <string name="browse_products_button">browse all products</string>
+    <string name="all_solutions">All Solutions</string>
+    <string name="all_products">All Products</string>
+    <string name="all_services">All Services</string>
+    <string name="next_text"><![CDATA[>]]></string>
+    <string name="previous_text"><![CDATA[<]]></string>
 </resources>

@@ -39,6 +39,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.events.AllEventsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.solutions.AllProductsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.solutions.AllServicesActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
