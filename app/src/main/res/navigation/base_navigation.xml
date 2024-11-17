@@ -10,8 +10,11 @@
         android:id="@+id/nav_home"
         android:name="com.eventplanner.fragments.home.HomeFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_home"
-        />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_registration"
+            app:destination="@id/nav_registration" />
+    </fragment>
     <fragment
         android:id="@+id/nav_top_events"
         android:name="com.eventplanner.fragments.events.TopEventsFragment"

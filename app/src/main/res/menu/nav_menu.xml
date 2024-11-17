@@ -4,13 +4,15 @@
     android:fitsSystemWindows="true"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_register"
+    <group android:checkableBehavior="single" >
+        <item android:id="@+id/nav_menu_register"
             android:title="@string/navbar_register"
             android:orderInCategory="100" />
-
-        <item android:id="@+id/nav_login"
+        <item android:id="@+id/nav_menu_login"
             android:title="@string/navbar_login"
+            android:orderInCategory="200"/>
+        <item android:id="@+id/nav_menu_create_service"
+            android:title="@string/navbar_create_service"
             android:orderInCategory="200"/>
     </group>
 </menu>

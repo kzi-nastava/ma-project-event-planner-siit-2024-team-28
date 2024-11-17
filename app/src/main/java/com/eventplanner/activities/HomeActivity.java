@@ -2,9 +2,7 @@ package com.eventplanner.activities;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -36,19 +34,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         Button eventsButton = findViewById(R.id.top_events_button);
-        eventsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransition.to(TopEventsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top);
-            }
-        });
+        eventsButton.setOnClickListener(v -> FragmentTransition.to(TopEventsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top));
         Button solutionsButton = findViewById(R.id.top_solutions_button);
-        solutionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransition.to(TopSolutionsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top);
-            }
-        });
+        solutionsButton.setOnClickListener(v -> FragmentTransition.to(TopSolutionsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top));
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -62,24 +50,28 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpNavBar() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-
         navController = Navigation.findNavController(this, R.id.fragment_nav_content_main);
-        navController.addOnDestinationChangedListener((navController, navDestination, bundle) -> {
-            int id = navDestination.getId();
-            if (id == R.id.nav_register) {
-                Toast.makeText(HomeActivity.this, "Register", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.nav_login) {
-                Toast.makeText(HomeActivity.this, "Login", Toast.LENGTH_SHORT).show();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationUI.setupWithNavController(navigationView, navController);
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            int id = destination.getId();
+
+            if (id == R.id.nav_menu_register) {
+                navController.navigate(R.id.nav_registration);
+            } else if (id == R.id.nav_menu_login) {
+                navController.navigate(R.id.nav_registration);
+            } else if (id == R.id.nav_menu_create_service) {
+                navController.navigate(R.id.nav_service_creation);
             }
         });
 
         mAppBarConfiguration = new AppBarConfiguration
-                .Builder(R.id.nav_register, R.id.nav_login)
+                .Builder(R.id.nav_home)
                 .setOpenableLayout(drawer)
                 .build();
 
-        NavigationUI.setupWithNavController(navigationView, navController);
     }
 
     @Override

@@ -50,6 +50,7 @@
     <string name="register_businessOwner">Business Owner</string>
     <string name="navbar_register">Register</string>
     <string name="navbar_login">Login</string>
+    <string name="navbar_create_service">Create service</string>
     <string name="filter">Filter</string>
     <string name="home_browse_button">Browse</string>
     <string name="browse_events_button">browse all events</string>
