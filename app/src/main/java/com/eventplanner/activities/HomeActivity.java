@@ -58,11 +58,12 @@ public class HomeActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             int id = destination.getId();
 
-            if (id == R.id.nav_menu_register) {
+            // Avoid unnecessary navigation by checking current destination
+            if (id == R.id.nav_registration && controller.getCurrentDestination().getId() != R.id.nav_registration) {
                 navController.navigate(R.id.nav_registration);
-            } else if (id == R.id.nav_menu_login) {
+            } else if (id == R.id.nav_login && controller.getCurrentDestination().getId() != R.id.nav_login) {
                 navController.navigate(R.id.nav_registration);
-            } else if (id == R.id.nav_menu_create_service) {
+            } else if (id == R.id.nav_service_creation && controller.getCurrentDestination().getId() != R.id.nav_service_creation) {
                 navController.navigate(R.id.nav_service_creation);
             }
         });
@@ -71,7 +72,6 @@ public class HomeActivity extends AppCompatActivity {
                 .Builder(R.id.nav_home)
                 .setOpenableLayout(drawer)
                 .build();
-
     }
 
     @Override
