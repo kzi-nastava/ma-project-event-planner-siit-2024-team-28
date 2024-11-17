@@ -1,30 +1,28 @@
 package com.eventplanner.fragments.events;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.eventplanner.R;
-import com.eventplanner.activities.events.AllEventsActivity;
 import com.eventplanner.adapters.events.EventListAdapter;
 import com.eventplanner.model.events.Event;
+import com.eventplanner.model.solutions.ReservationType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TopEventsFragment extends Fragment {
-    public TopEventsFragment() {
+public class AllEventsFragment extends Fragment {
+    public AllEventsFragment() {
         // Required empty public constructor
     }
-    public static TopEventsFragment newInstance() {
-        TopEventsFragment fragment = new TopEventsFragment();
+    public static AllEventsFragment newInstance() {
+        AllEventsFragment fragment = new AllEventsFragment();
         return fragment;
     }
 
@@ -32,30 +30,20 @@ public class TopEventsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_top_events, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_all_events, container, false);
 
         ListView listView = rootView.findViewById(android.R.id.list);
 
         List<Event> events = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            events.add(new Event((i + 1) + ". Event ", "Description for event"));
+        for (int i = 0; i < 10; i++) {
+            events.add(new Event("Event " + (i+1), "Description for event"));
         }
         EventListAdapter adapter = new EventListAdapter(getContext(), events);
         listView.setAdapter(adapter);
-
-        Button browseButton = rootView.findViewById(R.id.browse_events_button);
-        browseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AllEventsActivity.class);
-                startActivity(intent);
-            }
-        });
 
         return rootView;
     }

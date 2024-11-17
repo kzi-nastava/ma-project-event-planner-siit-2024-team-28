@@ -17,20 +17,24 @@ public class HomeActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_home_base);
 
-    Button btnFragment1 = findViewById(R.id.top_events_button);
-    btnFragment1.setOnClickListener(new View.OnClickListener() {
+    Button eventsButton = findViewById(R.id.top_events_button);
+    eventsButton.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             FragmentTransition.to(TopEventsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top);
         }
     });
-    Button btnFragment2 = findViewById(R.id.top_solutions_button);
-    btnFragment2.setOnClickListener(new View.OnClickListener() {
+    Button solutionsButton = findViewById(R.id.top_solutions_button);
+    solutionsButton.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             FragmentTransition.to(TopSolutionsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top);
         }
     });
+
+
+
+
 
 }
 
