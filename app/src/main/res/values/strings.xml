@@ -61,4 +61,15 @@
     <string name="all_services">All Services</string>
     <string name="next_text"><![CDATA[>]]></string>
     <string name="previous_text"><![CDATA[<]]></string>
+    <string name="register_title">Register</string>
+    <string name="registration_register">Register</string>
+    <string name="registration_description">Description</string>
+    <string name="registration_number">Phone Number</string>
+    <string name="registration_address">Address</string>
+    <string name="registration_organization_name">Organization Name</string>
+    <string name="registration_repeat_password">Repeat Password</string>
+    <string name="registration_password">Password</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_first_name">First name</string>
+    <string name="registration_last_name">Last name</string>
 </resources>

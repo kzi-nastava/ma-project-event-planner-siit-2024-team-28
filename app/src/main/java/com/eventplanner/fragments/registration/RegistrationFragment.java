@@ -1,6 +1,5 @@
 package com.eventplanner.fragments.registration;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,8 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 
@@ -22,14 +23,14 @@ public class RegistrationFragment extends Fragment {
         Button btnOrganizer = view.findViewById(R.id.btnOrganizer);
         Button btnBusiness = view.findViewById(R.id.btnBusiness);
 
+        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
+
         btnOrganizer.setOnClickListener(v -> {
-            Intent intent = new Intent(requireActivity(), EventOrganizerRegistrationFragment.class);
-            startActivity(intent);
+            navController.navigate(R.id.nav_event_organizer_registration);
         });
 
         btnBusiness.setOnClickListener(v -> {
-            Intent intent = new Intent(requireActivity(), BusinessOwnerRegistrationFragment.class);
-            startActivity(intent);
+            navController.navigate(R.id.nav_business_owner_registration);
         });
 
         return view;
