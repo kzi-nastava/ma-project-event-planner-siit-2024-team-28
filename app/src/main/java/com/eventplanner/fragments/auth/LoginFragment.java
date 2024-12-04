@@ -2,6 +2,7 @@ package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,24 +13,29 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.eventplanner.R;
+import com.eventplanner.model.requests.LoginRequest;
+import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.HttpUtils;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginFragment extends Fragment {
     private EditText email, password;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        // Initialize views
         email = view.findViewById(R.id.email);
         password = view.findViewById(R.id.password);
         Button loginButton = view.findViewById(R.id.submitButton);
 
         loginButton.setOnClickListener(v -> {
             if (validateForm()) {
-                // Implement login logic
-                Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                login();
             }
         });
 
@@ -52,5 +58,33 @@ public class LoginFragment extends Fragment {
     private boolean isValidEmail(String email) {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
         return email.matches(emailPattern);
+    }
+
+    private void login() {
+        LoginRequest request = new LoginRequest(
+            email.getText().toString(),
+            password.getText().toString()
+        );
+
+        new Thread(() -> {
+            Call<AuthResponse> call = HttpUtils.getAuthService().login(request);
+            call.enqueue(new Callback<>() {
+                @Override
+                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null && getActivity().getApplicationContext() != null) {
+                        AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
+                        Toast.makeText(getContext(), "Login successful!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "An error occurred while logging in. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AuthResponse> call, Throwable t) {
+                    Log.d("Backend call", t.getMessage() != null ? t.getMessage() : "unknown error");
+                    Toast.makeText(getContext(), "Login failed. Try again.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 }

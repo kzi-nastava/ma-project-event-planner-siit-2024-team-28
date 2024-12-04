@@ -2,6 +2,7 @@ package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +13,22 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.eventplanner.R;
+import com.eventplanner.model.requests.RegisterBusinessOwnerRequest;
+import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.HttpUtils;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BusinessOwnerRegistrationFragment extends Fragment {
     private EditText email, password, repeatPassword, organizationName, address, phoneNumber, description;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_business_owner_registration, container, false);
 
-        // Initialize views
         email = view.findViewById(R.id.email);
         password = view.findViewById(R.id.password);
         repeatPassword = view.findViewById(R.id.repeatPassword);
@@ -31,11 +38,9 @@ public class BusinessOwnerRegistrationFragment extends Fragment {
         description = view.findViewById(R.id.description);
         Button registerButton = view.findViewById(R.id.submitButton);
 
-        // Register button click listener
         registerButton.setOnClickListener(v -> {
             if (validateForm()) {
-                // Implement registration logic
-                Toast.makeText(getContext(), "Registration successful", Toast.LENGTH_SHORT).show();
+                registerBusinessOwner();
             }
         });
 
@@ -81,5 +86,38 @@ public class BusinessOwnerRegistrationFragment extends Fragment {
     private boolean isValidEmail(String email) {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
         return email.matches(emailPattern);
+    }
+
+    private void registerBusinessOwner() {
+        RegisterBusinessOwnerRequest request = new RegisterBusinessOwnerRequest(
+            email.getText().toString(),
+            password.getText().toString(),
+            phoneNumber.getText().toString(),
+            null,
+            address.getText().toString(),
+            organizationName.getText().toString(),
+            description.getText().toString()
+        );
+
+        new Thread(() -> {
+            Call<AuthResponse> call = HttpUtils.getAuthService().registerBusinessOwner(request);
+            call.enqueue(new Callback<>() {
+                @Override
+                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null && getActivity().getApplicationContext() != null) {
+                        AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
+                        Toast.makeText(getContext(), "Registration successful!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "An error occurred while registering. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AuthResponse> call, Throwable t) {
+                    Log.d("Backend call", t.getMessage() != null ? t.getMessage() : "unknown error");
+                    Toast.makeText(getContext(), "Registration failed. Try again.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 }
