@@ -24,7 +24,7 @@ import com.eventplanner.R;
 import com.eventplanner.fragments.FragmentTransition;
 import com.eventplanner.fragments.events.TopEventsFragment;
 import com.eventplanner.fragments.solutions.TopSolutionsFragment;
-import com.eventplanner.utils.ClientUtils;
+import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.navigation.NavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -50,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
 
-        ClientUtils.initialize(getApplicationContext());
+        HttpUtils.initialize(getApplicationContext());
         Button eventsButton = findViewById(R.id.top_events_button);
         eventsButton.setOnClickListener(v -> FragmentTransition.to(TopEventsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top));
         Button solutionsButton = findViewById(R.id.top_solutions_button);

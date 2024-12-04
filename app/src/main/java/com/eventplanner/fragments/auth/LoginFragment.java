@@ -16,7 +16,7 @@ import com.eventplanner.R;
 import com.eventplanner.model.requests.LoginRequest;
 import com.eventplanner.model.responses.AuthResponse;
 import com.eventplanner.utils.AuthUtils;
-import com.eventplanner.utils.ClientUtils;
+import com.eventplanner.utils.HttpUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -67,11 +67,11 @@ public class LoginFragment extends Fragment {
         );
 
         new Thread(() -> {
-            Call<AuthResponse> call = ClientUtils.getAuthService().login(request);
+            Call<AuthResponse> call = HttpUtils.getAuthService().login(request);
             call.enqueue(new Callback<>() {
                 @Override
                 public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null && getActivity().getApplicationContext() != null) {
                         AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
                         Toast.makeText(getContext(), "Login successful!", Toast.LENGTH_SHORT).show();
                     } else {
