@@ -2,6 +2,7 @@ package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +13,21 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.eventplanner.R;
+import com.eventplanner.model.requests.RegisterEventOrganizerRequest;
+import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.utils.ClientUtils;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EventOrganizerRegistrationFragment extends Fragment {
     private EditText email, password, repeatPassword, lastName, firstName, address, phoneNumber;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_event_organizer_registration, container, false);
 
-        // Initialize views
         email = view.findViewById(R.id.email);
         password = view.findViewById(R.id.password);
         repeatPassword = view.findViewById(R.id.repeatPassword);
@@ -31,11 +37,9 @@ public class EventOrganizerRegistrationFragment extends Fragment {
         phoneNumber = view.findViewById(R.id.phoneNumber);
         Button registerButton = view.findViewById(R.id.submitButton);
 
-        // Register button click listener
         registerButton.setOnClickListener(v -> {
             if (validateForm()) {
-                // Implement registration logic
-                Toast.makeText(getContext(), "Registration successful", Toast.LENGTH_SHORT).show();
+                registerEventOrganizer();
             }
         });
 
@@ -82,5 +86,33 @@ public class EventOrganizerRegistrationFragment extends Fragment {
     private boolean isValidEmail(String email) {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
         return email.matches(emailPattern);
+    }
+
+    private void registerEventOrganizer() {
+        RegisterEventOrganizerRequest request = new RegisterEventOrganizerRequest(
+            email.getText().toString(),
+            password.getText().toString(),
+            phoneNumber.getText().toString(),
+            null,
+            address.getText().toString(),
+            firstName.getText().toString(),
+            lastName.getText().toString()
+        );
+
+        new Thread(() -> {
+            Call<AuthResponse> call = ClientUtils.authService.registerEventOrganizer(request);
+            call.enqueue(new Callback<>() {
+                @Override
+                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                    Toast.makeText(getContext(), "Registration successful!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<AuthResponse> call, Throwable t) {
+                    Log.d("Backend call", t.getMessage() != null ? t.getMessage() : "unknown error");
+                    Toast.makeText(getContext(), "Registration failed. Try again.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 }

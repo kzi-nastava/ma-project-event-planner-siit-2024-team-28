@@ -89,13 +89,13 @@ public class BusinessOwnerRegistrationFragment extends Fragment {
 
     private void registerBusinessOwner() {
         RegisterBusinessOwnerRequest request = new RegisterBusinessOwnerRequest(
-                email.getText().toString(),
-                password.getText().toString(),
-                phoneNumber.getText().toString(),
-                null,
-                address.getText().toString(),
-                organizationName.getText().toString(),
-                description.getText().toString()
+            email.getText().toString(),
+            password.getText().toString(),
+            phoneNumber.getText().toString(),
+            null,
+            address.getText().toString(),
+            organizationName.getText().toString(),
+            description.getText().toString()
         );
 
         new Thread(() -> {
