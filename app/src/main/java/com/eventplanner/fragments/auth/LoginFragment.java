@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.eventplanner.R;
 import com.eventplanner.model.requests.LoginRequest;
 import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.ClientUtils;
 
 import retrofit2.Call;
@@ -66,17 +67,22 @@ public class LoginFragment extends Fragment {
         );
 
         new Thread(() -> {
-            Call<AuthResponse> call = ClientUtils.authService.login(request);
+            Call<AuthResponse> call = ClientUtils.getAuthService().login(request);
             call.enqueue(new Callback<>() {
                 @Override
                 public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                    Toast.makeText(getContext(), "Login successful!", Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null) {
+                        AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
+                        Toast.makeText(getContext(), "Login successful!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "An error occurred while logging in. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<AuthResponse> call, Throwable t) {
                     Log.d("Backend call", t.getMessage() != null ? t.getMessage() : "unknown error");
-                    Toast.makeText(getContext(), "Registration failed. Try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Login failed. Try again.", Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();

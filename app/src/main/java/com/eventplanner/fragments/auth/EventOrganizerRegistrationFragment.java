@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.eventplanner.R;
 import com.eventplanner.model.requests.RegisterEventOrganizerRequest;
 import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.ClientUtils;
 
 import retrofit2.Call;
@@ -100,11 +101,16 @@ public class EventOrganizerRegistrationFragment extends Fragment {
         );
 
         new Thread(() -> {
-            Call<AuthResponse> call = ClientUtils.authService.registerEventOrganizer(request);
+            Call<AuthResponse> call = ClientUtils.getAuthService().registerEventOrganizer(request);
             call.enqueue(new Callback<>() {
                 @Override
                 public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                    Toast.makeText(getContext(), "Registration successful!", Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null) {
+                        AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
+                        Toast.makeText(getContext(), "Registration successful!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "An error occurred while registering. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
