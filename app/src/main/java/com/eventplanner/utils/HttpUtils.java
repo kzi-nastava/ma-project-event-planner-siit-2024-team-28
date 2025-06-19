@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HttpUtils {
-    private static final String BACKEND_BASE_URL = BuildConfig.BACKEND_BASE_URL;
+    private static final String BACKEND_BASE_URL = "http://localhost:8080/"; //BuildConfig.BACKEND_BASE_URL;
     private static final String PREF_NAME = "authPrefs";
     private static final String TOKEN_KEY = "authToken";
 
