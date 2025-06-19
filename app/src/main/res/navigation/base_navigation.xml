@@ -79,12 +79,25 @@
         android:id="@+id/nav_all_products"
         android:name="com.eventplanner.fragments.solutions.AllProductsFragment"
         android:label="All products"
-        tools:layout="@layout/fragment_all_products"
-        />
+        tools:layout="@layout/fragment_all_products">
+        <action
+            android:id="@+id/action_allProductsFragment_to_solutionDetailsFragment"
+            app:destination="@id/solutionDetailsFragment" />
+        </fragment>
     <fragment
         android:id="@+id/nav_all_services"
         android:name="com.eventplanner.fragments.solutions.AllServicesFragment"
         android:label="All services"
         tools:layout="@layout/fragment_all_services"
         />
+
+    <fragment
+        android:id="@+id/solutionDetailsFragment"
+        android:name="com.eventplanner.fragments.solutions.SolutionDetailsFragment"
+        android:label="Solution Details">
+        <argument
+            android:name="solutionId"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

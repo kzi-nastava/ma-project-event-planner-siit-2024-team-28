@@ -13,6 +13,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.solutions.SolutionListAdapter;
@@ -76,6 +78,14 @@ public class AllProductsFragment extends Fragment {
         }
         SolutionListAdapter adapter = new SolutionListAdapter(getContext(), solutions);
         listView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(solution -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("solutionId", String.valueOf(2));
+
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_allProductsFragment_to_solutionDetailsFragment, bundle);
+        });
 
     }
 }

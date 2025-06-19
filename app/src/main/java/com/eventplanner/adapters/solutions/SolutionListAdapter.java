@@ -15,6 +15,16 @@ import com.eventplanner.model.solutions.Solution;
 import java.util.List;
 
 public class SolutionListAdapter extends ArrayAdapter<Solution> {
+    public interface OnItemClickListener {
+        void onItemClick(Solution solution);
+    }
+
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     public SolutionListAdapter(Context context, List<Solution> solutions) {
         super(context, 0, solutions);
     }
@@ -34,6 +44,13 @@ public class SolutionListAdapter extends ArrayAdapter<Solution> {
         titleTextView.setText(solution.getName());
         descriptionTextView.setText(solution.getDescription());
         imageImageView.setImageResource(solution.getImage());
+
+        // adding a onClickListener
+        convertView.setOnClickListener(v -> {
+            if (listener != null && solution != null) {
+                listener.onItemClick(solution);
+            }
+        });
 
         return convertView;
     }
