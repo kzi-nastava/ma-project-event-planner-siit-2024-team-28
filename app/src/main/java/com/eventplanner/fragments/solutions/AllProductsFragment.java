@@ -79,12 +79,13 @@ public class AllProductsFragment extends Fragment {
         SolutionListAdapter adapter = new SolutionListAdapter(getContext(), solutions);
         listView.setAdapter(adapter);
 
+        // on click navigate to SolutionDetailsFragment
         adapter.setOnItemClickListener(solution -> {
             Bundle bundle = new Bundle();
-            bundle.putString("solutionId", String.valueOf(2));
+            bundle.putString("solutionId", String.valueOf(2)); //TODO: srediti
 
             NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_allProductsFragment_to_solutionDetailsFragment, bundle);
+            navController.navigate(R.id.action_allProducts_to_solutionDetails, bundle);
         });
 
     }

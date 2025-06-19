@@ -39,12 +39,12 @@ public class SolutionDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // inflate layout
-        View view = inflater.inflate(R.layout.fragment_solution_details, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_solution_details, container, false);
 
-        TextView soltuionTitle = view.findViewById(R.id.textTitle);
+        TextView soltuionTitle = rootView.findViewById(R.id.textTitle);
         soltuionTitle.setText(solutionId);
 
 
-        return view;
+        return rootView;
     }
 }

@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_home_to_services_overview"
             app:destination="@id/nav_service_overview" />
+        <action
+            android:id="@+id/action_home_to_solutionDetails"
+            app:destination="@id/solution_details_fragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_top_events"
@@ -32,7 +35,11 @@
         android:name="com.eventplanner.fragments.solutions.TopSolutionsFragment"
         android:label="Top solutions"
         tools:layout="@layout/fragment_top_solutions"
-        />
+        >
+        <action
+            android:id="@+id/action_topSolutions_to_solutionDetails"
+            app:destination="@id/solution_details_fragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_registration"
         android:name="com.eventplanner.fragments.auth.RegistrationFragment"
@@ -81,18 +88,22 @@
         android:label="All products"
         tools:layout="@layout/fragment_all_products">
         <action
-            android:id="@+id/action_allProductsFragment_to_solutionDetailsFragment"
-            app:destination="@id/solutionDetailsFragment" />
+            android:id="@+id/action_allProducts_to_solutionDetails"
+            app:destination="@id/solution_details_fragment" />
         </fragment>
     <fragment
         android:id="@+id/nav_all_services"
         android:name="com.eventplanner.fragments.solutions.AllServicesFragment"
         android:label="All services"
         tools:layout="@layout/fragment_all_services"
-        />
+        >
+        <action
+            android:id="@+id/action_allServices_to_solutionDetails"
+            app:destination="@id/solution_details_fragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/solutionDetailsFragment"
+        android:id="@+id/solution_details_fragment"
         android:name="com.eventplanner.fragments.solutions.SolutionDetailsFragment"
         android:label="Solution Details">
         <argument

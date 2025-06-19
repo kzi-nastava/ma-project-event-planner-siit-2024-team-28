@@ -56,6 +56,15 @@ public class TopSolutionsFragment extends Fragment {
         SolutionListAdapter adapter = new SolutionListAdapter(getContext(), solutions);
         listView.setAdapter(adapter);
 
+        // on click navigate to SolutionDetailsFragment
+        adapter.setOnItemClickListener(solution -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("solutionId", String.valueOf(2)); //TODO: srediti
+
+            NavController navController = Navigation.findNavController(rootView);
+            navController.navigate(R.id.action_home_to_solutionDetails, bundle);
+        });
+
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
         Button browseServicesButton = rootView.findViewById(R.id.browse_services_button);
