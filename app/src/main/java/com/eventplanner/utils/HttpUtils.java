@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.eventplanner.BuildConfig;
 import com.eventplanner.services.AuthService;
+import com.eventplanner.services.SolutionService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +14,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HttpUtils {
-    private static final String BACKEND_BASE_URL = "http://localhost:8080/"; //BuildConfig.BACKEND_BASE_URL;
+    private static final String BACKEND_BASE_URL = BuildConfig.BACKEND_BASE_URL; //BuildConfig.BACKEND_BASE_URL;
     private static final String PREF_NAME = "authPrefs";
     private static final String TOKEN_KEY = "authToken";
 
@@ -41,4 +42,5 @@ public class HttpUtils {
     public static AuthService getAuthService() {
         return retrofit.create(AuthService.class);
     }
+    public static SolutionService getSolutionService() { return retrofit.create(SolutionService.class); }
 }
