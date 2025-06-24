@@ -14,20 +14,28 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.eventplanner.R;
+import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.utils.HttpUtils;
+
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SolutionDetailsFragment extends Fragment {
+    private FragmentSolutionDetailsBinding binding;
     private SolutionService solutionService;
-
     private static final String ARG_SOLUTION_ID = "solutionId";
-
     private String solutionId;
+    private GetSolutionResponse solution;
+    private String solutionType;
+
+    // fields used to sync two calls to backhand
+    private boolean isSolutionDetailsLoaded = false;
+    private boolean isSolutionTypeLoaded = false;
 
     public static SolutionDetailsFragment newInstance(String solutionId) {
         SolutionDetailsFragment fragment = new SolutionDetailsFragment();
@@ -47,6 +55,7 @@ public class SolutionDetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
+            solutionId = "14"; // TODO: skloniti kad se sredi prosledjivanje id-eva
         }
     }
 
@@ -54,38 +63,64 @@ public class SolutionDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // inflate layout
-        View rootView = inflater.inflate(R.layout.fragment_solution_details, container, false);
-
-        return rootView;
+        binding = FragmentSolutionDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // getting solution details from backend
+        fetchSolutionDetails(view);
+        fetchSolutionType(view);
+    }
 
-        TextView solutionTitle = view.findViewById(R.id.textTitle);
-
+    private void fetchSolutionDetails(View view) {
         Long id = Long.parseLong(solutionId);
         Call<GetSolutionResponse> call = solutionService.getSolutionById(id);
-
 
         call.enqueue(new Callback<GetSolutionResponse>() {
             @Override
             public void onResponse(Call<GetSolutionResponse> call, Response<GetSolutionResponse> response) {
                 if (response.isSuccessful()) {
-                    GetSolutionResponse solution = response.body();
+                    solution = response.body();
                     if (solution != null) {
-                        // UI postavljanje
-                        solutionTitle.setText(solution.getName());
+                        isSolutionDetailsLoaded = true;
+                        checkAndPopulate();
                     }
                 } else {
-                    Log.e("SolutionDetailsFragment", "Response error code: " + response.code());
+                    Log.e("SolutionDetailsFragment", "Error with fetching solution, response error code: " + response.code());
                     showErrorDialog();
                 }
             }
 
             @Override
             public void onFailure(Call<GetSolutionResponse> call, Throwable t) {
+                Log.e("SolutionDetailsFragment", "Network failure", t);
+                showErrorDialog();
+            }
+        });
+    }
+
+    private void fetchSolutionType(View view) {
+        Long id = Long.parseLong(solutionId);
+        Call<String> call = solutionService.getSolutionType(id);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    isSolutionTypeLoaded = true;
+                    solutionType = response.body();
+                    checkAndPopulate();
+                } else {
+                    Log.e("SolutionDetailsFragment", "Error with fetching solution type, response error code: " + response.code());
+                    showErrorDialog();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
                 Log.e("SolutionDetailsFragment", "Network failure", t);
                 showErrorDialog();
             }
@@ -100,5 +135,78 @@ public class SolutionDetailsFragment extends Fragment {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .setCancelable(false)
                 .show();
+    }
+
+    private void checkAndPopulate() {
+        if(isSolutionDetailsLoaded && isSolutionTypeLoaded)
+            populateSolutionDetails();
+    }
+
+    // method used to separate code for altering views from main code
+    private void populateSolutionDetails() {
+        binding.textTitle.setText(solution.getName());
+        binding.textCategory.setText(solution.getCategoryId().toString()); // TODO: srediti
+        binding.textAuthor.setText(solution.getBusinessOwnerId().toString()); // TODO: srediti
+        binding.textPrice.setText(binding.textPrice.getText() + ": " + String.format("%.2f", solution.getPrice()) + "$");
+
+        if(solution.getDiscount() > 0) {
+            binding.textDiscount.setText(binding.textDiscount.getText() + ": " + String.format("%.2f", calculateFinalPrice(solution.getPrice(), solution.getDiscount())) + "$");
+        }
+        else {
+            binding.textDiscount.setVisibility(View.GONE);
+        }
+
+        String availabilityStatus = (solution.getIsAvailable()) ? "Available" : "Unavailable";
+        binding.textAvailability.setText(binding.textAvailability.getText() + ": " + availabilityStatus);
+        binding.textDescription.setText(binding.textDescription.getText() + ": " + solution.getDescription());
+        binding.textEventTypes.setText(binding.textEventTypes.getText() + ": " + solution.getEventTypeIds().stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "))); // TODO: srediti
+
+        // fields only service has
+        if(!solutionType.equals("Service")) {
+            // remove excessive views | views no other solution has except service
+            binding.textSpecifics.setVisibility(View.GONE);
+            binding.textDuration.setVisibility(View.GONE);
+            binding.textMinDuration.setVisibility(View.GONE);
+            binding.textMaxDuration.setVisibility(View.GONE);
+            binding.textReservationDeadline.setVisibility(View.GONE);
+            binding.textCancellationDeadline.setVisibility(View.GONE);
+            binding.textReservationType.setVisibility(View.GONE);
+        }
+        else {
+            binding.textSpecifics.setText(binding.textSpecifics.getText() + ": " + solution.getSpecifics());
+
+            // solution (service) can either have fixed duration or minmax duration if fixed duration is non existent solution has minmax durations and vice versa
+            if (solution.getFixedDurationInSeconds() != null) {
+                // remove excessive views
+                binding.textMinDuration.setVisibility(View.GONE);
+                binding.textMaxDuration.setVisibility(View.GONE);
+                binding.textDuration.setText(binding.textDuration.getText() + ": " + String.format("%.2f", convertSecondsToHours(solution.getFixedDurationInSeconds())) + " hrs");
+            } else {
+                // hide excessive view
+                binding.textDuration.setVisibility(View.GONE);
+
+                binding.textMinDuration.setText(binding.textMinDuration.getText() + ": " + String.format("%.2f", convertSecondsToHours(solution.getMinDurationInSeconds())) + " hrs");
+                binding.textMaxDuration.setText(binding.textMaxDuration.getText() + ": " + String.format("%.2f", convertSecondsToHours(solution.getMaxDurationInSeconds())) + " hrs");
+            }
+
+            binding.textReservationDeadline.setText(binding.textReservationDeadline.getText() + ": " + solution.getReservationDeadlineDays().toString() + " days beforehand");
+            binding.textCancellationDeadline.setText(binding.textCancellationDeadline.getText() + ": " + solution.getCancellationDeadlineDays().toString() + " days beforehand");
+            binding.textReservationType.setText(binding.textReservationType.getText() + ": " + solution.getReservationType().toString());
+        }
+    }
+
+    private Double convertSecondsToHours(Integer seconds) {
+        Integer hours = seconds / 3600;
+        Integer minutes = (seconds % 3600) / 60;
+
+        Double decimalHours = hours + (minutes / 60.0);
+        return decimalHours;
+    }
+
+    private Double calculateFinalPrice(Double originalPrice, Double discountPercent) {
+        Double discountAmount = originalPrice * (discountPercent / 100.0);
+        return originalPrice - discountAmount;
     }
 }

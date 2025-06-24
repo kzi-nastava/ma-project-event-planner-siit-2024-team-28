@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class HttpUtils {
     private static final String BACKEND_BASE_URL = BuildConfig.BACKEND_BASE_URL; //BuildConfig.BACKEND_BASE_URL;
@@ -35,6 +36,7 @@ public class HttpUtils {
         retrofit = new Retrofit.Builder()
                 .baseUrl(BACKEND_BASE_URL)
                 .client(okHttpClient)
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

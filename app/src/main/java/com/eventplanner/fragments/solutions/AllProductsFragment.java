@@ -82,7 +82,7 @@ public class AllProductsFragment extends Fragment {
         // on click navigate to SolutionDetailsFragment
         adapter.setOnItemClickListener(solution -> {
             Bundle bundle = new Bundle();
-            bundle.putString("solutionId", String.valueOf(2)); //TODO: srediti
+            bundle.putString("solutionId", String.valueOf(1)); //TODO: srediti  treba proslediti id solutiona
 
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_allProducts_to_solutionDetails, bundle);

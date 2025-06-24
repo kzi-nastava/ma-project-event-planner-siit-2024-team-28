@@ -9,4 +9,7 @@ import retrofit2.http.Path;
 public interface SolutionService {
     @GET("solutions/{id}")
     Call<GetSolutionResponse> getSolutionById(@Path("id") Long id);
+
+    @GET("solutions/solution-type/{id}")
+    Call<String> getSolutionType(@Path("id") Long id);
 }

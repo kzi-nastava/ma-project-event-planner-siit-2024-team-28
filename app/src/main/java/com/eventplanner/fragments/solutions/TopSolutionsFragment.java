@@ -59,7 +59,7 @@ public class TopSolutionsFragment extends Fragment {
         // on click navigate to SolutionDetailsFragment
         adapter.setOnItemClickListener(solution -> {
             Bundle bundle = new Bundle();
-            bundle.putString("solutionId", String.valueOf(2)); //TODO: srediti
+            bundle.putString("solutionId", String.valueOf(1)); //TODO: srediti treba proslediti vrednosti id solutiona
 
             NavController navController = Navigation.findNavController(rootView);
             navController.navigate(R.id.action_home_to_solutionDetails, bundle);
