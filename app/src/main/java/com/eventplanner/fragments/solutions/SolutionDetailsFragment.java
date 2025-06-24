@@ -15,8 +15,12 @@ import android.widget.TextView;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
+import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
+import com.eventplanner.model.responses.users.GetUserResponse;
+import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
+import com.eventplanner.services.UserService;
 import com.eventplanner.utils.HttpUtils;
 
 import java.util.stream.Collectors;
@@ -28,10 +32,16 @@ import retrofit2.Response;
 public class SolutionDetailsFragment extends Fragment {
     private FragmentSolutionDetailsBinding binding;
     private SolutionService solutionService;
+
+    private SolutionCategoryService solutionCategoryService;
+    private UserService userService;
     private static final String ARG_SOLUTION_ID = "solutionId";
     private String solutionId;
     private GetSolutionResponse solution;
     private String solutionType;
+
+    private GetSolutionCategoryResponse solutionCategory;
+    private GetUserResponse businessOwner;
 
     // fields used to sync two calls to backhand
     private boolean isSolutionDetailsLoaded = false;
@@ -52,6 +62,8 @@ public class SolutionDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         solutionService = HttpUtils.getSolutionService();
+        solutionCategoryService = HttpUtils.getSolutionCategoryService();
+        userService = HttpUtils.getUserService();
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
@@ -87,6 +99,8 @@ public class SolutionDetailsFragment extends Fragment {
                     if (solution != null) {
                         isSolutionDetailsLoaded = true;
                         checkAndPopulate();
+                        fetchSolutionCategory(solution.getCategoryId());
+                        fetchBusinessOwner(solution.getBusinessOwnerId());
                     }
                 } else {
                     Log.e("SolutionDetailsFragment", "Error with fetching solution, response error code: " + response.code());
@@ -127,6 +141,54 @@ public class SolutionDetailsFragment extends Fragment {
         });
     }
 
+    private void fetchSolutionCategory(Long categoryId) {
+        Call<GetSolutionCategoryResponse> call = solutionCategoryService.getSolutionCategoryById(categoryId);
+
+        call.enqueue(new Callback<GetSolutionCategoryResponse>() {
+            @Override
+            public void onResponse(Call<GetSolutionCategoryResponse> call, Response<GetSolutionCategoryResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    solutionCategory = response.body();
+                    binding.textCategory.setText(solutionCategory.getName());
+                } else {
+                    Log.e("SolutionDetailsFragment", "Failed to load category: " + response.code());
+                    showErrorDialog();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetSolutionCategoryResponse> call, Throwable t) {
+                Log.e("SolutionDetailsFragment", "Network error while fetching category", t);
+                showErrorDialog();
+            }
+        });
+    }
+
+    private void fetchBusinessOwner(Long userId) {
+        Call<GetUserResponse> call = userService.getUserById(userId);
+
+        call.enqueue(new Callback<GetUserResponse>() {
+            @Override
+            public void onResponse(Call<GetUserResponse> call, Response<GetUserResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        businessOwner = response.body();
+                        binding.textAuthor.setText(businessOwner.getFirstName() + " " + businessOwner.getLastName());
+                    }
+                } else {
+                    Log.e("User", "Error while fetching user: " + response.code());
+                    showErrorDialog();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetUserResponse> call, Throwable t) {
+                Log.e("User", "Network error while fetching user", t);
+                showErrorDialog();
+            }
+        });
+    }
+
     private void showErrorDialog() {
         if (getContext() == null) return;
 
@@ -145,8 +207,8 @@ public class SolutionDetailsFragment extends Fragment {
     // method used to separate code for altering views from main code
     private void populateSolutionDetails() {
         binding.textTitle.setText(solution.getName());
-        binding.textCategory.setText(solution.getCategoryId().toString()); // TODO: srediti
-        binding.textAuthor.setText(solution.getBusinessOwnerId().toString()); // TODO: srediti
+        // category name is set in fetchSolutionCategory method
+        // businessOwner name is set in fetchBusinessOwner method
         binding.textPrice.setText(binding.textPrice.getText() + ": " + String.format("%.2f", solution.getPrice()) + "$");
 
         if(solution.getDiscount() > 0) {

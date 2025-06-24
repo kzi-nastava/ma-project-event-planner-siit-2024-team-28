@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 
 import com.eventplanner.BuildConfig;
 import com.eventplanner.services.AuthService;
+import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
+import com.eventplanner.services.UserService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,4 +47,6 @@ public class HttpUtils {
         return retrofit.create(AuthService.class);
     }
     public static SolutionService getSolutionService() { return retrofit.create(SolutionService.class); }
+    public static SolutionCategoryService getSolutionCategoryService() { return retrofit.create(SolutionCategoryService.class); }
+    public static UserService getUserService() { return retrofit.create(UserService.class); }
 }
