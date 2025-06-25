@@ -30,7 +30,7 @@
             android:gravity="center_horizontal">
 
             <TextView
-                android:id="@+id/textTitle"
+                android:id="@+id/textBusinessName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -49,15 +49,6 @@
                 android:contentDescription="Solution image"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ketering"/>
-
-            <TextView
-                android:id="@+id/textFullName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/full_name_input"
-                android:textSize="18sp"
-                android:textColor="#000000"/>
 
             <TextView
                 android:id="@+id/textAddress"

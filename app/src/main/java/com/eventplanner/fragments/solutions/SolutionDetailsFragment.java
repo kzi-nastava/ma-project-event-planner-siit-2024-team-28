@@ -7,11 +7,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.eventplanner.R;
@@ -76,10 +79,10 @@ public class SolutionDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // getting solution details from backend
-        fetchSolutionDetails(view);
+        fetchSolutionDetails();
     }
 
-    private void fetchSolutionDetails(View view) {
+    private void fetchSolutionDetails() {
         Long id = Long.parseLong(solutionId);
         Call<GetSolutionDetailsResponse> call = solutionService.getSolutionDetailsById(id);
 
@@ -90,8 +93,6 @@ public class SolutionDetailsFragment extends Fragment {
                     solution = response.body();
                     if (solution != null) {
                         populateSolutionDetails();
-//                        fetchSolutionCategory(solution.getCategoryId());
-//                        fetchBusinessOwner(solution.getBusinessOwnerId());
                     }
                 } else {
                     Log.e("SolutionDetailsFragment", "Error with fetching solution, response error code: " + response.code());
@@ -170,6 +171,14 @@ public class SolutionDetailsFragment extends Fragment {
             binding.textCancellationDeadline.setText(binding.textCancellationDeadline.getText() + ": " + solution.getCancellationDeadlineDays().toString() + " days beforehand");
             binding.textReservationType.setText(binding.textReservationType.getText() + ": " + solution.getReservationType().toString());
         }
+
+        binding.visitOwnerPageButton.setOnClickListener(v -> {
+            Log.i("SolutionDetailsFragment", "Visiting business owner page for id: " + solution.getBusinessOwnerId());
+            Bundle bundle = new Bundle();
+            bundle.putString("businessOwnerId", String.valueOf(solution.getBusinessOwnerId()));
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_soltuionDetails_to_businessOwnerDetails, bundle);
+        });
     }
 
     private Double convertSecondsToHours(Integer seconds) {
