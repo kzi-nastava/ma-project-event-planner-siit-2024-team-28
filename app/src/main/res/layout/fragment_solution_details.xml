@@ -71,7 +71,7 @@
             android:id="@+id/textPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Price"
+            android:text="@string/price_input"
             android:textColor="#000000"
             android:textSize="20sp" />
 
@@ -79,7 +79,7 @@
             android:id="@+id/textDiscount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Price with discount"
+            android:text="@string/price_discount"
             android:textColor="#FF0000"
             android:layout_marginBottom="16dp"
             android:textSize="22sp" />
@@ -89,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="Availability"
+            android:text="@string/availability"
             android:textColor="#000000"
             android:textSize="18sp"/>
 
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="#000000"
-            android:text="Description"
+            android:text="@string/description"
             android:textSize="18sp"/>
 
         <TextView
@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="#000000"
-            android:text="Event types"
+            android:text="@string/event_types"
             android:textSize="18sp"/>
 
         <TextView
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="#000000"
-            android:text="Specifics"
+            android:text="@string/specifics"
             android:textSize="18sp"/>
 
             <TextView
@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:textColor="#000000"
-                android:text="Duration"
+                android:text="@string/duration"
                 android:textSize="18sp"/>
 
             <TextView
@@ -135,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:textColor="#000000"
-                android:text="Min Duration"
+                android:text="@string/min_duration"
                 android:textSize="18sp"/>
 
             <TextView
@@ -144,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:textColor="#000000"
-                android:text="Max Duration"
+                android:text="@string/max_duration"
                 android:textSize="18sp"/>
 
         <TextView
@@ -153,7 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="#000000"
-            android:text="Reservation deadline"
+            android:text="@string/reservation_deadline"
             android:textSize="18sp"/>
 
         <TextView
@@ -162,7 +162,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="#000000"
-            android:text="Cancellation deadline"
+            android:text="@string/cancellation_deadline"
             android:textSize="18sp"/>
 
         <TextView
@@ -171,8 +171,80 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="#000000"
-            android:text="Reservation type"
+            android:text="@string/reservation_type"
             android:textSize="18sp"/>
+
+            <LinearLayout
+                android:id="@+id/buttonsLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:elevation="4dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:gravity="center_horizontal">
+
+                <!-- buttons first row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
+
+                    <Button
+                        android:backgroundTint="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/visit_owner"
+                        android:background="@drawable/button_rounded"
+                        android:textColor="@android:color/white" />
+
+                    <Button
+                        android:backgroundTint="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/add_to_favorites"
+                        android:background="@drawable/button_rounded"
+                        android:textColor="@android:color/white" />
+                </LinearLayout>
+
+                <!-- buttons second row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <Button
+                        android:backgroundTint="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/buy"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/submit_button" />
+
+                    <Button
+                        android:backgroundTint="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/leave_review"
+                        android:background="@drawable/button_rounded"
+                        android:textColor="@android:color/white" />
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 

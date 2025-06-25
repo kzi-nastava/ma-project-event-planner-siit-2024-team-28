@@ -77,4 +77,19 @@
     <string name="login">Login</string>
     <string name="home">Home</string>
     <string name="my_services">My services</string>
+    <string name="buy">Buy</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="visit_owner">Visit owner\'s page</string>
+    <string name="leave_review">Leave a review</string>
+    <string name="price">Price</string>
+    <string name="price_discount">Price with discount</string>
+    <string name="description">Description</string>
+    <string name="event_types">Event types</string>
+    <string name="specifics">Specifics</string>
+    <string name="duration">Duration</string>
+    <string name="min_duration">Min Duration</string>
+    <string name="max_duration">Max Duration</string>
+    <string name="reservation_deadline">Reservation deadline</string>
+    <string name="cancellation_deadline">Cancellation deadline</string>
+    <string name="reservation_type">Reservation type</string>
 </resources>

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -124,8 +125,10 @@ public class SolutionDetailsFragment extends Fragment {
         binding.textAuthor.setText(solution.getBusinessOwnerName());
         binding.textPrice.setText(binding.textPrice.getText() + ": " + String.format("%.2f", solution.getPrice()) + "$");
 
+        // if discount exists show actual price and set gray color to original price
         if(solution.getDiscount() > 0) {
             binding.textDiscount.setText(binding.textDiscount.getText() + ": " + String.format("%.2f", calculateFinalPrice(solution.getPrice(), solution.getDiscount())) + "$");
+            binding.textPrice.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
         }
         else {
             binding.textDiscount.setVisibility(View.GONE);
