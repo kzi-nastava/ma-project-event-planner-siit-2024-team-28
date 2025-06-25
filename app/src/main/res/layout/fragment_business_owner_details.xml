@@ -88,6 +88,40 @@
                 android:text="@string/report_user"
                 android:background="@drawable/red_button"
                 android:textColor="@android:color/white" />
+
+            <LinearLayout
+                android:id="@+id/commentsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/button_rounded"
+                android:elevation="4dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/comments"
+                    android:textSize="18sp"
+                    android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:id="@+id/commentsListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:maxHeight="150dp"
+                        tools:listitem="@layout/comment_card"/>
+
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>
