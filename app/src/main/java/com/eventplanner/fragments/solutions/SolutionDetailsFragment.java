@@ -15,14 +15,18 @@ import android.widget.TextView;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
+import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
+import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
+import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.HttpUtils;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -32,20 +36,10 @@ import retrofit2.Response;
 public class SolutionDetailsFragment extends Fragment {
     private FragmentSolutionDetailsBinding binding;
     private SolutionService solutionService;
-
-    private SolutionCategoryService solutionCategoryService;
-    private UserService userService;
     private static final String ARG_SOLUTION_ID = "solutionId";
     private String solutionId;
-    private GetSolutionResponse solution;
-    private String solutionType;
+    private GetSolutionDetailsResponse solution;
 
-    private GetSolutionCategoryResponse solutionCategory;
-    private GetUserResponse businessOwner;
-
-    // fields used to sync two calls to backhand
-    private boolean isSolutionDetailsLoaded = false;
-    private boolean isSolutionTypeLoaded = false;
 
     public static SolutionDetailsFragment newInstance(String solutionId) {
         SolutionDetailsFragment fragment = new SolutionDetailsFragment();
@@ -62,12 +56,10 @@ public class SolutionDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         solutionService = HttpUtils.getSolutionService();
-        solutionCategoryService = HttpUtils.getSolutionCategoryService();
-        userService = HttpUtils.getUserService();
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
-            solutionId = "14"; // TODO: skloniti kad se sredi prosledjivanje id-eva
+            solutionId = "7"; // TODO: skloniti kad se sredi prosledjivanje id-eva
         }
     }
 
@@ -84,23 +76,21 @@ public class SolutionDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         // getting solution details from backend
         fetchSolutionDetails(view);
-        fetchSolutionType(view);
     }
 
     private void fetchSolutionDetails(View view) {
         Long id = Long.parseLong(solutionId);
-        Call<GetSolutionResponse> call = solutionService.getSolutionById(id);
+        Call<GetSolutionDetailsResponse> call = solutionService.getSolutionDetailsById(id);
 
-        call.enqueue(new Callback<GetSolutionResponse>() {
+        call.enqueue(new Callback<GetSolutionDetailsResponse>() {
             @Override
-            public void onResponse(Call<GetSolutionResponse> call, Response<GetSolutionResponse> response) {
+            public void onResponse(Call<GetSolutionDetailsResponse> call, Response<GetSolutionDetailsResponse> response) {
                 if (response.isSuccessful()) {
                     solution = response.body();
                     if (solution != null) {
-                        isSolutionDetailsLoaded = true;
-                        checkAndPopulate();
-                        fetchSolutionCategory(solution.getCategoryId());
-                        fetchBusinessOwner(solution.getBusinessOwnerId());
+                        populateSolutionDetails();
+//                        fetchSolutionCategory(solution.getCategoryId());
+//                        fetchBusinessOwner(solution.getBusinessOwnerId());
                     }
                 } else {
                     Log.e("SolutionDetailsFragment", "Error with fetching solution, response error code: " + response.code());
@@ -109,81 +99,8 @@ public class SolutionDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<GetSolutionResponse> call, Throwable t) {
+            public void onFailure(Call<GetSolutionDetailsResponse> call, Throwable t) {
                 Log.e("SolutionDetailsFragment", "Network failure", t);
-                showErrorDialog();
-            }
-        });
-    }
-
-    private void fetchSolutionType(View view) {
-        Long id = Long.parseLong(solutionId);
-        Call<String> call = solutionService.getSolutionType(id);
-
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    isSolutionTypeLoaded = true;
-                    solutionType = response.body();
-                    checkAndPopulate();
-                } else {
-                    Log.e("SolutionDetailsFragment", "Error with fetching solution type, response error code: " + response.code());
-                    showErrorDialog();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Log.e("SolutionDetailsFragment", "Network failure", t);
-                showErrorDialog();
-            }
-        });
-    }
-
-    private void fetchSolutionCategory(Long categoryId) {
-        Call<GetSolutionCategoryResponse> call = solutionCategoryService.getSolutionCategoryById(categoryId);
-
-        call.enqueue(new Callback<GetSolutionCategoryResponse>() {
-            @Override
-            public void onResponse(Call<GetSolutionCategoryResponse> call, Response<GetSolutionCategoryResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    solutionCategory = response.body();
-                    binding.textCategory.setText(solutionCategory.getName());
-                } else {
-                    Log.e("SolutionDetailsFragment", "Failed to load category: " + response.code());
-                    showErrorDialog();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<GetSolutionCategoryResponse> call, Throwable t) {
-                Log.e("SolutionDetailsFragment", "Network error while fetching category", t);
-                showErrorDialog();
-            }
-        });
-    }
-
-    private void fetchBusinessOwner(Long userId) {
-        Call<GetUserResponse> call = userService.getUserById(userId);
-
-        call.enqueue(new Callback<GetUserResponse>() {
-            @Override
-            public void onResponse(Call<GetUserResponse> call, Response<GetUserResponse> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        businessOwner = response.body();
-                        binding.textAuthor.setText(businessOwner.getFirstName() + " " + businessOwner.getLastName());
-                    }
-                } else {
-                    Log.e("User", "Error while fetching user: " + response.code());
-                    showErrorDialog();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<GetUserResponse> call, Throwable t) {
-                Log.e("User", "Network error while fetching user", t);
                 showErrorDialog();
             }
         });
@@ -193,22 +110,18 @@ public class SolutionDetailsFragment extends Fragment {
         if (getContext() == null) return;
 
         new AlertDialog.Builder(getContext())
-                .setMessage("There has been an error.")
+                .setMessage("An error has occured.")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .setCancelable(false)
                 .show();
     }
 
-    private void checkAndPopulate() {
-        if(isSolutionDetailsLoaded && isSolutionTypeLoaded)
-            populateSolutionDetails();
-    }
 
     // method used to separate code for altering views from main code
     private void populateSolutionDetails() {
         binding.textTitle.setText(solution.getName());
-        // category name is set in fetchSolutionCategory method
-        // businessOwner name is set in fetchBusinessOwner method
+        binding.textCategory.setText(solution.getCategoryName());
+        binding.textAuthor.setText(solution.getBusinessOwnerName());
         binding.textPrice.setText(binding.textPrice.getText() + ": " + String.format("%.2f", solution.getPrice()) + "$");
 
         if(solution.getDiscount() > 0) {
@@ -221,12 +134,10 @@ public class SolutionDetailsFragment extends Fragment {
         String availabilityStatus = (solution.getIsAvailable()) ? "Available" : "Unavailable";
         binding.textAvailability.setText(binding.textAvailability.getText() + ": " + availabilityStatus);
         binding.textDescription.setText(binding.textDescription.getText() + ": " + solution.getDescription());
-        binding.textEventTypes.setText(binding.textEventTypes.getText() + ": " + solution.getEventTypeIds().stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(", "))); // TODO: srediti
-
+        binding.textEventTypes.setText(binding.textEventTypes.getText() + ": " + solution.getEventTypeNames().stream()
+                .map(String::valueOf).collect(Collectors.joining(", ")));
         // fields only service has
-        if(!solutionType.equals("Service")) {
+        if(!solution.getType().equals("Service")) {
             // remove excessive views | views no other solution has except service
             binding.textSpecifics.setVisibility(View.GONE);
             binding.textDuration.setVisibility(View.GONE);
@@ -248,7 +159,6 @@ public class SolutionDetailsFragment extends Fragment {
             } else {
                 // hide excessive view
                 binding.textDuration.setVisibility(View.GONE);
-
                 binding.textMinDuration.setText(binding.textMinDuration.getText() + ": " + String.format("%.2f", convertSecondsToHours(solution.getMinDurationInSeconds())) + " hrs");
                 binding.textMaxDuration.setText(binding.textMaxDuration.getText() + ": " + String.format("%.2f", convertSecondsToHours(solution.getMaxDurationInSeconds())) + " hrs");
             }

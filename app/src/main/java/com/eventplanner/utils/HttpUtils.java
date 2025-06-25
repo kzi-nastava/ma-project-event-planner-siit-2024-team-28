@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.eventplanner.BuildConfig;
 import com.eventplanner.services.AuthService;
+import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
@@ -49,4 +50,5 @@ public class HttpUtils {
     public static SolutionService getSolutionService() { return retrofit.create(SolutionService.class); }
     public static SolutionCategoryService getSolutionCategoryService() { return retrofit.create(SolutionCategoryService.class); }
     public static UserService getUserService() { return retrofit.create(UserService.class); }
+    public static EventTypeService getEventTypeService() { return retrofit.create(EventTypeService.class); }
 }

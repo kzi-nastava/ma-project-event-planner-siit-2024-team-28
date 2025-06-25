@@ -1,5 +1,6 @@
 package com.eventplanner.services;
 
+import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 
 import retrofit2.Call;
@@ -10,6 +11,6 @@ public interface SolutionService {
     @GET("solutions/{id}")
     Call<GetSolutionResponse> getSolutionById(@Path("id") Long id);
 
-    @GET("solutions/solution-type/{id}")
-    Call<String> getSolutionType(@Path("id") Long id);
+    @GET("solutions/solution-details/{id}")
+    Call<GetSolutionDetailsResponse> getSolutionDetailsById(@Path("id") Long id);
 }
