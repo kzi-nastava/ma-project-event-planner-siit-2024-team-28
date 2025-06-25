@@ -109,6 +109,18 @@
         <argument
             android:name="solutionId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_soltuionDetails_to_businessOwnerDetails"
+            app:destination="@id/business_owner_details_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/business_owner_details_fragment"
+        android:name="com.eventplanner.fragments.users.BusinessOwnerDetailsFragment"
+        android:label="Business Owner Details">
+        <argument
+            android:name="businessOwnerId"
+            app:argType="string" />
     </fragment>
 
 </navigation>

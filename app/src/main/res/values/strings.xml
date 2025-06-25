@@ -92,4 +92,8 @@
     <string name="reservation_deadline">Reservation deadline</string>
     <string name="cancellation_deadline">Cancellation deadline</string>
     <string name="reservation_type">Reservation type</string>
+    <string name="full_name_input">Full name:</string>
+    <string name="address_input">Address:</string>
+    <string name="phone_number_input">Phone number:</string>
+    <string name="report_user">Report user</string>
 </resources>
