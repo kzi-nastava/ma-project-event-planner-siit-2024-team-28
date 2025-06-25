@@ -97,6 +97,14 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         binding.textAddress.setText(binding.textAddress.getText() + " " + businessOwner.getAddress());
         binding.textDescription.setText(binding.textDescription.getText() + " " + businessOwner.getBusinessDescription());
         binding.textPhoneNumber.setText(binding.textPhoneNumber.getText() + " " + businessOwner.getPhoneNumber());
+        binding.reportUserButton.setOnClickListener(v -> {
+            Log.i("BusinessOwnerFragment", "Attempt creating report.");
+            createReport();
+        });
+    }
+
+    private void createReport() {
+
     }
 
     private void showErrorDialog() {
