@@ -40,7 +40,7 @@ public class AuthUtils {
         return null;
     }
 
-    public static UUID getUserId(Context context) {
+    public static Long getUserId(Context context) {
         String token = getToken(context);
         if (token != null) {
             JwtPayload payload = decodeJwt(token);

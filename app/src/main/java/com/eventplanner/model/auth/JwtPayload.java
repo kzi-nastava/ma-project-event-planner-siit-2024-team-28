@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class JwtPayload {
     private String role;
-    private UUID userId;
+    private Long userId;
 
     public String getRole() {
         return role;
@@ -14,11 +14,11 @@ public class JwtPayload {
         this.role = role;
     }
 
-    public UUID getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(UUID userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 }

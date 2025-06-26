@@ -25,7 +25,7 @@ android {
         buildConfigField(
             "String",
             "BACKEND_BASE_URL",
-            "\"${localProperties["BACKEND_BASE_URL"]}\""
+            "\"http://10.0.2.2:8080/api/\""
         )
     }
 
@@ -45,6 +45,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        viewBinding = true
     }
 }
 
@@ -58,6 +59,7 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
