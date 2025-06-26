@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
@@ -28,9 +29,11 @@ import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
+import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -40,6 +43,7 @@ import retrofit2.Response;
 public class SolutionDetailsFragment extends Fragment {
     private FragmentSolutionDetailsBinding binding;
     private SolutionService solutionService;
+    private UserService userService;
     private static final String ARG_SOLUTION_ID = "solutionId";
     private String solutionId;
     private GetSolutionDetailsResponse solution;
@@ -60,10 +64,11 @@ public class SolutionDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         solutionService = HttpUtils.getSolutionService();
+        userService = HttpUtils.getUserService();
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
-            solutionId = "2"; // TODO: skloniti kad se sredi prosledjivanje id-eva
+            solutionId = "7"; // TODO: skloniti kad se sredi prosledjivanje id-eva
         }
     }
 
@@ -172,12 +177,48 @@ public class SolutionDetailsFragment extends Fragment {
             binding.textReservationType.setText(binding.textReservationType.getText() + ": " + solution.getReservationType().toString());
         }
 
+        // setting routing to business owner page
         binding.visitOwnerPageButton.setOnClickListener(v -> {
             Log.i("SolutionDetailsFragment", "Visiting business owner page for id: " + solution.getBusinessOwnerId());
             Bundle bundle = new Bundle();
             bundle.putString("businessOwnerId", String.valueOf(solution.getBusinessOwnerId()));
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_soltuionDetails_to_businessOwnerDetails, bundle);
+        });
+
+        // button for adding to favorites should be only visible to EventOrganizers
+        if(AuthUtils.getUserRole(getContext()) == "EventOrganizer") {
+            binding.addToFavorites.setOnClickListener(v -> {
+                //UUID userId = AuthUtils.getUserId(getContext()); TODO: skontati i skloniti
+                Long userId = Long.parseLong("2");
+                addToFavorites(userId, Long.parseLong(solutionId));
+            });
+        } else
+            binding.addToFavorites.setVisibility(View.GONE);
+    }
+
+    private void addToFavorites(Long userId, Long serviceId) {
+        Call<String> call = userService.favoriteService(userId, serviceId);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    String message = response.body();
+                    Log.d("SolutionDetailsFragment", "Successfully added to favorites: " + message);
+                    // show message from backend
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("SolutionDetailsFragment", "Error: " + response.code());
+                    showErrorDialog();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("SolutionDetailsFragment", "Network failure", t);
+                showErrorDialog();
+            }
         });
     }
 
