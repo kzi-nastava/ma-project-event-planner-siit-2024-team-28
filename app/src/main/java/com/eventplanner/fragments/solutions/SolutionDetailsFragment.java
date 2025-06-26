@@ -189,8 +189,7 @@ public class SolutionDetailsFragment extends Fragment {
         // button for adding to favorites should be only visible to EventOrganizers
         if(AuthUtils.getUserRole(getContext()) == "EventOrganizer") {
             binding.addToFavorites.setOnClickListener(v -> {
-                //UUID userId = AuthUtils.getUserId(getContext()); TODO: skontati i skloniti
-                Long userId = Long.parseLong("2");
+                Long userId = AuthUtils.getUserId(getContext());
                 addToFavorites(userId, Long.parseLong(solutionId));
             });
         } else
