@@ -8,6 +8,7 @@ import com.eventplanner.services.AuthService;
 import com.eventplanner.services.CommentService;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ReportService;
+import com.eventplanner.services.ReviewService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
@@ -54,5 +55,6 @@ public class HttpUtils {
     public static UserService getUserService() { return retrofit.create(UserService.class); }
     public static EventTypeService getEventTypeService() { return retrofit.create(EventTypeService.class); }
     public static ReportService getReportService() { return retrofit.create(ReportService.class); }
-    public static CommentService getCommentService() {return retrofit.create(CommentService.class); }
+    public static CommentService getCommentService() { return retrofit.create(CommentService.class); }
+    public static ReviewService getReviewService() { return retrofit.create(ReviewService.class); }
 }

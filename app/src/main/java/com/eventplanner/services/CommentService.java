@@ -9,6 +9,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface CommentService {
-    @GET("comments/business-owner/{id}")
-    Call<Collection<GetCommentPreviewResponse>> getAllCommentsByBusinessOwnerById(@Path("id") Long id);
+    @GET("comments/business-owner/{businessOwnerId}")
+    Call<Collection<GetCommentPreviewResponse>> getAllCommentsByBusinessOwnerId(@Path("businessOwnerId") Long businessOwnerId);
 }

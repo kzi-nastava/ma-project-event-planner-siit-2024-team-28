@@ -30,8 +30,8 @@ public class CommentListAdapter extends ArrayAdapter<GetCommentPreviewResponse> 
         TextView commenter = convertView.findViewById(R.id.commenter);
         TextView commented = convertView.findViewById(R.id.commented);
 
-        commentText.setText(comment.getContent());
-        commenter.setText(comment.getCommenterName());
+        commentText.setText("\"" + comment.getContent() + "\"");
+        commenter.setText("- " + comment.getCommenterName());
         commented.setText(comment.getSolutionName());
 
         return convertView;

@@ -90,35 +90,33 @@
                 android:textColor="@android:color/white" />
 
             <LinearLayout
-                android:id="@+id/commentsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="24dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/button_rounded"
-                android:elevation="4dp"
-                android:clipToPadding="false"
-                android:clipChildren="false"
-                android:gravity="center_horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/seeComments"
+                    android:backgroundTint="@null"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
                     android:text="@string/comments"
-                    android:textSize="18sp"
-                    android:textColor="#ffffff"/>
+                    android:background="@drawable/button_rounded"
+                    android:textColor="@android:color/white" />
 
-                    <ListView
-                        android:id="@+id/commentsListView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
-                        android:maxHeight="150dp"
-                        tools:listitem="@layout/comment_card"/>
-
+                <Button
+                    android:id="@+id/seeReviews"
+                    android:backgroundTint="@null"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/reviews"
+                    android:background="@drawable/button_rounded"
+                    android:textColor="@android:color/white" />
 
             </LinearLayout>
 

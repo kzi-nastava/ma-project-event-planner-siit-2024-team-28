@@ -13,20 +13,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.comments.CommentListAdapter;
+import com.eventplanner.adapters.reviews.ReviewListAdapter;
 import com.eventplanner.databinding.FragmentBusinessOwnerDetailsBinding;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
 import com.eventplanner.model.requests.reports.CreateReportRequest;
 import com.eventplanner.model.responses.comments.GetCommentPreviewResponse;
 import com.eventplanner.model.responses.reports.GetReportResponse;
+import com.eventplanner.model.responses.reviews.GetReviewPreviewResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.services.CommentService;
 import com.eventplanner.services.ReportService;
+import com.eventplanner.services.ReviewService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.HttpUtils;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +48,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
     private UserService userService;
     private ReportService reportService;
     private CommentService commentService;
+    private ReviewService reviewService;
     private String businessOwnerId;
     private GetUserResponse businessOwner;
 
@@ -64,6 +70,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         userService = HttpUtils.getUserService();
         reportService = HttpUtils.getReportService();
         commentService = HttpUtils.getCommentService();
+        reviewService = HttpUtils.getReviewService();
         if (getArguments() != null) {
             businessOwnerId = getArguments().getString(ARG_BUSINESS_OWNER_ID);
         }
@@ -93,7 +100,6 @@ public class BusinessOwnerDetailsFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     businessOwner = response.body();
                     populateViews();
-                    fetchComments(Long.parseLong(businessOwnerId));
                     Log.i("BusinessOwnerDetailsFragment", "Business owner successfully fetched with id: " + businessOwnerId);
                 } else {
                     Log.w("BusinessOwnerDetailsFragment", "Error with fetching business owner: " + response.code());
@@ -122,6 +128,9 @@ public class BusinessOwnerDetailsFragment extends Fragment {
             Log.i("BusinessOwnerFragment", "Attempt creating report.");
             showReportDialog();
         });
+        // on click opens bottomSheetDialog for displaying comments|reviews
+        binding.seeComments.setOnClickListener(v -> showCommentsDialog());
+        binding.seeReviews.setOnClickListener(v -> showReviewsDialog());
     }
 
     // function for making dialog -> SUBMIT: call function for making request to back | CANCEL: nothing happens
@@ -177,17 +186,39 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         });
     }
 
-    private void fetchComments(Long businessOwnerId) {
-        Call<Collection<GetCommentPreviewResponse>> call = commentService.getAllCommentsByBusinessOwnerById(businessOwnerId);
+    private void showCommentsDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_comments, null);
+        ListView commentsListView = view.findViewById(R.id.commentsListView);
+
+        fetchComments(Long.parseLong(businessOwnerId), commentsListView);
+
+        dialog.setContentView(view);
+        dialog.show();
+    }
+
+    private void showReviewsDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_reviews, null);
+        ListView reviewsListView = view.findViewById(R.id.reviewsListView);
+
+        fetchReviews(Long.parseLong(businessOwnerId), reviewsListView);
+
+        dialog.setContentView(view);
+        dialog.show();
+    }
+
+    private void fetchComments(Long businessOwnerId, ListView commentsListView) {
+        Call<Collection<GetCommentPreviewResponse>> call = commentService.getAllCommentsByBusinessOwnerId(businessOwnerId);
 
         call.enqueue(new Callback<Collection<GetCommentPreviewResponse>>() {
             @Override
             public void onResponse(Call<Collection<GetCommentPreviewResponse>> call, Response<Collection<GetCommentPreviewResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Collection<GetCommentPreviewResponse> comments = response.body();
-                    Log.i("BusinessOwnerDetailsFragment", "Comments for business owner with id:" + businessOwnerId + " successfully fetched");
+                    Log.i("BusinessOwnerDetailsFragment", "Number of comments fetched: " + comments.size());
                     CommentListAdapter adapter = new CommentListAdapter(getContext(), new ArrayList<>(comments));
-                    binding.commentsListView.setAdapter(adapter);
+                    commentsListView.setAdapter(adapter);
 
                 } else {
                     Log.e("BusinessOwnerDetailsFragment", "Error response code: " + response.code());
@@ -199,6 +230,29 @@ public class BusinessOwnerDetailsFragment extends Fragment {
             public void onFailure(Call<Collection<GetCommentPreviewResponse>> call, Throwable t) {
                 Log.e("BusinessOwnerDetailsFragment", "Network error", t);
                 showErrorDialog();
+            }
+        });
+    }
+
+    private void fetchReviews(Long businessOwnerId, ListView reviewsListView) {
+        Call<Collection<GetReviewPreviewResponse>> call = reviewService.getAllReviewsByBusinessOwnerId(businessOwnerId);
+
+        call.enqueue(new Callback<Collection<GetReviewPreviewResponse>>() {
+            @Override
+            public void onResponse(Call<Collection<GetReviewPreviewResponse>> call, Response<Collection<GetReviewPreviewResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Collection<GetReviewPreviewResponse> reviews = response.body();
+                    Log.i("BusinessOwnerDetailsFragment", "Number of reviews fetched: " + reviews.size());
+                    ReviewListAdapter adapter = new ReviewListAdapter(getContext(), new ArrayList<>(reviews));
+                    reviewsListView.setAdapter(adapter);
+                } else {
+                    Log.w("BusinessOwnerDetailsFragment", "Error while fetching reviews: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Collection<GetReviewPreviewResponse>> call, Throwable t) {
+                Log.e("BusinessOwnerDetailsFragment", "Network failure: " + t.getMessage(), t);
             }
         });
     }

@@ -14,11 +14,11 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/comment"
+            android:id="@+id/rating"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:text="comment"
+            android:text="rating"
             android:textSize="20sp" />
 
         <LinearLayout
@@ -28,29 +28,29 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/commenter"
+                android:id="@+id/reviewer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginLeft="8dp"
                 android:textStyle="bold"
                 android:gravity="start"
-                android:text="commenter"
+                android:text="reviewer"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/commented"
+                android:id="@+id/reviewed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginRight="8dp"
                 android:gravity="end"
-                android:text="commented"
+                android:text="reviewed"
                 android:textSize="18sp" />
 
         </LinearLayout>
 
-        </LinearLayout>
+    </LinearLayout>
 
 
 
