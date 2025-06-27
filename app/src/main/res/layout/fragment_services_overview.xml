@@ -57,6 +57,44 @@
                 android:text="@string/filter" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/pagination_controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/button_prev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Previous page"
+                android:background="@drawable/button_background_selector"
+                android:textColor="@color/white"
+                android:enabled="false"
+                android:layout_marginEnd="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinner_page_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/edit_text_background"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/button_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Next page"
+                android:background="@drawable/button_background_selector"
+                android:textColor="@color/white"
+                android:enabled="false"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
         <ListView
             android:id="@+id/serviceListView"
             android:layout_width="match_parent"

@@ -76,9 +76,6 @@ public class ServicesOverviewFragment extends Fragment {
         serviceService = HttpUtils.getServiceService();
         categoryService = HttpUtils.getSolutionCategoryService();
         eventTypeService = HttpUtils.getEventTypeService();
-        // on default show first page with 5 elements
-        pageNumber = 0;
-        pageSize = 5;
     }
 
     @Nullable
@@ -102,6 +99,7 @@ public class ServicesOverviewFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 searchTerm = s.toString().trim();
+                pageNumber = 0;
                 filter();
             }
             @Override
@@ -121,6 +119,46 @@ public class ServicesOverviewFragment extends Fragment {
             setupFilterBottomSheet();
         });
 
+        // pagination elements
+        Button buttonPrev = rootView.findViewById(R.id.button_prev);
+        Button buttonNext = rootView.findViewById(R.id.button_next);
+        Spinner spinnerPageSize = rootView.findViewById(R.id.spinner_page_size);
+
+        // page size options
+        Integer[] pageSizes = {5, 10, 15};
+        ArrayAdapter<Integer> pageSizeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, pageSizes);
+        pageSizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPageSize.setAdapter(pageSizeAdapter);
+
+        // default value
+        int defaultIndex = 0;
+        spinnerPageSize.setSelection(defaultIndex);
+        pageSize = pageSizes[defaultIndex];
+
+        spinnerPageSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                pageSize = pageSizes[position];
+                pageNumber = 0;
+                filter();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        buttonPrev.setOnClickListener(v -> {
+            if (pageNumber > 0) {
+                pageNumber--;
+                filter();
+            }
+        });
+
+        buttonNext.setOnClickListener(v -> {
+            pageNumber++;
+            filter();
+        });
+
         return rootView;
     }
 
@@ -128,10 +166,12 @@ public class ServicesOverviewFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // fetching services
-        fetchServices();
+        // fetchServices();
+        filter();
     }
 
     // function for fetching services that business owner owns
+    // TODO: skloniti
     private void fetchServices() {
         Call<PagedResponse<GetServiceResponse>> call = serviceService.getServicesByBusinessOwnerId(
                 AuthUtils.getUserId(getContext()), pageNumber, pageSize);
@@ -191,14 +231,29 @@ public class ServicesOverviewFragment extends Fragment {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner.setAdapter(adapter);
 
+                    if (selectedCategoryId != null) {
+                        int indexToSelect = -1;
+                        for (int i = 0; i < allCategories.size(); i++) {
+                            if (allCategories.get(i).getId().equals(selectedCategoryId)) {
+                                indexToSelect = i + 1; // +1 since on index 0 is a placeholder
+                                break;
+                            }
+                        }
+                        if (indexToSelect != -1) {
+                            spinner.setSelection(indexToSelect);
+                        }
+                    }
+
                     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                             if (position == 0) {
                                 selectedCategoryId = null; // null is initially selected
+                                pageNumber = 0;
                                 filter();
                             } else {
                                 selectedCategoryId = allCategories.get(position - 1).getId();
+                                pageNumber = 0;
                                 filter();
                             }
                         }
@@ -250,14 +305,29 @@ public class ServicesOverviewFragment extends Fragment {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner.setAdapter(adapter);
 
+                    if (selectedEventTypeId != null) {
+                        int indexToSelect = -1;
+                        for (int i = 0; i < allEventTypes.size(); i++) {
+                            if (allEventTypes.get(i).getId().equals(selectedEventTypeId)) {
+                                indexToSelect = i + 1; // +1 since on index 0 is placeholder
+                                break;
+                            }
+                        }
+                        if (indexToSelect != -1) {
+                            spinner.setSelection(indexToSelect);
+                        }
+                    }
+
                     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                             if (position == 0) {
                                 selectedEventTypeId = null; // null is initially selected
+                                pageNumber = 0;
                                 filter();
                             } else {
                                 selectedEventTypeId = allEventTypes.get(position - 1).getId();
+                                pageNumber = 0;
                                 filter();
                             }
                         }
@@ -317,6 +387,9 @@ public class ServicesOverviewFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     List<GetServiceResponse> services = response.body().getContent();
                     populateServiceListView(services);
+                    // set buttons to disabled if we've hit first | last page
+                    rootView.findViewById(R.id.button_prev).setEnabled(!response.body().isFirst());
+                    rootView.findViewById(R.id.button_next).setEnabled(!response.body().isLast());
                 } else {
                     Log.e("ServiceOverviewFragment", "Error filtering services: " + response.code());
                 }
@@ -336,11 +409,8 @@ public class ServicesOverviewFragment extends Fragment {
         serviceListView.setAdapter(adapter);
     }
 
+    // FIXME: poziva se negde filter(); na otvaranje dugmeta
     private void setupFilterBottomSheet() {
-        // setting all filter parameters to null
-        minPrice = null; maxPrice = null; selectedCategoryId = null; selectedEventTypeId = null;
-        showUnavailable = false; showAvailable = false; isAvailable = null;
-
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_services, null);
 
@@ -352,17 +422,23 @@ public class ServicesOverviewFragment extends Fragment {
         // setting AVAILABLE UNAVAILABLE switch listeners and connecting them to filter params
         Switch switchAvailable = dialogView.findViewById(R.id.switch_show_available);
         Switch switchUnavailable = dialogView.findViewById(R.id.switch_show_unavailable);
+        switchAvailable.setChecked(showAvailable);
+        switchUnavailable.setChecked(showUnavailable);
         switchAvailable.setOnCheckedChangeListener((buttonView, isChecked) -> {
             showAvailable = isChecked;
+            pageNumber = 0;
             filter();
         });
         switchUnavailable.setOnCheckedChangeListener((buttonView, isChecked) -> {
             showUnavailable = isChecked;
+            pageNumber = 0;
             filter();
         });
 
         // setting MIN PRICE MAX PRICE edit text listeners and connecting them to filter params
         EditText maxPriceInput = dialogView.findViewById(R.id.maxPriceInput);
+        if(maxPrice != null)
+            maxPriceInput.setText(String.valueOf(maxPrice));
         maxPriceInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -379,6 +455,7 @@ public class ServicesOverviewFragment extends Fragment {
                 } catch (NumberFormatException e) {
                     maxPrice = null;
                 }
+                pageNumber = 0;
                 filter();
             }
 
@@ -386,6 +463,8 @@ public class ServicesOverviewFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
         EditText minPriceInput = dialogView.findViewById(R.id.minPriceInput);
+        if(minPrice != null)
+            minPriceInput.setText(String.valueOf(minPrice));
         minPriceInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -402,6 +481,7 @@ public class ServicesOverviewFragment extends Fragment {
                 } catch (NumberFormatException e) {
                     minPrice = null;
                 }
+                pageNumber = 0;
                 filter();
             }
 
