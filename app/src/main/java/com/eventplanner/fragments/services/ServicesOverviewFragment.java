@@ -9,8 +9,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,17 +24,44 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
+import com.eventplanner.adapters.solutions.ServiceListAdapter;
+import com.eventplanner.model.responses.PagedResponse;
+import com.eventplanner.model.responses.services.GetServiceResponse;
+import com.eventplanner.model.solutions.Service;
+import com.eventplanner.services.ServiceService;
+import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.util.Collection;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ServicesOverviewFragment extends Fragment {
+    private View rootView;
+    private ServiceService serviceService;
+    private int pageNumber;
+    private int pageSize;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        serviceService = HttpUtils.getServiceService();
+        // on default show first page with 5 elements
+        pageNumber = 0;
+        pageSize = 7;
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_services_overview, container, false);
+        rootView = inflater.inflate(R.layout.fragment_services_overview, container, false);
 
         // Apply window insets to handle system bars
-        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(rootView.findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -41,13 +70,13 @@ public class ServicesOverviewFragment extends Fragment {
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
         // Set up add services button to navigate to ServiceCreationActivity
-        Button addServicesButton = view.findViewById(R.id.button_add_service);
+        Button addServicesButton = rootView.findViewById(R.id.button_add_service);
         addServicesButton.setOnClickListener(v -> {
             navController.navigate(R.id.nav_service_creation);
         });
 
         // Set up filter button to show BottomSheetDialog
-        Button filterButton = view.findViewById(R.id.button_filter_services);
+        Button filterButton = rootView.findViewById(R.id.button_filter_services);
         filterButton.setOnClickListener(v -> {
             Log.i("ServicesOverviewFragment", "Filter button clicked");
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
@@ -76,17 +105,49 @@ public class ServicesOverviewFragment extends Fragment {
             bottomSheetDialog.show();
         });
 
-        // Inflate and add service cards to the container
-        LinearLayout linearLayoutContainer = view.findViewById(R.id.cards_container);
-        for (int i = 0; i < 5; i++) {
-            View itemView = inflater.inflate(R.layout.service_card, linearLayoutContainer, false);
-            ImageButton imageButton = itemView.findViewById(R.id.edit_button);
-            imageButton.setOnClickListener(v -> {
-                navController.navigate(R.id.nav_service_creation);
-            });
-            linearLayoutContainer.addView(itemView);
-        }
-
-        return view;
+        return rootView;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // fetching services
+        fetchServices();
+    }
+
+    private void fetchServices() {
+        Call<PagedResponse<GetServiceResponse>> call = serviceService.getServicesByBusinessOwnerId(
+                AuthUtils.getUserId(getContext()), pageNumber, pageSize);
+
+        call.enqueue(new Callback<PagedResponse<GetServiceResponse>>() {
+            @Override
+            public void onResponse(Call<PagedResponse<GetServiceResponse>> call, Response<PagedResponse<GetServiceResponse>> response) {
+                if (response.isSuccessful()) {
+                    PagedResponse<GetServiceResponse> pagedResponse = response.body();
+                    if (pagedResponse != null && pagedResponse.getContent() != null) {
+                        List<GetServiceResponse> services = pagedResponse.getContent();
+                        Log.i("ServicesOverviewFragment", "Services successfully fetched, number of services: " + services.size());
+                        populateServiceListView(services);
+                    } else {
+                        Log.e("ServicesOverviewFragment", "Empty response or no content.");
+                        Toast.makeText(getContext(), "You have no services.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.e("ServicesOverviewFragment", "Error while fetching services: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PagedResponse<GetServiceResponse>> call, Throwable t) {
+                Log.e("ServiceOverviewFragment", "Network failure", t);
+            }
+        });
+    }
+
+    private void populateServiceListView(List<GetServiceResponse> services) {
+        ListView serviceListView = rootView.findViewById(R.id.serviceListView);
+        ServiceListAdapter adapter = new ServiceListAdapter(getContext(), services);
+        serviceListView.setAdapter(adapter);
+    }
+
 }

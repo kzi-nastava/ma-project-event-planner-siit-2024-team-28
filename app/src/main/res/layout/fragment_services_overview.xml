@@ -43,7 +43,8 @@
                 android:layout_marginEnd="5dp"
                 app:backgroundTint="@color/cool_purple"
                 android:background="@drawable/button_rounded"
-                android:text="+ Add new service" />
+                android:textColor="@color/white"
+                android:text="@string/add_new_service" />
 
             <Button
                 android:id="@+id/button_filter_services"
@@ -55,27 +56,17 @@
                 android:layout_marginStart="5dp"
                 app:backgroundTint="@color/cool_purple"
                 android:background="@drawable/button_rounded"
-                android:text="Filter" />
+                android:textColor="@color/white"
+                android:text="@string/filter" />
         </LinearLayout>
 
-        <ScrollView
+        <ListView
+            android:id="@+id/serviceListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constrainedHeight="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/linear_buttons"
-            android:layout_margin="5dp">
+            android:layout_marginTop="18dp"
+            tools:listitem="@layout/service_card" />
 
-            <LinearLayout
-                android:id="@+id/cards_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-            </LinearLayout>
-
-        </ScrollView>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

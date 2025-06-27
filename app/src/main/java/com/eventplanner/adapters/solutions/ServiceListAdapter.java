@@ -1,0 +1,43 @@
+package com.eventplanner.adapters.solutions;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.eventplanner.R;
+import com.eventplanner.model.responses.services.GetServiceResponse;
+
+import java.text.DecimalFormat;
+import java.util.List;
+
+public class ServiceListAdapter extends ArrayAdapter<GetServiceResponse> {
+
+    public ServiceListAdapter(Context context, List<GetServiceResponse> services) {
+        super(context, 0, services);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if(convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.service_card, parent, false);
+        }
+
+        GetServiceResponse service = getItem(position);
+
+        TextView serviceName = convertView.findViewById(R.id.serviceName);
+        TextView priceText = convertView.findViewById(R.id.textPrice);
+        ImageView image = convertView.findViewById(R.id.serviceImage);
+
+        serviceName.setText(service.getName());
+        DecimalFormat df = new DecimalFormat("0.##");
+        priceText.setText("Price: " + df.format(service.getPrice()) + "$");
+        // TODO: srediti za sliku
+
+        // TODO: dodati listenere na buttone
+        return convertView;
+    }
+}
