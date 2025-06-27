@@ -65,13 +65,12 @@
                     android:text="@string/event_type"
                     android:textSize="18sp"
                     android:textColor="@android:color/black"/>
-                <LinearLayout
-                    android:id="@+id/event_types_checkboxes"
+                <RadioGroup
+                    android:id="@+id/radio_group_event_types"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="2dp">
-                </LinearLayout>
+                    android:layout_height="wrap_content">
+
+                </RadioGroup>
                 <!--
                 <CheckBox
                     android:layout_width="match_parent"

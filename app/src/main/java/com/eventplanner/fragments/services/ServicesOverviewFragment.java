@@ -27,9 +27,11 @@ import com.eventplanner.R;
 import com.eventplanner.adapters.solutions.ServiceListAdapter;
 import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.responses.PagedResponse;
+import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.solutions.Service;
+import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.utils.AuthUtils;
@@ -47,6 +49,7 @@ public class ServicesOverviewFragment extends Fragment {
     private View rootView;
     private ServiceService serviceService;
     private SolutionCategoryService categoryService;
+    private EventTypeService eventTypeService;
     private int pageNumber;
     private int pageSize;
 
@@ -55,6 +58,7 @@ public class ServicesOverviewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         serviceService = HttpUtils.getServiceService();
         categoryService = HttpUtils.getSolutionCategoryService();
+        eventTypeService = HttpUtils.getEventTypeService();
         // on default show first page with 5 elements
         pageNumber = 0;
         pageSize = 5;
@@ -74,31 +78,23 @@ public class ServicesOverviewFragment extends Fragment {
 
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
-        // Set up add services button to navigate to ServiceCreationActivity
+        // set up add services button to navigate to ServiceCreationActivity
         Button addServicesButton = rootView.findViewById(R.id.button_add_service);
         addServicesButton.setOnClickListener(v -> {
             navController.navigate(R.id.nav_service_creation);
         });
 
-        // Set up filter button to show BottomSheetDialog
+        // set up filter button to show BottomSheetDialog
         Button filterButton = rootView.findViewById(R.id.button_filter_services);
         filterButton.setOnClickListener(v -> {
             Log.i("ServicesOverviewFragment", "Filter button clicked");
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
             View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_services, null);
 
-            // Populate the BottomSheetDialog with RadioButtons
-            String[] eventTypes = getResources().getStringArray(R.array.event_types);
+            // populating filter with available categories
             populateCategoriesFilter(dialogView);
-
-            // Populate the BottomSheetDialog with CheckBoxes
-            LinearLayout eventTypesCheckboxes = dialogView.findViewById(R.id.event_types_checkboxes);
-            for (String eventType : eventTypes) {
-                CheckBox checkBox = new CheckBox(getContext());
-                checkBox.setText(eventType);
-                checkBox.setButtonTintList(getResources().getColorStateList(R.color.cool_purple));
-                eventTypesCheckboxes.addView(checkBox);
-            }
+            // populating filter with available eventTypes
+            populateEventTypesFilter(dialogView);
 
             bottomSheetDialog.setContentView(dialogView);
             bottomSheetDialog.show();
@@ -114,6 +110,7 @@ public class ServicesOverviewFragment extends Fragment {
         fetchServices();
     }
 
+    // function for fetching services that business owner owns
     private void fetchServices() {
         Call<PagedResponse<GetServiceResponse>> call = serviceService.getServicesByBusinessOwnerId(
                 AuthUtils.getUserId(getContext()), pageNumber, pageSize);
@@ -143,6 +140,8 @@ public class ServicesOverviewFragment extends Fragment {
         });
     }
 
+
+    // separated code for fetching all categories and creating radio buttons in bottom sheet filter
     private void populateCategoriesFilter(View dialogView) {
         RadioGroup categoriesRadioGroup = dialogView.findViewById(R.id.radio_group_categories);
 
@@ -172,6 +171,37 @@ public class ServicesOverviewFragment extends Fragment {
         });
     }
 
+    // separated code for fetching event types and creating radio buttons in bottom sheet filter
+    private void populateEventTypesFilter(View dialogView) {
+        RadioGroup eventTypesRadioGroup = dialogView.findViewById(R.id.radio_group_event_types);
+
+        Call<Collection<GetEventTypeResponse>> call = eventTypeService.getAllEventTypes();
+        call.enqueue(new Callback<Collection<GetEventTypeResponse>>() {
+            @Override
+            public void onResponse(Call<Collection<GetEventTypeResponse>> call, Response<Collection<GetEventTypeResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (GetEventTypeResponse eventType : response.body()) {
+                        if(eventType.getIsActive()) {
+                            RadioButton radioButton = new RadioButton(getContext());
+                            radioButton.setText(eventType.getName());
+                            radioButton.setTag(eventType.getId());
+                            radioButton.setButtonTintList(getResources().getColorStateList(R.color.cool_purple));
+                            eventTypesRadioGroup.addView(radioButton);
+                        }
+                    }
+                } else {
+                    Log.e("ServicesOverviewFragment", "Error while fetching event types: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Collection<GetEventTypeResponse>> call, Throwable t) {
+                Log.e("ServicesOverviewFragment", "Network failure", t);
+            }
+        });
+    }
+
+    // creating adapter after fetching services
     private void populateServiceListView(List<GetServiceResponse> services) {
         ListView serviceListView = rootView.findViewById(R.id.serviceListView);
         ServiceListAdapter adapter = new ServiceListAdapter(getContext(), services);
