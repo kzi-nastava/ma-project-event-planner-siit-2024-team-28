@@ -15,18 +15,15 @@
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.SearchView
+        <EditText
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Search services"
-            android:iconifiedByDefault="false"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:hint="Search services"
             android:background="@drawable/rounded_search_view"
-            android:radius="20dp"
-            android:layout_margin="5dp"/>
+            android:padding="10dp"
+            android:layout_margin="5dp"
+            android:inputType="text" />
 
         <LinearLayout
             android:id="@+id/linear_buttons"
