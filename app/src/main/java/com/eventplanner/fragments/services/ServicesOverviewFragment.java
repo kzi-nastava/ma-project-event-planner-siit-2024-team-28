@@ -25,10 +25,13 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.solutions.ServiceListAdapter;
+import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
+import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.solutions.Service;
 import com.eventplanner.services.ServiceService;
+import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -43,6 +46,7 @@ import retrofit2.Response;
 public class ServicesOverviewFragment extends Fragment {
     private View rootView;
     private ServiceService serviceService;
+    private SolutionCategoryService categoryService;
     private int pageNumber;
     private int pageSize;
 
@@ -50,9 +54,10 @@ public class ServicesOverviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         serviceService = HttpUtils.getServiceService();
+        categoryService = HttpUtils.getSolutionCategoryService();
         // on default show first page with 5 elements
         pageNumber = 0;
-        pageSize = 7;
+        pageSize = 5;
     }
 
     @Nullable
@@ -84,13 +89,7 @@ public class ServicesOverviewFragment extends Fragment {
 
             // Populate the BottomSheetDialog with RadioButtons
             String[] eventTypes = getResources().getStringArray(R.array.event_types);
-            RadioGroup radioGroupCategories = dialogView.findViewById(R.id.radio_group_categories);
-            for (String eventType : eventTypes) {
-                RadioButton radioButton = new RadioButton(getContext());
-                radioButton.setText(eventType);
-                radioButton.setButtonTintList(getResources().getColorStateList(R.color.cool_purple));
-                radioGroupCategories.addView(radioButton);
-            }
+            populateCategoriesFilter(dialogView);
 
             // Populate the BottomSheetDialog with CheckBoxes
             LinearLayout eventTypesCheckboxes = dialogView.findViewById(R.id.event_types_checkboxes);
@@ -140,6 +139,35 @@ public class ServicesOverviewFragment extends Fragment {
             @Override
             public void onFailure(Call<PagedResponse<GetServiceResponse>> call, Throwable t) {
                 Log.e("ServiceOverviewFragment", "Network failure", t);
+            }
+        });
+    }
+
+    private void populateCategoriesFilter(View dialogView) {
+        RadioGroup categoriesRadioGroup = dialogView.findViewById(R.id.radio_group_categories);
+
+        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAllSolutionCategories();
+        call.enqueue(new Callback<Collection<GetSolutionCategoryResponse>>() {
+            @Override
+            public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (GetSolutionCategoryResponse category : response.body()) {
+                        if (category.getRequestStatus().equals(RequestStatus.ACCEPTED) && !category.getIsDeleted()) {
+                            RadioButton radioButton = new RadioButton(getContext());
+                            radioButton.setText(category.getName());
+                            radioButton.setTag(category.getId());
+                            radioButton.setButtonTintList(getResources().getColorStateList(R.color.cool_purple));
+                            categoriesRadioGroup.addView(radioButton);
+                        }
+                    }
+                } else {
+                    Log.e("ServicesOverviewFragment", "Error while fetching categories: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Collection<GetSolutionCategoryResponse>> call, Throwable t) {
+                Log.e("ServicesOverviewFragment", "Network failure", t);
             }
         });
     }
