@@ -1,12 +1,17 @@
 package com.eventplanner.adapters.solutions;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.model.responses.services.GetServiceResponse;
@@ -37,7 +42,14 @@ public class ServiceListAdapter extends ArrayAdapter<GetServiceResponse> {
         priceText.setText("Price: " + df.format(service.getPrice()) + "$");
         // TODO: srediti za sliku
 
-        // TODO: dodati listenere na buttone
+        Button editButton = convertView.findViewById(R.id.editButton);
+        editButton.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("serviceId", String.valueOf(service.getId()));
+
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_services_overview_to_service_edit, args);
+        });
         return convertView;
     }
 }

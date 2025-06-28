@@ -254,7 +254,7 @@ public class ServiceCreationFragment extends Fragment {
             Toast.makeText(getContext(), "Duration input is required.", Toast.LENGTH_SHORT).show();
             return;
         }
-        // Reservation Canellation deadline validation
+        // Reservation Cancellation deadline validation
         Integer reservationDeadlineDays = null;
         Integer cancellationDeadlineDays = null;
         try {
@@ -374,7 +374,7 @@ public class ServiceCreationFragment extends Fragment {
     }
 
     // populating Category spinner with possible categories
-    // IMPORTANT: when using selected value use INDEX + 1 since first element iz null placeholder
+    // IMPORTANT: when using selected value use INDEX + 1 since first element is null placeholder
     private void populateCategoriesFilter() {
         Spinner spinner = binding.spinnerCategory;
 
