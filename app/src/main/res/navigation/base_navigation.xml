@@ -74,8 +74,11 @@
         android:id="@+id/nav_service_overview"
         android:name="com.eventplanner.fragments.services.ServicesOverviewFragment"
         android:label="Service overview"
-        tools:layout="@layout/fragment_services_overview"
-        />
+        tools:layout="@layout/fragment_services_overview">
+        <action
+            android:id="@+id/action_servicesOverview_to_createService"
+            app:destination="@+id/nav_service_creation"/>
+    </fragment>
     <fragment
         android:id="@+id/nav_all_events"
         android:name="com.eventplanner.fragments.events.AllEventsFragment"

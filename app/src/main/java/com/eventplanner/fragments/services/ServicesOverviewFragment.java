@@ -10,13 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -92,7 +87,7 @@ public class ServicesOverviewFragment extends Fragment {
 
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
-        EditText searchEditText = rootView.findViewById(androidx.appcompat.R.id.search_bar);
+        EditText searchEditText = rootView.findViewById(R.id.search_bar);
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -109,7 +104,7 @@ public class ServicesOverviewFragment extends Fragment {
         // set up add services button to navigate to ServiceCreationActivity
         Button addServicesButton = rootView.findViewById(R.id.button_add_service);
         addServicesButton.setOnClickListener(v -> {
-            navController.navigate(R.id.nav_service_creation);
+            navController.navigate(R.id.action_servicesOverview_to_createService);
         });
 
         // set up filter button to show BottomSheetDialog
@@ -409,7 +404,7 @@ public class ServicesOverviewFragment extends Fragment {
         serviceListView.setAdapter(adapter);
     }
 
-    // FIXME: poziva se negde filter(); na otvaranje dugmeta
+    // FIXME: poziva se negde filter(); na otvaranje filterSheet-a
     private void setupFilterBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_services, null);
