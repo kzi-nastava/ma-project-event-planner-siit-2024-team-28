@@ -1,16 +1,22 @@
 package com.eventplanner.services;
 
+import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
 
 import java.util.Collection;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ServiceService {
+    @POST("services")
+    Call<Long> createService(@Body CreateServiceRequest request);
+
     @GET("services/business-owner/{businessOwnerId}")
     Call<PagedResponse<GetServiceResponse>> getServicesByBusinessOwnerId(
             @Path("businessOwnerId") Long businessOwnerId,
