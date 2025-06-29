@@ -3,12 +3,14 @@ package com.eventplanner.services;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.services.UpdateServiceRequest;
 import com.eventplanner.model.responses.PagedResponse;
+import com.eventplanner.model.responses.services.DeleteServiceResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
 
 import java.util.Collection;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -31,6 +33,9 @@ public interface ServiceService {
 
     @PUT("services/{id}")
     Call<Void> updateService(@Path("id") Long id, @Body UpdateServiceRequest request);
+
+    @DELETE("services/{id}")
+    Call<DeleteServiceResponse> deleteService(@Path("id") Long id);
 
     @GET("services/business-owner/{businessOwnerId}/filter")
     Call<PagedResponse<GetServiceResponse>> filterServicesByBusinessOwner(
