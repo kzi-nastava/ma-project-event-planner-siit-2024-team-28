@@ -33,6 +33,7 @@ import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -186,8 +187,11 @@ public class SolutionDetailsFragment extends Fragment {
             navController.navigate(R.id.action_soltuionDetails_to_businessOwnerDetails, bundle);
         });
 
+
+
         // button for adding to favorites should be only visible to EventOrganizers
-        if(AuthUtils.getUserRole(getContext()) == "EventOrganizer") {
+        List<String> roles = AuthUtils.getUserRoles(getContext());
+        if(roles.contains("EventOrganizer")) {
             binding.addToFavorites.setOnClickListener(v -> {
                 Long userId = AuthUtils.getUserId(getContext());
                 addToFavorites(userId, Long.parseLong(solutionId));

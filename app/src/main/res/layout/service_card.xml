@@ -3,54 +3,88 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
-    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="10dp"
     android:background="@drawable/rounded_white_card"
-    android:layout_marginBottom="15dp"
-    >
+    android:layout_marginBottom="30dp">
 
-    <ImageView
-        android:id="@+id/image1"
-        android:layout_width="170dp"
-        android:layout_height="match_parent"
-        app:srcCompat="@drawable/ketering"/>
+    <!-- Gornji deo sa slikom i informacijama -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_margin="5dp"
-            android:text="Ketering"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:layout_margin="5dp"
-            android:text="@string/lorem_ipsum"
-            android:textSize="14sp"
-            android:textStyle="italic"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <View
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/edit_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/round_border_background"
-                app:srcCompat="@drawable/edit" />
+        <!-- Slika -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/serviceImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/ketering" />
         </LinearLayout>
 
+        <!-- Tekstualni podaci -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
 
+            <TextView
+                android:id="@+id/serviceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Service name"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/textPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/price_input"
+                android:textSize="20sp"
+                android:textStyle="italic" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Dugmad -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="@string/delete"
+            app:backgroundTint="@color/delete_red"
+            android:textColor="@android:color/white"
+            android:background="@drawable/red_button" />
+
+        <Button
+            android:id="@+id/editButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/edit"
+            app:backgroundTint="@color/cool_purple"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_rounded" />
     </LinearLayout>
 </LinearLayout>

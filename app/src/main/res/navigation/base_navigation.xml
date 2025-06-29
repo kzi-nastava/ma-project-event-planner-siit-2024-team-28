@@ -74,8 +74,14 @@
         android:id="@+id/nav_service_overview"
         android:name="com.eventplanner.fragments.services.ServicesOverviewFragment"
         android:label="Service overview"
-        tools:layout="@layout/fragment_services_overview"
-        />
+        tools:layout="@layout/fragment_services_overview">
+        <action
+            android:id="@+id/action_servicesOverview_to_createService"
+            app:destination="@+id/nav_service_creation"/>
+        <action
+            android:id="@+id/action_services_overview_to_service_edit"
+            app:destination="@+id/nav_service_edit"/>
+    </fragment>
     <fragment
         android:id="@+id/nav_all_events"
         android:name="com.eventplanner.fragments.events.AllEventsFragment"
@@ -122,5 +128,15 @@
             android:name="businessOwnerId"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_service_edit"
+        android:name="com.eventplanner.fragments.services.ServiceEditFragment"
+        android:label="Service Edit">
+        <argument
+            android:name="serviceId"
+            app:argType="string" />
+    </fragment>
+
 
 </navigation>

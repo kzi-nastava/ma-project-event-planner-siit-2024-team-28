@@ -3,11 +3,14 @@ package com.eventplanner.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
+import android.util.Log;
 
 import com.eventplanner.model.auth.JwtPayload;
 import com.google.gson.Gson;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthUtils {
@@ -29,16 +32,27 @@ public class AuthUtils {
         return sharedPreferences.getString(TOKEN_KEY, null);
     }
 
-    public static String getUserRole(Context context) {
+    public static List<String> getUserRoles(Context context) {
         String token = getToken(context);
         if (token != null) {
             JwtPayload payload = decodeJwt(token);
             if (payload != null) {
-                return payload.getRole();
+                return payload.getRolesList();
             }
         }
-        return null;
+        return Collections.emptyList();
     }
+
+//    public static String getUserRole(Context context) {
+//        String token = getToken(context);
+//        if (token != null) {
+//            JwtPayload payload = decodeJwt(token);
+//            if (payload != null) {
+//                return payload.getRole();
+//            }
+//        }
+//        return null;
+//    }
 
     public static Long getUserId(Context context) {
         String token = getToken(context);
