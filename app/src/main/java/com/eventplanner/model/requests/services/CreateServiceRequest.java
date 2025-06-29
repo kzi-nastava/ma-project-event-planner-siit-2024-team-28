@@ -1,6 +1,7 @@
 package com.eventplanner.model.requests.services;
 
 import com.eventplanner.model.enums.ReservationType;
+import com.eventplanner.model.enums.SolutionStatus;
 
 import java.util.Collection;
 
@@ -22,6 +23,7 @@ public class CreateServiceRequest {
     private ReservationType reservationType;
     private Long categoryId;
     private Long businessOwnerId;
+    private SolutionStatus status;
     private Collection<Long> eventTypeIds;
 
     public void setCategoryId(Long categoryId) {
@@ -47,6 +49,7 @@ public class CreateServiceRequest {
         this.categoryId = builder.categoryId;
         this.businessOwnerId = builder.businessOwnerId;
         this.eventTypeIds = builder.eventTypeIds;
+        this.status = builder.status;
     }
 
     // Static Builder class
@@ -68,6 +71,7 @@ public class CreateServiceRequest {
         private ReservationType reservationType;
         private Long categoryId;
         private Long businessOwnerId;
+        private SolutionStatus status;
         private Collection<Long> eventTypeIds;
 
         public Builder name(String name) {
@@ -152,6 +156,11 @@ public class CreateServiceRequest {
 
         public Builder businessOwnerId(Long businessOwnerId) {
             this.businessOwnerId = businessOwnerId;
+            return this;
+        }
+
+        public Builder status(SolutionStatus status) {
+            this.status = status;
             return this;
         }
 

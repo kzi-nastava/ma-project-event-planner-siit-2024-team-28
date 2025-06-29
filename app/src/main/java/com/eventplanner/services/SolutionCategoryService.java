@@ -20,4 +20,7 @@ public interface SolutionCategoryService {
 
     @GET("categories")
     Call<Collection<GetSolutionCategoryResponse>> getAllSolutionCategories();
+
+    @GET("categories/accepted-categories")
+    Call<Collection<GetSolutionCategoryResponse>> getAcceptedCategories();
 }

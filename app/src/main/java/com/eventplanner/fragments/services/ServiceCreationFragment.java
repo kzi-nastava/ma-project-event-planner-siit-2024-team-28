@@ -26,6 +26,7 @@ import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentServiceCreationBinding;
 import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.enums.ReservationType;
+import com.eventplanner.model.enums.SolutionStatus;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.solutionCategories.CreateSolutionCategoryRequest;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
@@ -288,10 +289,6 @@ public class ServiceCreationFragment extends Fragment {
         }
         else if (!binding.editTextCustomCategory.getText().toString().trim().isEmpty()) {
             customCategory = binding.editTextCustomCategory.getText().toString().trim();
-            if (isVisible) {
-                Toast.makeText(getContext(), "For custom category service cannot be visible for event organizers.", Toast.LENGTH_SHORT).show();
-                return;
-            }
             customCategoryCreation = true;
         }
         else {
@@ -317,6 +314,7 @@ public class ServiceCreationFragment extends Fragment {
                 .categoryId(selectedCategoryId)
                 .businessOwnerId(AuthUtils.getUserId(requireContext()))
                 .eventTypeIds(selectedEventTypeIds)
+                .status((customCategoryCreation) ? SolutionStatus.PENDING : SolutionStatus.ACTIVE ) // If category is custom we are creating PENDING service
                 .build();
 
         if(!customCategoryCreation) {
@@ -378,7 +376,7 @@ public class ServiceCreationFragment extends Fragment {
     private void populateCategoriesFilter() {
         Spinner spinner = binding.spinnerCategory;
 
-        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAllSolutionCategories();
+        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAcceptedCategories();
         call.enqueue(new Callback<Collection<GetSolutionCategoryResponse>>() {
             @Override
             public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
@@ -389,10 +387,8 @@ public class ServiceCreationFragment extends Fragment {
                     categoryNames.add("Select a category...");
 
                     for (GetSolutionCategoryResponse category : response.body()) {
-                        if (category.getRequestStatus().equals(RequestStatus.ACCEPTED) && !category.getIsDeleted()) {
-                            allCategories.add(category);
-                            categoryNames.add(category.getName());
-                        }
+                        allCategories.add(category);
+                        categoryNames.add(category.getName());
                     }
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(

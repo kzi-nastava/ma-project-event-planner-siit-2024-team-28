@@ -96,6 +96,7 @@
     <string name="address_input">Address:</string>
     <string name="phone_number_input">Phone number:</string>
     <string name="report_user">Report user</string>
+    <string name="status_input">Status:</string>
     <string name="comments">Comments</string>
     <string name="reviews">Reviews</string>
     <string name="add_new_service">+ Add new service</string>

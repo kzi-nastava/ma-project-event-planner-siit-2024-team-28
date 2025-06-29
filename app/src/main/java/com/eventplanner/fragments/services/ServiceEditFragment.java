@@ -105,6 +105,7 @@ public class ServiceEditFragment extends Fragment {
         // Chips that match selected event types are set to checked state
         populateEventTypesChipGroup();
 
+        binding.statusTextView.setText(binding.statusTextView.getText() + " " + service.getStatus());
 
         // RadioGroup change listener
         binding.radioGroupDuration.setOnCheckedChangeListener((group, checkedId) -> {
