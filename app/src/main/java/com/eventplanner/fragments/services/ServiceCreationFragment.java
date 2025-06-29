@@ -26,6 +26,7 @@ import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentServiceCreationBinding;
 import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.enums.ReservationType;
+import com.eventplanner.model.enums.SolutionStatus;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.solutionCategories.CreateSolutionCategoryRequest;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
@@ -288,10 +289,6 @@ public class ServiceCreationFragment extends Fragment {
         }
         else if (!binding.editTextCustomCategory.getText().toString().trim().isEmpty()) {
             customCategory = binding.editTextCustomCategory.getText().toString().trim();
-            if (isVisible) {
-                Toast.makeText(getContext(), "For custom category service cannot be visible for event organizers.", Toast.LENGTH_SHORT).show();
-                return;
-            }
             customCategoryCreation = true;
         }
         else {
@@ -317,6 +314,7 @@ public class ServiceCreationFragment extends Fragment {
                 .categoryId(selectedCategoryId)
                 .businessOwnerId(AuthUtils.getUserId(requireContext()))
                 .eventTypeIds(selectedEventTypeIds)
+                .status((customCategoryCreation) ? SolutionStatus.PENDING : SolutionStatus.ACTIVE ) // If category is custom we are creating PENDING service
                 .build();
 
         if(!customCategoryCreation) {

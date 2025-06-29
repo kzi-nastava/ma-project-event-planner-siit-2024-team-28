@@ -1,6 +1,7 @@
 package com.eventplanner.model.responses.services;
 
 import com.eventplanner.model.enums.ReservationType;
+import com.eventplanner.model.enums.SolutionStatus;
 
 import java.util.Collection;
 
@@ -23,6 +24,7 @@ public class GetServiceResponse {
     private ReservationType reservationType;
     private Long categoryId;
     private Long businessOwnerId;
+    private SolutionStatus status;
     private Collection<Long> eventTypeIds;
 
     public Long getId() {
@@ -96,6 +98,11 @@ public class GetServiceResponse {
     public Long getBusinessOwnerId() {
         return businessOwnerId;
     }
+
+    public SolutionStatus getStatus() {
+        return status;
+    }
+
 
     public Collection<Long> getEventTypeIds() {
         return eventTypeIds;
