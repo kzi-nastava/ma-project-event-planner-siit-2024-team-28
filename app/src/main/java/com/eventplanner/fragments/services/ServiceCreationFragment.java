@@ -376,7 +376,7 @@ public class ServiceCreationFragment extends Fragment {
     private void populateCategoriesFilter() {
         Spinner spinner = binding.spinnerCategory;
 
-        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAllSolutionCategories();
+        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAcceptedCategories();
         call.enqueue(new Callback<Collection<GetSolutionCategoryResponse>>() {
             @Override
             public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
@@ -387,10 +387,8 @@ public class ServiceCreationFragment extends Fragment {
                     categoryNames.add("Select a category...");
 
                     for (GetSolutionCategoryResponse category : response.body()) {
-                        if (category.getRequestStatus().equals(RequestStatus.ACCEPTED) && !category.getIsDeleted()) {
-                            allCategories.add(category);
-                            categoryNames.add(category.getName());
-                        }
+                        allCategories.add(category);
+                        categoryNames.add(category.getName());
                     }
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(
