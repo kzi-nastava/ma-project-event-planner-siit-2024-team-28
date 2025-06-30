@@ -63,6 +63,8 @@
     <string name="registration_email">Email</string>
     <string name="registration_first_name">First name</string>
     <string name="registration_last_name">Last name</string>
+    <string name="registration_upload_profile_picture">Profile picture</string>
+    <string name="registration_select_profile_pic">Select your profile picture</string>
 
     <!-- fragment_login -->
     <string name="login_email_hint">Enter your email</string>
@@ -92,9 +94,10 @@
     <!-- Toast messages -->
     <string name="toast_check_email">Check your email to activate your account.</string>
     <string name="toast_registration_error">An error occurred while registering. Please try again.</string>
-    <string name="toast_registration_failed">Registration failed. Try again.</string>
+    <string name="toast_registration_failed">Registration failed. Please try again.</string>
     <string name="toast_invalid_credentials">Invalid credentials. Please try again.</string>
-    <string name="toast_login_failed">Login failed. Try again.</string>
+    <string name="toast_login_failed">Login failed. Please try again.</string>
+    <string name="toast_image_upload_fail">Failed to upload image. Please try again.</string>
 
     <!-- Navbar -->
     <string name="navbar_register">Register</string>

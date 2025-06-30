@@ -11,10 +11,10 @@ import retrofit2.http.POST;
 
 public interface AuthService {
     @POST("auth/event-organizer")
-    Call<AuthResponse> registerEventOrganizer(@Body RegisterEventOrganizerRequest request);
+    Call<Void> registerEventOrganizer(@Body RegisterEventOrganizerRequest request);
 
     @POST("auth/business-owner")
-    Call<AuthResponse> registerBusinessOwner(@Body RegisterBusinessOwnerRequest request);
+    Call<Void> registerBusinessOwner(@Body RegisterBusinessOwnerRequest request);
 
     @POST("auth/login")
     Call<AuthResponse> login(@Body LoginRequest request);

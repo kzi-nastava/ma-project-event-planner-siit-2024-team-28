@@ -1,11 +1,17 @@
 package com.eventplanner.fragments.auth;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,16 +20,22 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.model.requests.RegisterBusinessOwnerRequest;
-import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
+
+import java.io.InputStream;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BusinessOwnerRegistrationFragment extends Fragment {
+    private static final int PICK_IMAGE_REQUEST = 1001;
+
     private EditText email, password, repeatPassword, organizationName, address, phoneNumber, description;
+    private ImageView profilePicturePreview;
+    private String profilePictureBase64 = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,8 +48,12 @@ public class BusinessOwnerRegistrationFragment extends Fragment {
         address = view.findViewById(R.id.address);
         phoneNumber = view.findViewById(R.id.phoneNumber);
         description = view.findViewById(R.id.description);
-        Button registerButton = view.findViewById(R.id.submitButton);
+        profilePicturePreview = view.findViewById(R.id.profilePicturePreview);
 
+        Button uploadProfilePictureButton = view.findViewById(R.id.uploadProfilePictureButton);
+        uploadProfilePictureButton.setOnClickListener(v -> openImagePicker());
+
+        Button registerButton = view.findViewById(R.id.submitButton);
         registerButton.setOnClickListener(v -> {
             if (validateForm()) {
                 registerBusinessOwner();
@@ -130,22 +146,56 @@ public class BusinessOwnerRegistrationFragment extends Fragment {
         return valid;
     }
 
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.registration_select_profile_pic)), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                try {
+                    // Show preview
+                    InputStream inputStream = activity.getContentResolver().openInputStream(imageUri);
+                    Bitmap selectedImage = BitmapFactory.decodeStream(inputStream);
+                    profilePicturePreview.setImageBitmap(selectedImage);
+
+                    // Convert to Base64
+                    profilePictureBase64 = Base64Util.encodeImageToBase64(selectedImage);
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), getString(R.string.toast_image_upload_fail), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
     private void registerBusinessOwner() {
         RegisterBusinessOwnerRequest request = new RegisterBusinessOwnerRequest(
                 email.getText().toString(),
                 password.getText().toString(),
                 phoneNumber.getText().toString(),
-                null,
+                profilePictureBase64,
                 address.getText().toString(),
                 organizationName.getText().toString(),
                 description.getText().toString()
         );
 
         new Thread(() -> {
-            Call<AuthResponse> call = HttpUtils.getAuthService().registerBusinessOwner(request);
+            Call<Void> call = HttpUtils.getAuthService().registerBusinessOwner(request);
             call.enqueue(new Callback<>() {
                 @Override
-                public void onResponse(@NonNull Call<AuthResponse> call, @NonNull Response<AuthResponse> response) {
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                     if (response.isSuccessful() && getActivity() != null && getActivity().getApplicationContext() != null) {
                         Toast.makeText(getContext(), getString(R.string.toast_check_email), Toast.LENGTH_SHORT).show();
 
@@ -160,7 +210,7 @@ public class BusinessOwnerRegistrationFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<AuthResponse> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                     Toast.makeText(getContext(), getString(R.string.toast_registration_failed), Toast.LENGTH_SHORT).show();
                 }
             });
