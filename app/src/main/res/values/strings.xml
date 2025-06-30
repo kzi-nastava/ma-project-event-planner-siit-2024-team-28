@@ -102,4 +102,7 @@
     <string name="add_new_service">+ Add new service</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="to_pdf">Export to PDF file</string>
+    <string name="price_list">Here\'s the price list for your solutions:</string>
+    <string name="total_price">Total price:</string>
 </resources>
