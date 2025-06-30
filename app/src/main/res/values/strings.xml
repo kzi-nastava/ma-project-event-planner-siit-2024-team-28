@@ -19,7 +19,7 @@
     <string name="settings">Settings</string>
     <string name="language">Language</string>
     <string name="select_category_service">Select the category of the service:</string>
-    <string name="select_category_service_custom">... or make up your own category</string>
+    <string name="select_category_service_custom">… or make up your own category</string>
     <string name="name_input">Name:</string>
     <string name="description_input">Description:</string>
     <string name="specifics_input">Specifics:</string>
@@ -46,11 +46,62 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tristique commodo malesuada. Nullam in aliquet nisl. In dui augue, luctus in sem vitae, condimentum fermentum nulla. Quisque molestie maximus varius. Vivamus molestie sem dolor, in rhoncus felis dapibus ac. Integer eu lobortis felis.</string>
-    <string name="register_eventOrganizer">Event Organizer</string>
-    <string name="register_businessOwner">Business Owner</string>
+
+    <!-- fragment_registration -->
+    <string name="register_eventOrganizer">Register as an event Organizer</string>
+    <string name="register_businessOwner">Register as a business Owner</string>
+
+    <!-- fragment_business_owner_registration, fragment_event_organizer_registration -->
+    <string name="register_title">Create your account</string>
+    <string name="registration_register">Register</string>
+    <string name="registration_description">Description</string>
+    <string name="registration_number">Phone number</string>
+    <string name="registration_address">Address</string>
+    <string name="registration_organization_name">Organization name</string>
+    <string name="registration_repeat_password">Repeat password</string>
+    <string name="registration_password">Password</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_first_name">First name</string>
+    <string name="registration_last_name">Last name</string>
+
+    <!-- fragment_login -->
+    <string name="login_email_hint">Enter your email</string>
+    <string name="login_password_hint">Enter your password</string>
+    <string name="login_title">Login to access the entire app</string>
+
+    <!-- Validation error messages -->
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Please enter a valid email address</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_invalid">Password must be at least 6 characters</string>
+    <string name="error_repeat_password_required">Please repeat your password</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+    <string name="error_organization_name_required">Organization Name is required</string>
+    <string name="error_organization_name_invalid">Organization Name must be at least 3 characters</string>
+    <string name="error_address_required">Address is required</string>
+    <string name="error_address_invalid">Address is invalid or too short</string>
+    <string name="error_phone_required">Phone number is required</string>
+    <string name="error_phone_invalid">Please enter a valid phone number</string>
+    <string name="error_description_required">Description is required</string>
+    <string name="error_description_invalid">Description must be at least 5 characters</string>
+    <string name="error_first_name_required">First name is required</string>
+    <string name="error_first_name_invalid">First name must be at least 1 character</string>
+    <string name="error_last_name_required">Last Name is required</string>
+    <string name="error_last_name_invalid">Last Name must be at least 1 character</string>
+
+    <!-- Toast messages -->
+    <string name="toast_check_email">Check your email to activate your account.</string>
+    <string name="toast_registration_error">An error occurred while registering. Please try again.</string>
+    <string name="toast_registration_failed">Registration failed. Try again.</string>
+    <string name="toast_invalid_credentials">Invalid credentials. Please try again.</string>
+    <string name="toast_login_failed">Login failed. Try again.</string>
+
+    <!-- Navbar -->
     <string name="navbar_register">Register</string>
     <string name="navbar_login">Login</string>
+    <string name="navbar_logout">Logout</string>
     <string name="navbar_create_service">Create service</string>
+
     <string name="filter">Filter</string>
     <string name="home_browse_button">Browse</string>
     <string name="browse_events_button">browse all events</string>
@@ -61,17 +112,7 @@
     <string name="all_services">All Services</string>
     <string name="next_text"><![CDATA[>]]></string>
     <string name="previous_text"><![CDATA[<]]></string>
-    <string name="register_title">Register</string>
-    <string name="registration_register">Register</string>
-    <string name="registration_description">Description</string>
-    <string name="registration_number">Phone Number</string>
-    <string name="registration_address">Address</string>
-    <string name="registration_organization_name">Organization Name</string>
-    <string name="registration_repeat_password">Repeat Password</string>
-    <string name="registration_password">Password</string>
-    <string name="registration_email">Email</string>
-    <string name="registration_first_name">First name</string>
-    <string name="registration_last_name">Last name</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login">Login</string>

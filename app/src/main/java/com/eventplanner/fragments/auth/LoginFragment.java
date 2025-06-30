@@ -1,8 +1,6 @@
 package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +8,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
+import com.eventplanner.activities.HomeActivity;
 import com.eventplanner.model.requests.LoginRequest;
 import com.eventplanner.model.responses.AuthResponse;
 import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
 
 import retrofit2.Call;
@@ -43,46 +45,60 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean validateForm() {
-        if (!isValidEmail(email.getText().toString())) {
-            email.setError("Please enter a valid email address");
-            return false;
-        }
-        if (TextUtils.isEmpty(password.getText())) {
-            password.setError("Password is required");
-            return false;
+        boolean valid = true;
+
+        String emailInput = email.getText().toString().trim();
+        String passwordInput = password.getText().toString();
+
+        if (!FormValidator.isValidEmail(emailInput)) {
+            email.setError(getString(R.string.error_email_invalid));
+            valid = false;
+        } else {
+            email.setError(null);
         }
 
-        return true;
-    }
+        if (FormValidator.isEmpty(passwordInput)) {
+            password.setError(getString(R.string.error_password_required));
+            valid = false;
+        } else {
+            password.setError(null);
+        }
 
-    private boolean isValidEmail(String email) {
-        String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
-        return email.matches(emailPattern);
+        return valid;
     }
 
     private void login() {
         LoginRequest request = new LoginRequest(
-            email.getText().toString(),
-            password.getText().toString()
+                email.getText().toString(),
+                password.getText().toString()
         );
 
         new Thread(() -> {
             Call<AuthResponse> call = HttpUtils.getAuthService().login(request);
             call.enqueue(new Callback<>() {
                 @Override
-                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                public void onResponse(@NonNull Call<AuthResponse> call, @NonNull Response<AuthResponse> response) {
                     if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null && getActivity().getApplicationContext() != null) {
                         AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
-                        Toast.makeText(getContext(), "Login successful!", Toast.LENGTH_SHORT).show();
+
+                        // Update navigation menu after login
+                        if (getActivity() instanceof HomeActivity) {
+                            ((HomeActivity) getActivity()).updateNavMenu();
+                        }
+
+                        // Navigate back to HomeFragment
+                        View view = getView();
+                        if (view != null) {
+                            Navigation.findNavController(view).navigate(R.id.nav_home);
+                        }
                     } else {
-                        Toast.makeText(getContext(), "An error occurred while logging in. Please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.toast_invalid_credentials), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<AuthResponse> call, Throwable t) {
-                    Log.d("Backend call", t.getMessage() != null ? t.getMessage() : "unknown error");
-                    Toast.makeText(getContext(), "Login failed. Try again.", Toast.LENGTH_SHORT).show();
+                public void onFailure(@NonNull Call<AuthResponse> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), getString(R.string.toast_login_failed), Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();

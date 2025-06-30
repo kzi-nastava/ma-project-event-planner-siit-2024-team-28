@@ -1,8 +1,6 @@
 package com.eventplanner.fragments.auth;
 
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +8,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.model.requests.RegisterEventOrganizerRequest;
 import com.eventplanner.model.responses.AuthResponse;
-import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
 
 import retrofit2.Call;
@@ -48,75 +48,120 @@ public class EventOrganizerRegistrationFragment extends Fragment {
     }
 
     private boolean validateForm() {
-        if (!isValidEmail(email.getText().toString())) {
-            email.setError("Please enter a valid email address");
-            return false;
-        }
-        if (TextUtils.isEmpty(password.getText())) {
-            password.setError("Password is required");
-            return false;
-        }
-        if (TextUtils.isEmpty(repeatPassword.getText())) {
-            repeatPassword.setError("Please repeat your password");
-            return false;
-        }
-        if (!password.getText().toString().equals(repeatPassword.getText().toString())) {
-            repeatPassword.setError("Passwords do not match");
-            return false;
-        }
-        if (TextUtils.isEmpty(lastName.getText())) {
-            lastName.setError("Last Name is required");
-            return false;
-        }
-        if (TextUtils.isEmpty(firstName.getText())) {
-            firstName.setError("First name is required");
-            return false;
-        }
-        if (TextUtils.isEmpty(address.getText())) {
-            address.setError("Address is required");
-            return false;
-        }
-        if (TextUtils.isEmpty(phoneNumber.getText())) {
-            phoneNumber.setError("Phone number is required");
-            return false;
+        boolean valid = true;
+
+        String emailStr = email.getText().toString().trim();
+        if (FormValidator.isEmpty(emailStr)) {
+            email.setError(getString(R.string.error_email_required));
+            valid = false;
+        } else if (!FormValidator.isValidEmail(emailStr)) {
+            email.setError(getString(R.string.error_email_invalid));
+            valid = false;
+        } else {
+            email.setError(null);
         }
 
-        return true;
-    }
+        String passwordStr = password.getText().toString();
+        if (FormValidator.isEmpty(passwordStr)) {
+            password.setError(getString(R.string.error_password_required));
+            valid = false;
+        } else if (!FormValidator.isValidPassword(passwordStr)) {
+            password.setError(getString(R.string.error_password_invalid));
+            valid = false;
+        } else {
+            password.setError(null);
+        }
 
-    private boolean isValidEmail(String email) {
-        String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
-        return email.matches(emailPattern);
+        String repeatPasswordStr = repeatPassword.getText().toString();
+        if (FormValidator.isEmpty(repeatPasswordStr)) {
+            repeatPassword.setError(getString(R.string.error_repeat_password_required));
+            valid = false;
+        } else if (!repeatPasswordStr.equals(passwordStr)) {
+            repeatPassword.setError(getString(R.string.error_passwords_mismatch));
+            valid = false;
+        } else {
+            repeatPassword.setError(null);
+        }
+
+        String lastNameStr = lastName.getText().toString().trim();
+        if (FormValidator.isEmpty(lastNameStr)) {
+            lastName.setError(getString(R.string.error_last_name_required));
+            valid = false;
+        } else if (!FormValidator.hasMinLength(lastNameStr, 1)) {
+            lastName.setError(getString(R.string.error_last_name_invalid));
+            valid = false;
+        } else {
+            lastName.setError(null);
+        }
+
+        String firstNameStr = firstName.getText().toString().trim();
+        if (FormValidator.isEmpty(firstNameStr)) {
+            firstName.setError(getString(R.string.error_first_name_required));
+            valid = false;
+        } else if (!FormValidator.hasMinLength(firstNameStr, 1)) {
+            firstName.setError(getString(R.string.error_first_name_invalid));
+            valid = false;
+        } else {
+            firstName.setError(null);
+        }
+
+        String addressStr = address.getText().toString().trim();
+        if (FormValidator.isEmpty(addressStr)) {
+            address.setError(getString(R.string.error_address_required));
+            valid = false;
+        } else if (!FormValidator.isValidAddress(addressStr)) {
+            address.setError(getString(R.string.error_address_invalid));
+            valid = false;
+        } else {
+            address.setError(null);
+        }
+
+        String phoneStr = phoneNumber.getText().toString().trim();
+        if (FormValidator.isEmpty(phoneStr)) {
+            phoneNumber.setError(getString(R.string.error_phone_required));
+            valid = false;
+        } else if (!FormValidator.isValidPhoneNumber(phoneStr)) {
+            phoneNumber.setError(getString(R.string.error_phone_invalid));
+            valid = false;
+        } else {
+            phoneNumber.setError(null);
+        }
+
+        return valid;
     }
 
     private void registerEventOrganizer() {
         RegisterEventOrganizerRequest request = new RegisterEventOrganizerRequest(
-            email.getText().toString(),
-            password.getText().toString(),
-            phoneNumber.getText().toString(),
-            null,
-            address.getText().toString(),
-            firstName.getText().toString(),
-            lastName.getText().toString()
+                email.getText().toString(),
+                password.getText().toString(),
+                phoneNumber.getText().toString(),
+                null,
+                address.getText().toString(),
+                firstName.getText().toString(),
+                lastName.getText().toString()
         );
 
         new Thread(() -> {
             Call<AuthResponse> call = HttpUtils.getAuthService().registerEventOrganizer(request);
             call.enqueue(new Callback<>() {
                 @Override
-                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().getJwtToken() != null && getActivity() != null && getActivity().getApplicationContext() != null) {
-                        AuthUtils.saveToken(getActivity().getApplicationContext(), response.body().getJwtToken());
-                        Toast.makeText(getContext(), "Registration successful!", Toast.LENGTH_SHORT).show();
+                public void onResponse(@NonNull Call<AuthResponse> call, @NonNull Response<AuthResponse> response) {
+                    if (response.isSuccessful() && getActivity() != null && getActivity().getApplicationContext() != null) {
+                        Toast.makeText(getContext(), getString(R.string.toast_check_email), Toast.LENGTH_SHORT).show();
+
+                        // Navigate back to HomeFragment
+                        View view = getView();
+                        if (view != null) {
+                            Navigation.findNavController(view).navigate(R.id.nav_home);
+                        }
                     } else {
-                        Toast.makeText(getContext(), "An error occurred while registering. Please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.toast_registration_error), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<AuthResponse> call, Throwable t) {
-                    Log.d("Backend call", t.getMessage() != null ? t.getMessage() : "unknown error");
-                    Toast.makeText(getContext(), "Registration failed. Try again.", Toast.LENGTH_SHORT).show();
+                public void onFailure(@NonNull Call<AuthResponse> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), getString(R.string.toast_registration_failed), Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();

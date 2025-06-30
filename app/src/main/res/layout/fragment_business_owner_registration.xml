@@ -8,7 +8,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_weight="0.6"
             android:padding="16dp">
 
             <TextView
@@ -21,84 +20,100 @@
 
             <!-- Email Field -->
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
                     android:hint="@string/registration_email"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Password Field -->
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:hint="@string/registration_password"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Repeat Password Field -->
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <EditText
                     android:id="@+id/repeatPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:hint="@string/registration_repeat_password"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Organization Name Field -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/organizationName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/registration_organization_name" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Address Field -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/registration_address" />
-            </com.google.android.material.textfield.TextInputLayout>
-
             <!-- Phone Number Field -->
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <EditText
                     android:id="@+id/phoneNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="phone"
                     android:hint="@string/registration_number"
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Description Field -->
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <EditText
                     android:id="@+id/description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:hint="@string/registration_description"
                     android:inputType="textMultiLine" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Organization Name Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/organizationName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints=""
+                    android:hint="@string/registration_organization_name"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Address Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginVertical="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints=""
+                    android:hint="@string/registration_address"
+                    android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Submit Button -->
