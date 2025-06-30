@@ -32,6 +32,8 @@ import com.eventplanner.services.SolutionService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -116,8 +118,16 @@ public class PriceListFragment extends Fragment implements PriceListAdapter.OnPr
                     Toast.makeText(getContext(), "Price successfully updated.", Toast.LENGTH_SHORT).show();
                     Log.d("PriceListFragment", "Price successfully updated.");
                 } else {
-                    Toast.makeText(getContext(), "There has been an error while updating your price.", Toast.LENGTH_SHORT).show();
-                    Log.e("PriceListFragment", "An error while updating price" + response.errorBody().toString());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("PriceListFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("PriceListFragment", "Error: " + message);
                 }
             }
 
@@ -140,8 +150,16 @@ public class PriceListFragment extends Fragment implements PriceListAdapter.OnPr
                     Toast.makeText(getContext(), "Discount successfully updated.", Toast.LENGTH_SHORT).show();
                     Log.d("PriceListFragment", "Discount successfully updated.");
                 } else {
-                    Toast.makeText(getContext(), "There has been an error while updating your discount.", Toast.LENGTH_SHORT).show();
-                    Log.e("PriceListFragment", "An error while updating discount" + response.errorBody().toString());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("PriceListFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("PriceListFragment", "An error while updating discount: " + message);
                 }
             }
 
