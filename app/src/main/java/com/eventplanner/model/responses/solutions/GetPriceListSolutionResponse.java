@@ -7,6 +7,19 @@ public class GetPriceListSolutionResponse {
     private Double discount;
     private Double finalPrice;
 
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public void setFinalPrice(Double finalPrice) {
+        this.finalPrice = finalPrice;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
     public Long getSolutionId() {
         return solutionId;
     }

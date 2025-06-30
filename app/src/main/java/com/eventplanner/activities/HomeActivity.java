@@ -83,6 +83,8 @@ public class HomeActivity extends AppCompatActivity {
                 navController.navigate(R.id.nav_registration);
             } else if (id == R.id.nav_service_creation && controller.getCurrentDestination().getId() != R.id.nav_service_creation) {
                 navController.navigate(R.id.nav_service_creation);
+            } else if (id == R.id.nav_price_list && controller.getCurrentDestination().getId() != R.id.nav_price_list) {
+                navController.navigate((R.id.nav_price_list));
             }
         });
 

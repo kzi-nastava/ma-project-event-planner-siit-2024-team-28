@@ -21,6 +21,9 @@
             android:id="@+id/action_home_to_services_overview"
             app:destination="@id/nav_service_overview" />
         <action
+            android:id="@+id/action_home_to_price_list"
+            app:destination="@id/nav_price_list" />
+        <action
             android:id="@+id/action_home_to_solutionDetails"
             app:destination="@id/solution_details_fragment" />
     </fragment>
@@ -29,6 +32,12 @@
         android:name="com.eventplanner.fragments.events.TopEventsFragment"
         android:label="Top events"
         tools:layout="@layout/fragment_top_events"
+        />
+    <fragment
+        android:id="@+id/nav_price_list"
+        android:name="com.eventplanner.fragments.solutions.PriceListFragment"
+        android:label="Price list"
+        tools:layout="@layout/fragment_price_list"
         />
     <fragment
         android:id="@+id/nav_top_solutions"

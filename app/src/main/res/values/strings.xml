@@ -103,6 +103,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="to_pdf">Export to PDF file</string>
-    <string name="price_list">Here\'s the price list for your solutions:</string>
+    <string name="price_list">Price list</string>
+    <string name="price_list_title">Here\'s the price list for your solutions:</string>
     <string name="total_price">Total price:</string>
 </resources>

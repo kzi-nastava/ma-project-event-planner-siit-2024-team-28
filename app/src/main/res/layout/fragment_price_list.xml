@@ -21,13 +21,13 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="15dp"
             android:fontFamily="sans-serif"
-            android:text="@string/price_list"
+            android:text="@string/price_list_title"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:textSize="25sp" />
 
         <Button
-            android:id="@+id/deleteButton"
+            android:id="@+id/export_to_pdf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -37,7 +37,7 @@
             app:backgroundTint="@color/delete_red" />
 
         <ListView
-            android:id="@+id/serviceListView"
+            android:id="@+id/priceListListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
