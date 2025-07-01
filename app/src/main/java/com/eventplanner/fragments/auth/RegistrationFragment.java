@@ -1,5 +1,6 @@
 package com.eventplanner.fragments.auth;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,15 +24,18 @@ public class RegistrationFragment extends Fragment {
         Button btnOrganizer = view.findViewById(R.id.btnOrganizer);
         Button btnBusiness = view.findViewById(R.id.btnBusiness);
 
-        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
+        Activity activity = getActivity();
+        if (activity != null) {
+            NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
-        btnOrganizer.setOnClickListener(v -> {
-            navController.navigate(R.id.nav_event_organizer_registration);
-        });
+            btnOrganizer.setOnClickListener(v -> {
+                navController.navigate(R.id.nav_event_organizer_registration);
+            });
 
-        btnBusiness.setOnClickListener(v -> {
-            navController.navigate(R.id.nav_business_owner_registration);
-        });
+            btnBusiness.setOnClickListener(v -> {
+                navController.navigate(R.id.nav_business_owner_registration);
+            });
+        }
 
         return view;
     }

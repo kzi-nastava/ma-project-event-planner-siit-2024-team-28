@@ -1,38 +1,20 @@
-package com.eventplanner.model.requests;
+package com.eventplanner.model.requests.auth;
 
-public class RegisterEventOrganizerRequest {
-    private String email;
-    private String password;
+public class UpdateEventOrganizerRequest {
     private String phoneNumber;
-    private String profilePictureBase64; // Nullable, use `null` if no picture
+    private String profilePictureBase64;
     private String address;
     private String firstName;
     private String lastName;
 
-    public RegisterEventOrganizerRequest(String email, String password, String phoneNumber, String profilePictureBase64, String address, String firstName, String lastName) {
-        this.email = email;
-        this.password = password;
+    public UpdateEventOrganizerRequest() {}
+
+    public UpdateEventOrganizerRequest(String phoneNumber, String profilePictureBase64, String address, String firstName, String lastName) {
         this.phoneNumber = phoneNumber;
         this.profilePictureBase64 = profilePictureBase64;
         this.address = address;
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhoneNumber() {
