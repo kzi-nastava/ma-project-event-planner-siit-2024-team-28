@@ -192,4 +192,5 @@
     <string name="pending_categories">Pending categories</string>
     <string name="categorize">Categorize</string>
     <string name="categories">Categories</string>
+    <string name="create_new_category">Create new category</string>
 </resources>

@@ -3,6 +3,8 @@ package com.eventplanner.fragments.categories;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.solutionCategories.CategoryListAdapter;
@@ -18,6 +21,7 @@ import com.eventplanner.databinding.FragmentCategoriesOverviewBinding;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.utils.HttpUtils;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +58,12 @@ public class CategoriesOverviewFragment extends Fragment {
 
         fetchCategories();
 
+        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
+
+        binding.buttonCreateCategory.setOnClickListener(v -> {
+            navController.navigate(R.id.action_categories_overview_to_category_creation);
+        });
+
         return view;
     }
 
@@ -66,7 +76,9 @@ public class CategoriesOverviewFragment extends Fragment {
                     List<GetSolutionCategoryResponse> categories = new ArrayList<>(response.body());
                     CategoryListAdapter adapter = new CategoryListAdapter(getContext(), categories);
                     binding.categoryListView.setAdapter(adapter);
+                    Log.i("CategoriesOverviewFragment", "eo");
                 } else {
+                    Toast.makeText(getContext(), "Failed to fetch categories", Toast.LENGTH_SHORT).show();
                     Log.e("CategoriesOverviewFragment", "Failed to fetch categories: " + response.code());
                 }
             }

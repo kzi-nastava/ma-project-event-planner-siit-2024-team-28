@@ -24,6 +24,9 @@
             android:id="@+id/action_home_to_price_list"
             app:destination="@id/nav_price_list" />
         <action
+            android:id="@+id/action_home_to_categories_overview"
+            app:destination="@id/nav_categories_overview" />
+        <action
             android:id="@+id/action_home_to_solutionDetails"
             app:destination="@id/solution_details_fragment" />
         <action
@@ -35,6 +38,21 @@
         android:name="com.eventplanner.fragments.events.TopEventsFragment"
         android:label="Top events"
         tools:layout="@layout/fragment_top_events"
+        />
+    <fragment
+        android:id="@+id/nav_categories_overview"
+        android:name="com.eventplanner.fragments.categories.CategoriesOverviewFragment"
+        android:label="Categories overview"
+        tools:layout="@layout/fragment_categories_overview">
+        <action
+            android:id="@+id/action_categories_overview_to_category_creation"
+            app:destination="@id/nav_category_creation"/>
+    </fragment>
+    <fragment
+        android:id="@+id/nav_category_creation"
+        android:name="com.eventplanner.fragments.categories.CategoryCreationFragment"
+        android:label="Category creation"
+        tools:layout="@layout/fragment_category_creation"
         />
     <fragment
         android:id="@+id/nav_price_list"
