@@ -1,14 +1,17 @@
 package com.eventplanner.services;
 
 import com.eventplanner.model.requests.solutionCategories.CreateSolutionCategoryRequest;
+import com.eventplanner.model.requests.solutionCategories.UpdateSolutionCategoryRequest;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 
 import java.util.Collection;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface SolutionCategoryService {
@@ -23,4 +26,10 @@ public interface SolutionCategoryService {
 
     @GET("categories/accepted-categories")
     Call<Collection<GetSolutionCategoryResponse>> getAcceptedCategories();
+
+    @PUT("categories/{id}")
+    Call<Void> updateCategory(@Path("id") Long id, @Body UpdateSolutionCategoryRequest request);
+
+    @DELETE("categories/{id}")
+    Call<Void> deleteCategory(@Path("id") Long id);
 }

@@ -193,4 +193,6 @@
     <string name="categorize">Categorize</string>
     <string name="categories">Categories</string>
     <string name="create_new_category">Create new category</string>
+    <string name="edit_category">Edit category</string>
+    <string name="select_category">Select category:</string>
 </resources>

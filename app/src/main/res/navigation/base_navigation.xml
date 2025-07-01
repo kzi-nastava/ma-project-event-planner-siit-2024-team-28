@@ -47,7 +47,20 @@
         <action
             android:id="@+id/action_categories_overview_to_category_creation"
             app:destination="@id/nav_category_creation"/>
+        <action
+            android:id="@+id/action_categories_overview_to_category_edit"
+            app:destination="@id/nav_category_edit">
+            <argument
+                android:name="solutionId"
+                app:argType="long"/>
+        </action>
     </fragment>
+    <fragment
+        android:id="@+id/nav_category_edit"
+        android:name="com.eventplanner.fragments.categories.CategoryEditFragment"
+        android:label="Category edit"
+        tools:layout="@layout/fragment_category_edit"
+        />
     <fragment
         android:id="@+id/nav_category_creation"
         android:name="com.eventplanner.fragments.categories.CategoryCreationFragment"

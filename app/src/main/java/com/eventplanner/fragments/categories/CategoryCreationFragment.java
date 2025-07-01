@@ -32,7 +32,7 @@ public class CategoryCreationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static CategoryCreationFragment newInstance(String param1, String param2) {
+    public static CategoryCreationFragment newInstance() {
         CategoryCreationFragment fragment = new CategoryCreationFragment();
         return fragment;
     }

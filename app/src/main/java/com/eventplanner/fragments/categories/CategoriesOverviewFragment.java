@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,12 +35,13 @@ import retrofit2.Response;
 public class CategoriesOverviewFragment extends Fragment {
     FragmentCategoriesOverviewBinding binding;
     SolutionCategoryService categoryService;
+    NavController navController;
 
     public CategoriesOverviewFragment() {
         // Required empty public constructor
     }
 
-    public static CategoriesOverviewFragment newInstance(String param1, String param2) {
+    public static CategoriesOverviewFragment newInstance() {
         CategoriesOverviewFragment fragment = new CategoriesOverviewFragment();
         return fragment;
     }
@@ -48,6 +50,7 @@ public class CategoriesOverviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         categoryService = HttpUtils.getSolutionCategoryService();
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
     }
 
     @Override
@@ -57,8 +60,6 @@ public class CategoriesOverviewFragment extends Fragment {
         View view = binding.getRoot();
 
         fetchCategories();
-
-        NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
         binding.buttonCreateCategory.setOnClickListener(v -> {
             navController.navigate(R.id.action_categories_overview_to_category_creation);
@@ -74,9 +75,18 @@ public class CategoriesOverviewFragment extends Fragment {
             public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<GetSolutionCategoryResponse> categories = new ArrayList<>(response.body());
-                    CategoryListAdapter adapter = new CategoryListAdapter(getContext(), categories);
+
+                    // Creating on click listener for adapter
+                    CategoryListAdapter.OnEditClickListener listener = category -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("categoryId", category.getId());
+
+                        navController
+                                .navigate(R.id.action_categories_overview_to_category_edit, bundle);
+                    };
+
+                    CategoryListAdapter adapter = new CategoryListAdapter(getContext(), categories, listener);
                     binding.categoryListView.setAdapter(adapter);
-                    Log.i("CategoriesOverviewFragment", "eo");
                 } else {
                     Toast.makeText(getContext(), "Failed to fetch categories", Toast.LENGTH_SHORT).show();
                     Log.e("CategoriesOverviewFragment", "Failed to fetch categories: " + response.code());
