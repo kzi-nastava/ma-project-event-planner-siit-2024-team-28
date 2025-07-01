@@ -106,4 +106,8 @@
     <string name="price_list">Price list</string>
     <string name="price_list_title">Here\'s the price list for your solutions:</string>
     <string name="total_price">Total price:</string>
+    <string name="create_category">Create category</string>
+    <string name="pending_categories">Pending categories</string>
+    <string name="categorize">Categorize</string>
+    <string name="categories">Categories</string>
 </resources>

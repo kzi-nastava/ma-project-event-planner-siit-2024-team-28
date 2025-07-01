@@ -20,5 +20,8 @@
         <item android:id="@+id/nav_price_list"
             android:title="@string/price_list"
             android:orderInCategory="500"/>
+        <item android:id="@+id/nav_categories_overview"
+            android:title="@string/categories"
+            android:orderInCategory="500"/>
     </group>
 </menu>
