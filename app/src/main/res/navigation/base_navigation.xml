@@ -26,8 +26,9 @@
         <action
             android:id="@+id/action_home_to_solutionDetails"
             app:destination="@id/solution_details_fragment" />
-        <action android:id="@+id/action_home_to_categories_overview"
-            app:destination="@id/nav_categories_overview"/>
+        <action
+            android:id="@+id/action_home_to_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
     <fragment
         android:id="@+id/nav_top_events"
@@ -40,12 +41,6 @@
         android:name="com.eventplanner.fragments.solutions.PriceListFragment"
         android:label="Price list"
         tools:layout="@layout/fragment_price_list"
-        />
-    <fragment
-        android:id="@+id/nav_categories_overview"
-        android:name="com.eventplanner.fragments.categories.CategoriesOverviewFragment"
-        android:label="Categories overview"
-        tools:layout="@layout/fragment_categories_overview"
         />
     <fragment
         android:id="@+id/nav_top_solutions"
@@ -155,5 +150,20 @@
             app:argType="string" />
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.eventplanner.fragments.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
 
+        <action
+            android:id="@+id/action_profile_to_change_password"
+            app:destination="@id/nav_change_password" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_change_password"
+        android:name="com.eventplanner.fragments.profile.ChangePasswordFragment"
+        android:label="Change Password"
+        tools:layout="@layout/fragment_change_password" />
 </navigation>

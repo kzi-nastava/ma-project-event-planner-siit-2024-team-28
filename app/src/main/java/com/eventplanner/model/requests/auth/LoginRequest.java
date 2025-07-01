@@ -1,4 +1,4 @@
-package com.eventplanner.model.requests;
+package com.eventplanner.model.requests.auth;
 
 public class LoginRequest {
     private String email;

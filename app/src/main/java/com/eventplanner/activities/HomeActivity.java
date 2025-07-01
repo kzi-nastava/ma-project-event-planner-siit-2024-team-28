@@ -3,6 +3,7 @@ package com.eventplanner.activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
@@ -13,6 +14,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -24,6 +26,7 @@ import com.eventplanner.R;
 import com.eventplanner.fragments.FragmentTransition;
 import com.eventplanner.fragments.events.TopEventsFragment;
 import com.eventplanner.fragments.solutions.TopSolutionsFragment;
+import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.navigation.NavigationView;
 
@@ -48,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void init() {
         EdgeToEdge.enable(this);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_home);
 
         HttpUtils.initialize(getApplicationContext());
@@ -73,20 +77,22 @@ public class HomeActivity extends AppCompatActivity {
         NavigationView navigationView = findViewById(R.id.nav_view);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            int id = destination.getId();
-
-            // Avoid unnecessary navigation by checking current destination
-            if (id == R.id.nav_registration && controller.getCurrentDestination().getId() != R.id.nav_registration) {
-                navController.navigate(R.id.nav_registration);
-            } else if (id == R.id.nav_login && controller.getCurrentDestination().getId() != R.id.nav_login) {
-                navController.navigate(R.id.nav_registration);
-            } else if (id == R.id.nav_service_creation && controller.getCurrentDestination().getId() != R.id.nav_service_creation) {
-                navController.navigate(R.id.nav_service_creation);
-            } else if (id == R.id.nav_price_list && controller.getCurrentDestination().getId() != R.id.nav_price_list) {
-                navController.navigate(R.id.nav_price_list);
-            } else if (id == R.id.nav_categories_overview && controller.getCurrentDestination().getId() != R.id.nav_categories_overview) {
-                navController.navigate(R.id.nav_categories_overview);
+        // Handle menu item clicks
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_logout) {
+                AuthUtils.clearToken(this);
+                updateNavMenu();
+                drawer.closeDrawers();
+                navController.navigate(R.id.nav_home);
+                return true;
+            } else {
+                // For all other items, let NavigationUI handle navigation
+                boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
+                if (handled) {
+                    drawer.closeDrawers();
+                }
+                return handled;
             }
         });
 
@@ -94,6 +100,37 @@ public class HomeActivity extends AppCompatActivity {
                 .Builder(R.id.nav_home)
                 .setOpenableLayout(drawer)
                 .build();
+
+        updateNavMenu();
+    }
+
+    public void updateNavMenu() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+
+        boolean loggedIn = AuthUtils.getToken(this) != null;
+
+        MenuItem loginItem = menu.findItem(R.id.nav_login);
+        if (loginItem != null) {
+            loginItem.setVisible(!loggedIn);
+        }
+
+        MenuItem registerItem = menu.findItem(R.id.nav_registration);
+        if (registerItem != null) {
+            registerItem.setVisible(!loggedIn);
+        }
+
+        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
+        if (logoutItem != null) {
+            logoutItem.setVisible(loggedIn);
+        }
+
+        MenuItem profileItem = menu.findItem(R.id.nav_profile);
+        if (profileItem != null) {
+            profileItem.setVisible(loggedIn);
+        }
+
+        navigationView.invalidate();
     }
 
     @Override

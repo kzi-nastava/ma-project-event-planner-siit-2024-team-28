@@ -19,7 +19,7 @@
     <string name="settings">Settings</string>
     <string name="language">Language</string>
     <string name="select_category_service">Select the category of the service:</string>
-    <string name="select_category_service_custom">... or make up your own category</string>
+    <string name="select_category_service_custom">… or make up your own category</string>
     <string name="name_input">Name:</string>
     <string name="description_input">Description:</string>
     <string name="specifics_input">Specifics:</string>
@@ -46,11 +46,103 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tristique commodo malesuada. Nullam in aliquet nisl. In dui augue, luctus in sem vitae, condimentum fermentum nulla. Quisque molestie maximus varius. Vivamus molestie sem dolor, in rhoncus felis dapibus ac. Integer eu lobortis felis.</string>
-    <string name="register_eventOrganizer">Event Organizer</string>
-    <string name="register_businessOwner">Business Owner</string>
+
+    <!-- fragment_registration -->
+    <string name="register_eventOrganizer">Register as an event Organizer</string>
+    <string name="register_businessOwner">Register as a business Owner</string>
+
+    <!-- fragment_business_owner_registration, fragment_event_organizer_registration -->
+    <string name="register_title">Create your account</string>
+    <string name="registration_register">Register</string>
+    <string name="registration_description">Description</string>
+    <string name="registration_number">Phone number</string>
+    <string name="registration_address">Address</string>
+    <string name="registration_organization_name">Organization name</string>
+    <string name="registration_repeat_password">Repeat password</string>
+    <string name="registration_password">Password</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_first_name">First name</string>
+    <string name="registration_last_name">Last name</string>
+    <string name="registration_upload_profile_picture">Profile picture</string>
+    <string name="registration_select_profile_pic">Select your profile picture</string>
+
+    <!-- fragment_login -->
+    <string name="login_email_hint">Enter your email</string>
+    <string name="login_password_hint">Enter your password</string>
+    <string name="login_title">Login to access the entire app</string>
+
+    <!-- Validation error messages -->
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Please enter a valid email address</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_invalid">Password must be at least 6 characters</string>
+    <string name="error_repeat_password_required">Please repeat your password</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+    <string name="error_organization_name_required">Organization Name is required</string>
+    <string name="error_organization_name_invalid">Organization Name must be at least 3 characters</string>
+    <string name="error_address_required">Address is required</string>
+    <string name="error_address_invalid">Address is invalid or too short</string>
+    <string name="error_phone_required">Phone number is required</string>
+    <string name="error_phone_invalid">Please enter a valid phone number</string>
+    <string name="error_description_required">Description is required</string>
+    <string name="error_description_invalid">Description must be at least 5 characters</string>
+    <string name="error_first_name_required">First name is required</string>
+    <string name="error_first_name_invalid">First name must be at least 1 character</string>
+    <string name="error_last_name_required">Last Name is required</string>
+    <string name="error_last_name_invalid">Last Name must be at least 1 character</string>
+    <string name="error_current_password_required">Current password is required</string>
+    <string name="error_new_password_required">New password is required</string>
+    <string name="error_confirm_password_required">Please confirm your password</string>
+
+    <!-- Toast messages -->
+    <string name="toast_check_email">Check your email to activate your account.</string>
+    <string name="toast_registration_error">An error occurred while registering. Please try again.</string>
+    <string name="toast_registration_failed">Registration failed. Please try again.</string>
+    <string name="toast_invalid_credentials">Invalid credentials. Please try again.</string>
+    <string name="toast_login_failed">Login failed. Please try again.</string>
+    <string name="toast_image_upload_fail">Failed to upload image. Please try again.</string>
+    <string name="toast_profile_updated_success">Profile updated successfully</string>
+    <string name="toast_profile_update_failed">Failed to update profile</string>
+    <string name="toast_deactivation_not_implemented">Deactivation not implemented yet</string>
+    <string name="toast_password_changed_success">Password changed successfully</string>
+    <string name="toast_password_change_failed">Failed to change password</string>
+    <string name="toast_network_error">Network error</string>
+
+    <!-- Navbar -->
     <string name="navbar_register">Register</string>
     <string name="navbar_login">Login</string>
+    <string name="navbar_logout">Logout</string>
     <string name="navbar_create_service">Create service</string>
+    <string name="navbar_profile">My profile</string>
+
+    <!-- fragment_profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_email_hint">Email</string>
+    <string name="profile_phone_hint">Phone Number</string>
+    <string name="profile_address_hint">Address</string>
+    <string name="profile_business_name_hint">Business Name</string>
+    <string name="profile_business_desc_hint">Business Description</string>
+    <string name="profile_first_name_hint">First Name</string>
+    <string name="profile_last_name_hint">Last Name</string>
+    <string name="profile_upload_picture">Upload Profile Picture</string>
+    <string name="profile_select_picture">Select your profile picture</string>
+    <string name="profile_save_button">Save Profile</string>
+    <string name="profile_change_password_button">Change Password</string>
+    <string name="profile_deactivate_button">Deactivate Account</string>
+    <string name="profile_deactivate_title">Confirm Deactivation</string>
+    <string name="profile_deactivate_confirmation">Are you sure you want to deactivate your account? This action cannot be undone.</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="toast_deactivation_failed">Failed to deactivate account</string>
+
+    <!-- fragment_change_password -->
+    <string name="change_password_title">Change Password</string>
+    <string name="hint_current_password">Current Password</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="hint_confirm_new_password">Confirm New Password</string>
+    <string name="change_password_button">Change Password</string>
+    <string name="cancel_button">Cancel</string>
+
     <string name="filter">Filter</string>
     <string name="home_browse_button">Browse</string>
     <string name="browse_events_button">browse all events</string>
@@ -61,17 +153,7 @@
     <string name="all_services">All Services</string>
     <string name="next_text"><![CDATA[>]]></string>
     <string name="previous_text"><![CDATA[<]]></string>
-    <string name="register_title">Register</string>
-    <string name="registration_register">Register</string>
-    <string name="registration_description">Description</string>
-    <string name="registration_number">Phone Number</string>
-    <string name="registration_address">Address</string>
-    <string name="registration_organization_name">Organization Name</string>
-    <string name="registration_repeat_password">Repeat Password</string>
-    <string name="registration_password">Password</string>
-    <string name="registration_email">Email</string>
-    <string name="registration_first_name">First name</string>
-    <string name="registration_last_name">Last name</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login">Login</string>

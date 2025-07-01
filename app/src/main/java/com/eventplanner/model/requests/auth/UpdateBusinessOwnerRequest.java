@@ -1,22 +1,22 @@
-package com.eventplanner.model.requests;
+package com.eventplanner.model.requests.auth;
 
-public class RegisterBusinessOwnerRequest {
+public class UpdateBusinessOwnerRequest {
     private String email;
-    private String password;
     private String phoneNumber;
-    private String profilePictureBase64; // Nullable, use `null` if no picture
+    private String profilePictureBase64;
     private String address;
-    private String name;
-    private String description;
+    private String businessName;
+    private String businessDescription;
 
-    public RegisterBusinessOwnerRequest(String email, String password, String phoneNumber, String profilePictureBase64, String address, String name, String description) {
+    public UpdateBusinessOwnerRequest() {}
+
+    public UpdateBusinessOwnerRequest(String email, String phoneNumber, String profilePictureBase64, String address, String businessName, String businessDescription) {
         this.email = email;
-        this.password = password;
         this.phoneNumber = phoneNumber;
         this.profilePictureBase64 = profilePictureBase64;
         this.address = address;
-        this.name = name;
-        this.description = description;
+        this.businessName = businessName;
+        this.businessDescription = businessDescription;
     }
 
     public String getEmail() {
@@ -25,14 +25,6 @@ public class RegisterBusinessOwnerRequest {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhoneNumber() {
@@ -59,20 +51,20 @@ public class RegisterBusinessOwnerRequest {
         this.address = address;
     }
 
-    public String getName() {
-        return name;
+    public String getBusinessName() {
+        return businessName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getBusinessDescription() {
+        return businessDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setBusinessDescription(String businessDescription) {
+        this.businessDescription = businessDescription;
     }
 }
 
