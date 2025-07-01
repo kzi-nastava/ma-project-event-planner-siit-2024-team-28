@@ -24,11 +24,13 @@ import com.eventplanner.activities.HomeActivity;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.requests.auth.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.auth.UpdateEventOrganizerRequest;
+import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.InputStream;
 import java.util.List;
@@ -45,6 +47,7 @@ public class ProfileFragment extends Fragment {
     private String profilePictureBase64 = null;
     private List<String> currentUserRoles;
     private Long userId;
+    private TextInputLayout businessNameLayout, businessDescriptionLayout, firstNameLayout, lastNameLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,24 +62,18 @@ public class ProfileFragment extends Fragment {
         firstName = view.findViewById(R.id.firstName);
         lastName = view.findViewById(R.id.lastName);
         profilePicturePreview = view.findViewById(R.id.profilePicturePreview);
-
-        // Set hints from strings.xml
-        email.setHint(getString(R.string.profile_email_hint));
-        phoneNumber.setHint(getString(R.string.profile_phone_hint));
-        address.setHint(getString(R.string.profile_address_hint));
-        businessName.setHint(getString(R.string.profile_business_name_hint));
-        businessDescription.setHint(getString(R.string.profile_business_desc_hint));
-        firstName.setHint(getString(R.string.profile_first_name_hint));
-        lastName.setHint(getString(R.string.profile_last_name_hint));
+        businessNameLayout = view.findViewById(R.id.businessNameLayout);
+        businessDescriptionLayout = view.findViewById(R.id.businessDescriptionLayout);
+        firstNameLayout = view.findViewById(R.id.firstNameLayout);
+        lastNameLayout = view.findViewById(R.id.lastNameLayout);
 
         // Get current user info
         userId = AuthUtils.getUserId(requireContext());
         currentUserRoles = AuthUtils.getUserRoles(requireContext());
-
         checkDeactivationStatus();
 
         // Setup role-based visibility
-        setupRoleBasedViews();
+        setupRoleBasedViews(view);
 
         // Set click listeners
         Button uploadProfilePictureButton = view.findViewById(R.id.uploadProfilePictureButton);
@@ -101,8 +98,10 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    private void setupRoleBasedViews() {
-        if (currentUserRoles == null) return;
+    private void setupRoleBasedViews(View view) {
+        if (currentUserRoles == null) {
+            return;
+        }
 
         boolean isBusinessOwner = false;
         boolean isEventOrganizer = false;
@@ -116,15 +115,15 @@ public class ProfileFragment extends Fragment {
         }
 
         if (isBusinessOwner) {
-            businessName.setVisibility(View.VISIBLE);
-            businessDescription.setVisibility(View.VISIBLE);
-            firstName.setVisibility(View.GONE);
-            lastName.setVisibility(View.GONE);
+            businessNameLayout.setVisibility(View.VISIBLE);
+            businessDescriptionLayout.setVisibility(View.VISIBLE);
+            firstNameLayout.setVisibility(View.GONE);
+            lastNameLayout.setVisibility(View.GONE);
         } else if (isEventOrganizer) {
-            businessName.setVisibility(View.GONE);
-            businessDescription.setVisibility(View.GONE);
-            firstName.setVisibility(View.VISIBLE);
-            lastName.setVisibility(View.VISIBLE);
+            businessNameLayout.setVisibility(View.GONE);
+            businessDescriptionLayout.setVisibility(View.GONE);
+            firstNameLayout.setVisibility(View.VISIBLE);
+            lastNameLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -149,12 +148,12 @@ public class ProfileFragment extends Fragment {
         });
 
         // Get profile picture
-        Call<String> pictureCall = HttpUtils.getUserService().getUserProfilePictureBase64(userId);
+        Call<GetUserProfilePictureResponse> pictureCall = HttpUtils.getUserService().getUserProfilePictureBase64(userId);
         pictureCall.enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+            public void onResponse(@NonNull Call<GetUserProfilePictureResponse> call, @NonNull Response<GetUserProfilePictureResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    String base64Image = response.body();
+                    String base64Image = response.body().getProfilePictureBase64();
                     if (!base64Image.isEmpty()) {
                         profilePictureBase64 = base64Image;
                         Bitmap bitmap = Base64Util.decodeBase64ToBitmap(base64Image);
@@ -169,7 +168,7 @@ public class ProfileFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<GetUserProfilePictureResponse> call, @NonNull Throwable t) {
                 // Set default image on failure
                 profilePicturePreview.setImageResource(R.drawable.user);
             }
@@ -236,7 +235,7 @@ public class ProfileFragment extends Fragment {
             valid = false;
         }
 
-        if (businessName.getVisibility() == View.VISIBLE) {
+        if (businessNameLayout.getVisibility() == View.VISIBLE) {
             String businessNameStr = businessName.getText().toString().trim();
             if (FormValidator.isEmpty(businessNameStr)) {
                 businessName.setError(getString(R.string.error_organization_name_required));
@@ -250,7 +249,7 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        if (firstName.getVisibility() == View.VISIBLE) {
+        if (firstNameLayout.getVisibility() == View.VISIBLE) {
             String firstNameStr = firstName.getText().toString().trim();
             if (FormValidator.isEmpty(firstNameStr)) {
                 firstName.setError(getString(R.string.error_first_name_required));
@@ -268,7 +267,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void saveProfile() {
-        if (!validateForm() || userId == null) return;
+        if (!validateForm() || userId == null) {
+            return;
+        }
 
         if (isBusinessOwner()) {
             updateBusinessOwner();
@@ -278,7 +279,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private boolean isBusinessOwner() {
-        if (currentUserRoles == null) return false;
+        if (currentUserRoles == null) {
+            return false;
+        }
+
         for (String role : currentUserRoles) {
             if (role.equals(UserRoles.BusinessOwner)) return true;
         }
@@ -286,7 +290,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private boolean isEventOrganizer() {
-        if (currentUserRoles == null) return false;
+        if (currentUserRoles == null) {
+            return false;
+        }
+
         for (String role : currentUserRoles) {
             if (role.equals(UserRoles.EventOrganizer)) return true;
         }

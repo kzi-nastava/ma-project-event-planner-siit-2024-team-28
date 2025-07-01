@@ -37,16 +37,9 @@ public class ChangePasswordFragment extends Fragment {
 
         Button submitButton = view.findViewById(R.id.submitButton);
         submitButton.setOnClickListener(v -> changePassword());
-        submitButton.setText(getString(R.string.change_password_button));
 
         Button cancelButton = view.findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(v -> requireActivity().onBackPressed());
-        cancelButton.setText(getString(R.string.cancel_button));
-
-        // Set hints from strings.xml
-        oldPassword.setHint(getString(R.string.hint_current_password));
-        newPassword.setHint(getString(R.string.hint_new_password));
-        confirmNewPassword.setHint(getString(R.string.hint_confirm_new_password));
 
         return view;
     }

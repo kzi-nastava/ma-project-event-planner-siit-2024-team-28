@@ -3,6 +3,7 @@ package com.eventplanner.services;
 import com.eventplanner.model.requests.auth.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.auth.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.auth.UpdatePasswordRequest;
+import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 
 import retrofit2.Call;
@@ -25,7 +26,7 @@ public interface UserService {
     );
 
     @GET("users/{id}/profile-picture")
-    Call<String> getUserProfilePictureBase64(@Path("id") Long id);
+    Call<GetUserProfilePictureResponse> getUserProfilePictureBase64(@Path("id") Long id);
 
     @PUT("users/business-owners/{id}")
     Call<Void> updateBusinessOwner(@Path("id") Long id, @Body UpdateBusinessOwnerRequest request);
