@@ -1,9 +1,9 @@
 package com.eventplanner.services;
 
-import com.eventplanner.model.requests.LoginRequest;
-import com.eventplanner.model.requests.RegisterBusinessOwnerRequest;
-import com.eventplanner.model.requests.RegisterEventOrganizerRequest;
-import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.model.requests.auth.LoginRequest;
+import com.eventplanner.model.requests.auth.RegisterBusinessOwnerRequest;
+import com.eventplanner.model.requests.auth.RegisterEventOrganizerRequest;
+import com.eventplanner.model.responses.auth.AuthResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

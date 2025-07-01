@@ -14,8 +14,8 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
-import com.eventplanner.model.requests.LoginRequest;
-import com.eventplanner.model.responses.AuthResponse;
+import com.eventplanner.model.requests.auth.LoginRequest;
+import com.eventplanner.model.responses.auth.AuthResponse;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;

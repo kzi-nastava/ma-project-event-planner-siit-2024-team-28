@@ -1,4 +1,4 @@
-package com.eventplanner.model.responses;
+package com.eventplanner.model.responses.auth;
 
 public class AuthResponse {
     private String jwtToken;

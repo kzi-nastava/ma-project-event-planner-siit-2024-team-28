@@ -125,6 +125,11 @@ public class HomeActivity extends AppCompatActivity {
             logoutItem.setVisible(loggedIn);
         }
 
+        MenuItem profileItem = menu.findItem(R.id.nav_profile);
+        if (profileItem != null) {
+            profileItem.setVisible(loggedIn);
+        }
+
         navigationView.invalidate();
     }
 

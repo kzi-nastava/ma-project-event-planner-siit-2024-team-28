@@ -19,7 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
-import com.eventplanner.model.requests.RegisterEventOrganizerRequest;
+import com.eventplanner.model.requests.auth.RegisterEventOrganizerRequest;
 import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
