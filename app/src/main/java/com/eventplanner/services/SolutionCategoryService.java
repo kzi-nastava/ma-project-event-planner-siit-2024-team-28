@@ -13,6 +13,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface SolutionCategoryService {
     @POST("categories")
@@ -32,4 +33,10 @@ public interface SolutionCategoryService {
 
     @DELETE("categories/{id}")
     Call<Void> deleteCategory(@Path("id") Long id);
+
+    @PUT("categories/categorize-solution")
+    Call<Void> categorizeSolution(
+            @Query("categoryId") Long categoryId,
+            @Query("solutionId") Long solutionId
+    );
 }
