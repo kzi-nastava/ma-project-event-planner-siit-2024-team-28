@@ -188,4 +188,16 @@
     <string name="price_list">Price list</string>
     <string name="price_list_title">Here\'s the price list for your solutions:</string>
     <string name="total_price">Total price:</string>
+    <string name="create_category">Create category</string>
+    <string name="pending_categories">Pending categories</string>
+    <string name="categorize">Categorize</string>
+    <string name="categories">Categories</string>
+    <string name="create_new_category">Create new category</string>
+    <string name="edit_category">Edit category</string>
+    <string name="select_category">Select category:</string>
+    <string name="categorize_solution">Select pending solution to categorize it:</string>
+    <string name="choose_solution">Choose pending solution:</string>
+    <string name="choose_category">Choose one of the categories:</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
 </resources>

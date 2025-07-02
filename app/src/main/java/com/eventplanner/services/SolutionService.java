@@ -27,4 +27,7 @@ public interface SolutionService {
 
     @PATCH("solutions/{id}/discount")
     Call<Void> updateSolutionDiscount(@Path("id") Long solutionId, @Query("newDiscount") Double newDiscount);
+
+    @GET("solutions/pending-solutions")
+    Call<Collection<GetSolutionResponse>> getPendingSolutions();
 }
