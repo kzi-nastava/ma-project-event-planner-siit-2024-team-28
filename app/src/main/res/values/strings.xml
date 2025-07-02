@@ -200,4 +200,12 @@
     <string name="choose_category">Choose one of the categories:</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+    <string name="budget_planning_title">Let\'s help you plan budget for your event!</string>
+    <string name="choose_event">Choose one of your events:</string>
+    <string name="create_item_manual">Create an item by selecting category and entering an amount</string>
+    <string name="create_item">Create item</string>
+    <string name="amount_input">Amount: </string>
+    <string name="show_items">Show items</string>
+    <string name="items_title">Items for:</string>
+    <string name="maximum_budget">Maximum budget:</string>
 </resources>
