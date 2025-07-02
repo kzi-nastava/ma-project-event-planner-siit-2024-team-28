@@ -40,6 +40,12 @@
         tools:layout="@layout/fragment_top_events"
         />
     <fragment
+        android:id="@+id/nav_category_acception"
+        android:name="com.eventplanner.fragments.categories.CategoryAcceptionFragment"
+        android:label="Category acception"
+        tools:layout="@layout/fragment_category_acception"
+        />
+    <fragment
         android:id="@+id/nav_categories_overview"
         android:name="com.eventplanner.fragments.categories.CategoriesOverviewFragment"
         android:label="Categories overview"
@@ -56,6 +62,8 @@
         </action>
         <action android:id="@+id/action_categories_overview_to_categorize_solution"
             app:destination="@+id/nav_categorize_solution"/>
+        <action android:id="@+id/action_categories_overview_to_category_acception"
+            app:destination="@+id/nav_category_acception"/>
     </fragment>
     <fragment
         android:id="@+id/nav_categorize_solution"

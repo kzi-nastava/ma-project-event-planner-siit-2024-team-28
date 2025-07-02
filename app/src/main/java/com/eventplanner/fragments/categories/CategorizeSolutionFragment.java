@@ -153,7 +153,6 @@ public class CategorizeSolutionFragment extends Fragment {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                             if (position == 0) {
-                                // Placeholder izabran, vrednost null
                                 selectedCategoryId = null;
                             } else {
                                 GetSolutionCategoryResponse selectedCategory = categories.get(position - 1);

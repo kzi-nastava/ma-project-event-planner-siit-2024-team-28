@@ -69,6 +69,10 @@ public class CategoriesOverviewFragment extends Fragment {
             navController.navigate(R.id.action_categories_overview_to_categorize_solution);
         });
 
+        binding.buttonAcceptCategory.setOnClickListener(v -> {
+            navController.navigate(R.id.action_categories_overview_to_category_acception);
+        });
+
         return view;
     }
 

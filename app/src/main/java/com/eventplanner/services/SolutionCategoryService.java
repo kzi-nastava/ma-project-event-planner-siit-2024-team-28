@@ -28,6 +28,9 @@ public interface SolutionCategoryService {
     @GET("categories/accepted-categories")
     Call<Collection<GetSolutionCategoryResponse>> getAcceptedCategories();
 
+    @GET("categories/pending-categories")
+    Call<Collection<GetSolutionCategoryResponse>> getPendingCategories();
+
     @PUT("categories/{id}")
     Call<Void> updateCategory(@Path("id") Long id, @Body UpdateSolutionCategoryRequest request);
 
