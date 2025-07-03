@@ -24,6 +24,9 @@
             android:id="@+id/action_home_to_price_list"
             app:destination="@id/nav_price_list" />
         <action
+            android:id="@+id/action_home_to_budget_planning"
+            app:destination="@id/nav_budget_planning" />
+        <action
             android:id="@+id/action_home_to_categories_overview"
             app:destination="@id/nav_categories_overview" />
         <action
@@ -38,6 +41,12 @@
         android:name="com.eventplanner.fragments.events.TopEventsFragment"
         android:label="Top events"
         tools:layout="@layout/fragment_top_events"
+        />
+    <fragment
+        android:id="@+id/nav_budget_planning"
+        android:name="com.eventplanner.fragments.solutions.BudgetPlanningFragment"
+        android:label="Budget planning"
+        tools:layout="@layout/fragment_budget_planning"
         />
     <fragment
         android:id="@+id/nav_category_acception"

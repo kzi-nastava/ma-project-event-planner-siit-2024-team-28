@@ -208,4 +208,5 @@
     <string name="show_items">Show items</string>
     <string name="items_title">Items for:</string>
     <string name="maximum_budget">Maximum budget:</string>
+    <string name="budget_planning">Budget planning</string>
 </resources>

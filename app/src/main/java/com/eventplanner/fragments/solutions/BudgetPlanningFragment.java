@@ -4,63 +4,205 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.eventplanner.R;
+import com.eventplanner.databinding.FragmentBudgetPlanningBinding;
+import com.eventplanner.model.responses.events.GetEventResponse;
+import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
+import com.eventplanner.services.EventService;
+import com.eventplanner.services.EventTypeService;
+import com.eventplanner.services.RequiredSolutionService;
+import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.HttpUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BudgetPlanningFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class BudgetPlanningFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    FragmentBudgetPlanningBinding binding;
+    EventService eventService;
+    RequiredSolutionService requiredSolutionService;
+    EventTypeService eventTypeService;
+    Long eventOrganizerId;
+    Long selectedEventId;
+    Long selectedCategoryId;
 
     public BudgetPlanningFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BudgetPlanningFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static BudgetPlanningFragment newInstance(String param1, String param2) {
         BudgetPlanningFragment fragment = new BudgetPlanningFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        eventService = HttpUtils.getEventService();
+        requiredSolutionService = HttpUtils.getRequiredSolutionService();
+        eventTypeService = HttpUtils.getEventTypeService();
+        eventOrganizerId = AuthUtils.getUserId(getContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_budget_planning, container, false);
+        binding = FragmentBudgetPlanningBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+        setupViews();
+
+        return view;
+    }
+
+    private void setupViews() {
+        fetchActiveEvents();
+    }
+
+    private void fetchActiveEvents() {
+        Call<Collection<GetEventResponse>> call = eventService.getActiveEventsByOrganizer(eventOrganizerId);
+
+        call.enqueue(new Callback<Collection<GetEventResponse>>() {
+            @Override
+            public void onResponse(Call<Collection<GetEventResponse>> call, Response<Collection<GetEventResponse>> response) {
+                if (response.isSuccessful()) {
+                    List<GetEventResponse> events = new ArrayList<>(response.body());
+
+                    List<String> eventNames = new ArrayList<>();
+                    eventNames.add("Select event"); // placeholder
+                    for (GetEventResponse event : events) {
+                        eventNames.add(event.getName());
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            eventNames
+                    );
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                    Spinner spinner = binding.spinnerEvents;
+                    spinner.setAdapter(adapter);
+
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            if (position == 0) {
+                                selectedEventId = null;
+                            } else {
+                                selectedEventId = events.get(position - 1).getId();
+                                fetchEvent();
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                        }
+                    });
+                    Log.d("BudgetPlanningFragment", "Fetched events: " + events.size() + " events");
+                } else {
+                    Log.e("BudgetPlanningFragment", "Failed fetching events: " + response.code());
+                    Toast.makeText(getContext(), "Failed to load events", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Collection<GetEventResponse>> call, Throwable t) {
+                Log.e("BudgetPlanningFragment", "Network error", t);
+                Toast.makeText(getContext(), "Network failure", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchEvent() {
+        Call<GetEventResponse> call = eventService.getEventById(selectedEventId);
+        call.enqueue(new Callback<GetEventResponse>() {
+            @Override
+            public void onResponse(Call<GetEventResponse> call, Response<GetEventResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    GetEventResponse event = response.body();
+
+                    fetchRecommendedCategories(event.getEventTypeId());
+
+                    Log.d("BudgetPlanningFragment", "Event successfully fetched: " + event.getName());
+                } else {
+                    Log.e("BudgetPlanningFragment", "Failed to load event: " + response.code());
+                    Toast.makeText(getContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetEventResponse> call, Throwable t) {
+                Log.e("BudgetPlanningFragment", "Network failure", t);
+                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchRecommendedCategories(Long eventTypeId) {
+        Call<Collection<GetSolutionCategoryResponse>> call = eventTypeService.getRecommendedCategories(eventTypeId);
+        call.enqueue(new Callback<Collection<GetSolutionCategoryResponse>>() {
+            @Override
+            public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<GetSolutionCategoryResponse> categories = new ArrayList<>(response.body());
+
+                    List<String> categoryNames = new ArrayList<>();
+                    categoryNames.add("Select category"); // placeholder
+                    for (GetSolutionCategoryResponse category : categories) {
+                        categoryNames.add(category.getName());
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            categoryNames
+                    );
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                    Spinner spinner = binding.spinnerCategories;
+                    spinner.setAdapter(adapter);
+
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            if (position == 0) {
+                                selectedCategoryId = null;
+                            } else {
+                                selectedCategoryId = categories.get(position - 1).getId();
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                        }
+                    });
+                    Log.d("BudgetPlanningFragment", "Recommended categories successfully fetched: " + categories.size());
+                } else {
+                    Log.e("BudgetPlanningFragment", "Failed to load recommended categories: " + response.code());
+                    Toast.makeText(getContext(), "Failed to load recommended categories", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Collection<GetSolutionCategoryResponse>> call, Throwable t) {
+                Log.e("BudgetPlanningFragment", "Network error while loading recommended categories", t);
+                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
