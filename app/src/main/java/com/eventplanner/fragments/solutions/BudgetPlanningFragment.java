@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentBudgetPlanningBinding;
+import com.eventplanner.model.requests.requiredSolutions.CreateRequiredSolutionRequest;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.services.EventService;
@@ -71,6 +72,9 @@ public class BudgetPlanningFragment extends Fragment {
 
     private void setupViews() {
         fetchActiveEvents();
+        binding.buttonCreateItem.setOnClickListener(v -> {
+            createItem();
+        });
     }
 
     private void fetchActiveEvents() {
@@ -202,6 +206,58 @@ public class BudgetPlanningFragment extends Fragment {
             public void onFailure(Call<Collection<GetSolutionCategoryResponse>> call, Throwable t) {
                 Log.e("BudgetPlanningFragment", "Network error while loading recommended categories", t);
                 Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void createItem() {
+        // Validation
+        if (selectedEventId == null) {
+            Toast.makeText(getContext(), "You have to select an event.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (selectedCategoryId == null) {
+            Toast.makeText(getContext(), "You have to select a category.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String amountText = binding.editTextAmount.getText().toString().trim();
+        Double amount;
+        try {
+            amount = Double.parseDouble(amountText);
+        } catch (Exception e) {
+            if (amountText.isEmpty()) {
+                Toast.makeText(getContext(), "You have to enter amount.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Invalid input for amount.", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        CreateRequiredSolutionRequest request = new CreateRequiredSolutionRequest.Builder()
+                .budget(amount)
+                .solutionId(null)
+                .categoryId(selectedCategoryId)
+                .eventId(selectedEventId)
+                .build();
+
+        Call<Long> call = requiredSolutionService.createRequiredSolution(request);
+        call.enqueue(new Callback<Long>() {
+            @Override
+            public void onResponse(Call<Long> call, Response<Long> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Long newId = response.body();
+                    Log.d("BudgetPlanningFragment", "Created RequiredSolution with id: " + newId);
+                    Toast.makeText(getContext(), "Required solution created successfully.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("BudgetPlanningFragment", "Failed to create required solution. Code: " + response.code());
+                    Toast.makeText(getContext(), "Failed to create required solution.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Long> call, Throwable t) {
+                Log.e("YourTag", "Network error", t);
+                Toast.makeText(getContext(), "Network error occurred.", Toast.LENGTH_SHORT).show();
             }
         });
     }
