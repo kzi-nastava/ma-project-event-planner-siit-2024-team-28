@@ -43,17 +43,29 @@
         tools:layout="@layout/fragment_top_events"
         />
     <fragment
+        android:id="@+id/nav_budget_planning_items"
+        android:name="com.eventplanner.fragments.solutions.BudgetPlanningItemsFragment"
+        android:label="Budget planning items"
+        tools:layout="@layout/budget_planning_item_card"
+        />
+    <fragment
         android:id="@+id/nav_budget_planning"
         android:name="com.eventplanner.fragments.solutions.BudgetPlanningFragment"
         android:label="Budget planning"
-        tools:layout="@layout/fragment_budget_planning"
-        />
+        tools:layout="@layout/fragment_budget_planning" >
+        <action
+            android:id="@+id/action_budget_planning_to_budget_planning_items"
+            app:destination="@id/nav_budget_planning_items">
+            <argument
+                android:name="eventId"
+                app:argType="long"/>
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/nav_category_acception"
         android:name="com.eventplanner.fragments.categories.CategoryAcceptionFragment"
         android:label="Category acception"
-        tools:layout="@layout/fragment_category_acception"
-        />
+        tools:layout="@layout/fragment_category_acception" />
     <fragment
         android:id="@+id/nav_categories_overview"
         android:name="com.eventplanner.fragments.categories.CategoriesOverviewFragment"
@@ -179,6 +191,7 @@
     <fragment
         android:id="@+id/solution_details_fragment"
         android:name="com.eventplanner.fragments.solutions.SolutionDetailsFragment"
+        tools:layout="@layout/fragment_solution_details"
         android:label="Solution Details">
         <argument
             android:name="solutionId"
@@ -191,6 +204,7 @@
     <fragment
         android:id="@+id/business_owner_details_fragment"
         android:name="com.eventplanner.fragments.users.BusinessOwnerDetailsFragment"
+        tools:layout="@layout/fragment_business_owner_details"
         android:label="Business Owner Details">
         <argument
             android:name="businessOwnerId"
@@ -200,6 +214,7 @@
     <fragment
         android:id="@+id/nav_service_edit"
         android:name="com.eventplanner.fragments.services.ServiceEditFragment"
+        tools:layout="@layout/fragment_service_edit"
         android:label="Service Edit">
         <argument
             android:name="serviceId"

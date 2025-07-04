@@ -3,6 +3,8 @@ package com.eventplanner.fragments.solutions;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ public class BudgetPlanningFragment extends Fragment {
     EventService eventService;
     RequiredSolutionService requiredSolutionService;
     EventTypeService eventTypeService;
+    NavController navController;
     Long eventOrganizerId;
     Long selectedEventId;
     Long selectedCategoryId;
@@ -57,6 +60,7 @@ public class BudgetPlanningFragment extends Fragment {
         requiredSolutionService = HttpUtils.getRequiredSolutionService();
         eventTypeService = HttpUtils.getEventTypeService();
         eventOrganizerId = AuthUtils.getUserId(getContext());
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
     }
 
     @Override
@@ -74,6 +78,15 @@ public class BudgetPlanningFragment extends Fragment {
         fetchActiveEvents();
         binding.buttonCreateItem.setOnClickListener(v -> {
             createItem();
+        });
+        binding.buttonShowItems.setOnClickListener(v -> {
+            if(selectedEventId == null) {
+                Toast.makeText(getContext(), "Select an event first.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Bundle args = new Bundle();
+            args.putLong("eventId", selectedEventId);
+            navController.navigate(R.id.action_budget_planning_to_budget_planning_items, args);
         });
     }
 
