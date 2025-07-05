@@ -1,5 +1,7 @@
 package com.eventplanner.adapters.solutions;
 
+import static android.provider.Settings.System.getString;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.eventplanner.adapters.requiredSolutions.RequiredSolutionRecyclerViewAdapter;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.R;
 
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class SolutionRecyclerViewAdapter extends RecyclerView.Adapter<SolutionRecyclerViewAdapter.SolutionViewHolder>{
 
@@ -23,11 +28,8 @@ public class SolutionRecyclerViewAdapter extends RecyclerView.Adapter<SolutionRe
         void onItemClick(GetSolutionResponse solution);
     }
 
-    public SolutionRecyclerViewAdapter(List<GetSolutionResponse> solutions) {
+    public SolutionRecyclerViewAdapter(List<GetSolutionResponse> solutions, OnItemClickListener listener) {
         this.solutions = solutions;
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
@@ -35,15 +37,20 @@ public class SolutionRecyclerViewAdapter extends RecyclerView.Adapter<SolutionRe
     @Override
     public SolutionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.solution_card, parent, false);
+                .inflate(R.layout.budget_planning_item_solution_card, parent, false);
         return new SolutionViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull SolutionViewHolder holder, int position) {
         GetSolutionResponse solution = solutions.get(position);
-        holder.titleTextView.setText(solution.getName());
-        holder.descriptionTextView.setText(solution.getDescription());
+        holder.solutionName.setText(solution.getName());
+        DecimalFormat df = new DecimalFormat("#.00");
+        String priceLabel = holder.itemView.getContext().getString(R.string.price_input);
+        holder.price.setText(priceLabel + " " + String.valueOf(df.format(solution.getPrice())) + "$");
+        String priceWithDiscountLabel = holder.itemView.getContext().getString(R.string.total_price);
+        Double priceWithDiscount = solution.getPrice() * (1 - solution.getDiscount() / 100);
+        holder.priceWithDiscount.setText(priceWithDiscountLabel + " " + String.valueOf(df.format(priceWithDiscount)) + "$");
         // TODO: srediti slike
         // holder.imageView.setImageResource(solution.getImageBase64());
 
@@ -60,14 +67,16 @@ public class SolutionRecyclerViewAdapter extends RecyclerView.Adapter<SolutionRe
     }
 
     static class SolutionViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, descriptionTextView;
+        TextView solutionName, price, priceWithDiscount;
         ImageView imageView;
 
         public SolutionViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleTextView = itemView.findViewById(R.id.solution_name);
-            descriptionTextView = itemView.findViewById(R.id.solution_description);
+            solutionName = itemView.findViewById(R.id.text_solution_name);
+            price = itemView.findViewById(R.id.text_price);
+            priceWithDiscount = itemView.findViewById(R.id.text_price_with_discount);
             imageView = itemView.findViewById(R.id.solution_image);
         }
+
     }
 }

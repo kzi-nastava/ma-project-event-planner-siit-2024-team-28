@@ -69,7 +69,7 @@ public class SolutionDetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
-            solutionId = "7"; // TODO: skloniti kad se sredi prosledjivanje id-eva
+            //solutionId = "7"; // TODO: skloniti kad se sredi prosledjivanje id-eva
         }
     }
 

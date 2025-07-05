@@ -31,7 +31,7 @@
             app:destination="@id/nav_categories_overview" />
         <action
             android:id="@+id/action_home_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
         <action
             android:id="@+id/action_home_to_profile"
             app:destination="@id/nav_profile" />
@@ -46,8 +46,11 @@
         android:id="@+id/nav_budget_planning_items"
         android:name="com.eventplanner.fragments.solutions.BudgetPlanningItemsFragment"
         android:label="Budget planning items"
-        tools:layout="@layout/budget_planning_item_card"
-        />
+        tools:layout="@layout/budget_planning_item_card" >
+        <action
+            android:id="@+id/action_budget_planning_items_to_solution_details"
+            app:destination="@+id/nav_solution_details" />
+    </fragment>
     <fragment
         android:id="@+id/nav_budget_planning"
         android:name="com.eventplanner.fragments.solutions.BudgetPlanningFragment"
@@ -118,7 +121,7 @@
         >
         <action
             android:id="@+id/action_topSolutions_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
     </fragment>
     <fragment
         android:id="@+id/nav_registration"
@@ -175,7 +178,7 @@
         tools:layout="@layout/fragment_all_products">
         <action
             android:id="@+id/action_allProducts_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
         </fragment>
     <fragment
         android:id="@+id/nav_all_services"
@@ -185,11 +188,11 @@
         >
         <action
             android:id="@+id/action_allServices_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
     </fragment>
 
     <fragment
-        android:id="@+id/solution_details_fragment"
+        android:id="@+id/nav_solution_details"
         android:name="com.eventplanner.fragments.solutions.SolutionDetailsFragment"
         tools:layout="@layout/fragment_solution_details"
         android:label="Solution Details">

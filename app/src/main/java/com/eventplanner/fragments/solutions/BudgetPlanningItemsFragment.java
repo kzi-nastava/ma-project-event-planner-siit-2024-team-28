@@ -3,6 +3,8 @@ package com.eventplanner.fragments.solutions;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +46,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
     private SolutionService solutionService;
     private List<GetRequiredSolutionItemResponse> items;
     private RequiredSolutionRecyclerViewAdapter adapter;
+    private NavController navController;
 
     public BudgetPlanningItemsFragment() {
         // Required empty public constructor
@@ -66,6 +69,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
         requiredSolutionService = HttpUtils.getRequiredSolutionService();
         eventService = HttpUtils.getEventService();
         solutionService = HttpUtils.getSolutionService();
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
     }
 
     @Override
@@ -104,12 +108,18 @@ public class BudgetPlanningItemsFragment extends Fragment {
         });
     }
 
+    // Two RecyclerViews -> one (horizontal) for RequiredSolutions
+    //                   -> second (vertical) for Solutions which is found inside first one
+    // This function handles setting up those RecyclerViews and their adapters
+    // Function includes overriding methods for those adapters (listener interfaces) and backend calls for those methods
+    // Probably needs refactoring (understatement)
+    // GL!
     private void setupItemRecyclerView() {
         RecyclerView itemsRecyclerView = binding.recyclerItems;
         itemsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
         );
-
+        // Overriding listener methods for requiredSolutionAdapter
         RequiredSolutionRecyclerViewAdapter.OnItemInteractionListener listener =
                 new RequiredSolutionRecyclerViewAdapter.OnItemInteractionListener() {
                     @Override
@@ -124,7 +134,17 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                 public void onResponse(Call<Collection<GetSolutionResponse>> call, Response<Collection<GetSolutionResponse>> response) {
                                     if (response.isSuccessful()) {
                                         List<GetSolutionResponse> solutions = new ArrayList<>(response.body());
-                                        SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions);
+                                        // Overriding listener method for solution adapter
+                                        SolutionRecyclerViewAdapter.OnItemClickListener solutionAdapterListener =
+                                                new SolutionRecyclerViewAdapter.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(GetSolutionResponse solution) {
+                                                Bundle args = new Bundle();
+                                                args.putString("solutionId", String.valueOf(solution.getId()));
+                                                navController.navigate(R.id.action_budget_planning_items_to_solution_details, args);
+                                            }
+                                        };
+                                        SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions, solutionAdapterListener);
 
                                         if (recyclerView.getLayoutManager() == null) {
                                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -154,7 +174,17 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                         GetSolutionResponse fetchedSolution = response.body();
                                         List<GetSolutionResponse> solutions = new ArrayList<>();
                                         solutions.add(fetchedSolution);
-                                        SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions);
+                                        // Overriding listener method for solution adapter
+                                        SolutionRecyclerViewAdapter.OnItemClickListener solutionAdapterListener =
+                                                new SolutionRecyclerViewAdapter.OnItemClickListener() {
+                                                    @Override
+                                                    public void onItemClick(GetSolutionResponse solution) {
+                                                        Bundle args = new Bundle();
+                                                        args.putString("solutionId", String.valueOf(solution.getId()));
+                                                        navController.navigate(R.id.action_budget_planning_items_to_solution_details, args);
+                                                    }
+                                                };
+                                        SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions, solutionAdapterListener);
 
                                         if (recyclerView.getLayoutManager() == null) {
                                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

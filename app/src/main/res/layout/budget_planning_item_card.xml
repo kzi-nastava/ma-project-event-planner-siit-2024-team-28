@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="15dp"
     android:background="@drawable/rounded_purple_card"
-    android:layout_marginBottom="30dp">
+    android:layout_marginEnd="20dp">
 
     <TextView
         android:id="@+id/category_name"
@@ -63,6 +63,7 @@
         android:id="@+id/recycler_solutions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="false"/>
+        android:nestedScrollingEnabled="false"
+        android:layout_marginTop="20dp"/>
 
 </LinearLayout>
