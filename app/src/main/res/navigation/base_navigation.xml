@@ -24,11 +24,14 @@
             android:id="@+id/action_home_to_price_list"
             app:destination="@id/nav_price_list" />
         <action
+            android:id="@+id/action_home_to_budget_planning"
+            app:destination="@id/nav_budget_planning" />
+        <action
             android:id="@+id/action_home_to_categories_overview"
             app:destination="@id/nav_categories_overview" />
         <action
             android:id="@+id/action_home_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
         <action
             android:id="@+id/action_home_to_profile"
             app:destination="@id/nav_profile" />
@@ -40,11 +43,32 @@
         tools:layout="@layout/fragment_top_events"
         />
     <fragment
+        android:id="@+id/nav_budget_planning_items"
+        android:name="com.eventplanner.fragments.solutions.BudgetPlanningItemsFragment"
+        android:label="Budget planning items"
+        tools:layout="@layout/budget_planning_item_card" >
+        <action
+            android:id="@+id/action_budget_planning_items_to_solution_details"
+            app:destination="@+id/nav_solution_details" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_budget_planning"
+        android:name="com.eventplanner.fragments.solutions.BudgetPlanningFragment"
+        android:label="Budget planning"
+        tools:layout="@layout/fragment_budget_planning" >
+        <action
+            android:id="@+id/action_budget_planning_to_budget_planning_items"
+            app:destination="@id/nav_budget_planning_items">
+            <argument
+                android:name="eventId"
+                app:argType="long"/>
+        </action>
+    </fragment>
+    <fragment
         android:id="@+id/nav_category_acception"
         android:name="com.eventplanner.fragments.categories.CategoryAcceptionFragment"
         android:label="Category acception"
-        tools:layout="@layout/fragment_category_acception"
-        />
+        tools:layout="@layout/fragment_category_acception" />
     <fragment
         android:id="@+id/nav_categories_overview"
         android:name="com.eventplanner.fragments.categories.CategoriesOverviewFragment"
@@ -97,7 +121,7 @@
         >
         <action
             android:id="@+id/action_topSolutions_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
     </fragment>
     <fragment
         android:id="@+id/nav_registration"
@@ -154,7 +178,7 @@
         tools:layout="@layout/fragment_all_products">
         <action
             android:id="@+id/action_allProducts_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
         </fragment>
     <fragment
         android:id="@+id/nav_all_services"
@@ -164,12 +188,13 @@
         >
         <action
             android:id="@+id/action_allServices_to_solutionDetails"
-            app:destination="@id/solution_details_fragment" />
+            app:destination="@id/nav_solution_details" />
     </fragment>
 
     <fragment
-        android:id="@+id/solution_details_fragment"
+        android:id="@+id/nav_solution_details"
         android:name="com.eventplanner.fragments.solutions.SolutionDetailsFragment"
+        tools:layout="@layout/fragment_solution_details"
         android:label="Solution Details">
         <argument
             android:name="solutionId"
@@ -182,6 +207,7 @@
     <fragment
         android:id="@+id/business_owner_details_fragment"
         android:name="com.eventplanner.fragments.users.BusinessOwnerDetailsFragment"
+        tools:layout="@layout/fragment_business_owner_details"
         android:label="Business Owner Details">
         <argument
             android:name="businessOwnerId"
@@ -191,6 +217,7 @@
     <fragment
         android:id="@+id/nav_service_edit"
         android:name="com.eventplanner.fragments.services.ServiceEditFragment"
+        tools:layout="@layout/fragment_service_edit"
         android:label="Service Edit">
         <argument
             android:name="serviceId"

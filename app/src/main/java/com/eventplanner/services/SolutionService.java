@@ -30,4 +30,10 @@ public interface SolutionService {
 
     @GET("solutions/pending-solutions")
     Call<Collection<GetSolutionResponse>> getPendingSolutions();
+
+    @GET("solutions/required-solution/appropriate-solutions")
+    Call<Collection<GetSolutionResponse>> getAppropriateSolutions(
+            @Query("categoryId") Long categoryId,
+            @Query("amount") Double amount
+    );
 }
