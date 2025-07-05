@@ -1,6 +1,7 @@
 package com.eventplanner.services;
 
 import com.eventplanner.model.requests.requiredSolutions.CreateRequiredSolutionRequest;
+import com.eventplanner.model.requests.requiredSolutions.UpdateRequiredSolutionRequest;
 import com.eventplanner.model.responses.requiredSolutions.GetRequiredSolutionItemResponse;
 
 import java.util.Collection;
@@ -10,6 +11,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface RequiredSolutionService {
@@ -21,4 +23,10 @@ public interface RequiredSolutionService {
 
     @DELETE("required-solutions/{id}")
     Call<Void> deleteRequiredSolution(@Path("id") Long id);
+
+    @PUT("required-solutions/{id}")
+    Call<Void> updateRequiredSolution(
+            @Path("id") Long id,
+            @Body UpdateRequiredSolutionRequest request
+    );
 }

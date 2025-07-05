@@ -17,6 +17,7 @@ import com.eventplanner.adapters.requiredSolutions.RequiredSolutionRecyclerViewA
 import com.eventplanner.adapters.solutions.SolutionRecyclerViewAdapter;
 import com.eventplanner.databinding.FragmentBudgetPlanningBinding;
 import com.eventplanner.databinding.FragmentBudgetPlanningItemsBinding;
+import com.eventplanner.model.requests.requiredSolutions.UpdateRequiredSolutionRequest;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.requiredSolutions.GetRequiredSolutionItemResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
@@ -112,32 +113,67 @@ public class BudgetPlanningItemsFragment extends Fragment {
         RequiredSolutionRecyclerViewAdapter.OnItemInteractionListener listener =
                 new RequiredSolutionRecyclerViewAdapter.OnItemInteractionListener() {
                     @Override
-                    public void onSolutionsRequested(Long categoryId, Double budget, RecyclerView recyclerView) {
-                        Call<Collection<GetSolutionResponse>> call = solutionService.getAppropriateSolutions(categoryId, budget);
-                        call.enqueue(new Callback<Collection<GetSolutionResponse>>() {
-                            @Override
-                            public void onResponse(Call<Collection<GetSolutionResponse>> call, Response<Collection<GetSolutionResponse>> response) {
-                                if (response.isSuccessful()) {
-                                    List<GetSolutionResponse> solutions = new ArrayList<>(response.body());
-                                    SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions);
+                    public void onSolutionsRequested(GetRequiredSolutionItemResponse item, RecyclerView recyclerView) {
+                        // If item has no bought solution load all possible solution user can buy
+                        if (item.getSolutionId() == null) {
+                            Long categoryId = item.getCategoryId();
+                            Double budget = item.getBudget();
+                            Call<Collection<GetSolutionResponse>> call = solutionService.getAppropriateSolutions(categoryId, budget);
+                            call.enqueue(new Callback<Collection<GetSolutionResponse>>() {
+                                @Override
+                                public void onResponse(Call<Collection<GetSolutionResponse>> call, Response<Collection<GetSolutionResponse>> response) {
+                                    if (response.isSuccessful()) {
+                                        List<GetSolutionResponse> solutions = new ArrayList<>(response.body());
+                                        SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions);
 
-                                    if (recyclerView.getLayoutManager() == null) {
-                                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                        if (recyclerView.getLayoutManager() == null) {
+                                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                        }
+
+                                        recyclerView.setAdapter(solutionsAdapter);
+                                       Log.i("BudgetPlanningItemsFragment", "Successfully fetched solutions for an item.");
+                                    } else {
+                                        Log.i("BudgetPlanningItemsFragment", "Error while fetching solutions for an item: " + response.code());
                                     }
-
-                                    recyclerView.setAdapter(solutionsAdapter);
-                                   Log.i("BudgetPlanningItemsFragment", "Successfully fetched solutions for an item.");
-                                } else {
-                                    Log.i("BudgetPlanningItemsFragment", "Error while fetching solutions for an item: " + response.code());
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(Call<Collection<GetSolutionResponse>> call, Throwable t) {
-                                Log.e("BudgetPlanningFragment", "Network failure", t);
-                                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                @Override
+                                public void onFailure(Call<Collection<GetSolutionResponse>> call, Throwable t) {
+                                    Log.e("BudgetPlanningFragment", "Network failure", t);
+                                    Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            // Item has a bought solution so we just load it nothing more
+                            Long solutionId = item.getSolutionId();
+                            Call<GetSolutionResponse> call = solutionService.getSolutionById(solutionId);
+                            call.enqueue(new Callback<GetSolutionResponse>() {
+                                @Override
+                                public void onResponse(Call<GetSolutionResponse> call, Response<GetSolutionResponse> response) {
+                                    if (response.isSuccessful()) {
+                                        GetSolutionResponse fetchedSolution = response.body();
+                                        List<GetSolutionResponse> solutions = new ArrayList<>();
+                                        solutions.add(fetchedSolution);
+                                        SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions);
+
+                                        if (recyclerView.getLayoutManager() == null) {
+                                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                        }
+
+                                        recyclerView.setAdapter(solutionsAdapter);
+                                        Log.i("BudgetPlanningItemsFragment", "Successfully fetched solution for an item.");
+                                    } else {
+                                        Log.i("BudgetPlanningItemsFragment", "Error while fetching solution for an item: " + response.code());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<GetSolutionResponse> call, Throwable t) {
+                                    Log.e("BudgetPlanningFragment", "Network failure", t);
+                                    Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
 
                     @Override
@@ -163,6 +199,48 @@ public class BudgetPlanningItemsFragment extends Fragment {
                             }
                         });
                     }
+
+                    @Override
+                    public void onEditClick(Long requiredSolutionId, String newBudget) {
+                        Double budget = null;
+                        try {
+                            budget = Double.parseDouble(newBudget);
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Invalid budget input.", Toast.LENGTH_SHORT).show();
+                        }
+                        UpdateRequiredSolutionRequest request = new UpdateRequiredSolutionRequest(budget,null,null,null);
+
+                        Call<Void> call = requiredSolutionService.updateRequiredSolution(requiredSolutionId, request);
+                        Double finalBudget = budget;
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    GetRequiredSolutionItemResponse item = adapter.getItemById(requiredSolutionId);
+                                    if(item != null) {
+                                        item.setBudget(finalBudget);
+                                        int position = adapter.getPositionById(requiredSolutionId);
+                                        if (position != -1) {
+                                            adapter.notifyItemChanged(position);
+                                        }
+                                    }
+                                    calculateMaximumBudget();
+                                    Toast.makeText(getContext(), "Successfully updated!", Toast.LENGTH_SHORT).show();
+                                    Log.i("BudgetPlanningItemsFragment", "Item's amount successfully updated.");
+                                } else {
+                                    Toast.makeText(getContext(), "Update failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                                    Log.i("BudgetPlanningItemsFragment", "Update failed: " + response.code());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.i("BudgetPlanningItemsFragment", "Network error: " + t.getMessage());
+                            }
+                        });
+                    }
+
                 };
 
         adapter = new RequiredSolutionRecyclerViewAdapter(items, listener);

@@ -38,18 +38,34 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
         holder.categoryName.setText(requiredSolution.getCategoryName());
         holder.editTextAmount.setText(String.valueOf(requiredSolution.getBudget()));
 
-        Double budget = requiredSolutions.get(position).getBudget();
-        listener.onSolutionsRequested(requiredSolution.getCategoryId(), budget, holder.solutionsRecycler);
+        // load solutions/solution for an item
+        listener.onSolutionsRequested(requiredSolution, holder.solutionsRecycler);
 
+        // listener for deleting an item
         holder.deleteButton.setOnClickListener(v -> {
             Long requiredSolutionId = requiredSolution.getId();
             listener.onDeleteClick(position, requiredSolutionId);
+        });
+
+        // listener for editing amount for an item
+        holder.editButton.setOnClickListener(v -> {
+            String newBudget = holder.editTextAmount.getText().toString().trim();
+            listener.onEditClick(requiredSolution.getId(), newBudget);
         });
     }
 
     @Override
     public int getItemCount() {
         return requiredSolutions.size();
+    }
+
+    public GetRequiredSolutionItemResponse getItemById(Long id) {
+        for (int i = 0; i < requiredSolutions.size(); i++) {
+            if (requiredSolutions.get(i).getId().equals(id)) {
+                return requiredSolutions.get(i);
+            }
+        }
+        return null;
     }
 
     public void removeItemById(Long id) {
@@ -62,10 +78,20 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
         }
     }
 
+    public int getPositionById(Long id) {
+        for (int i = 0; i < requiredSolutions.size(); i++) {
+            if (requiredSolutions.get(i).getId().equals(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     // Interface for implementing methods that handle interactions with an item (item -> requiredSolution+)
     public interface OnItemInteractionListener {
-        void onSolutionsRequested(Long categoryId, Double budget, RecyclerView recyclerView); // recyclerView -> one that contains solutions for item
+        void onSolutionsRequested(GetRequiredSolutionItemResponse item, RecyclerView recyclerView); // recyclerView -> one that contains solutions for item
         void onDeleteClick(int position, Long requiredSolutionId);
+        void onEditClick(Long requiredSolutionId, String newBudget); // newBudget is string since we want to do validation in fragment/activity
     }
 
     static class RequiredSolutionViewHolder extends RecyclerView.ViewHolder {
@@ -73,6 +99,7 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
         RecyclerView solutionsRecycler;
         EditText editTextAmount;
         Button deleteButton;
+        Button editButton;
 
         public RequiredSolutionViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,6 +107,7 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
             solutionsRecycler = itemView.findViewById(R.id.recycler_solutions);
             editTextAmount = itemView.findViewById(R.id.editText_amount);
             deleteButton = itemView.findViewById(R.id.button_delete_item);
+            editButton = itemView.findViewById(R.id.button_edit_amount);
         }
     }
 }
