@@ -194,8 +194,9 @@ public class SolutionDetailsFragment extends Fragment {
      */
     private void fetchActiveEvents(Consumer<List<GetEventResponse>> onSuccess) {
         Long eventOrganizerId = AuthUtils.getUserId(getContext());
-        Call<Collection<GetEventResponse>> call = eventService.getActiveEventsByOrganizer(eventOrganizerId);
+        List<Long> eventTypeIds = new ArrayList<>(solution.getEventTypeIds());
 
+        Call<Collection<GetEventResponse>> call = eventService.getActiveEventsByTypeAndOrganizer(eventOrganizerId, eventTypeIds);
         call.enqueue(new Callback<Collection<GetEventResponse>>() {
             @Override
             public void onResponse(Call<Collection<GetEventResponse>> call, Response<Collection<GetEventResponse>> response) {

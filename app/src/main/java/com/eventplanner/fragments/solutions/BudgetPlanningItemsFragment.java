@@ -44,6 +44,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
     FragmentBudgetPlanningItemsBinding binding;
     private static final String ARG_EVENT_ID = "eventId";
     private Long eventId;
+    private Long eventTypeId;
     private RequiredSolutionService requiredSolutionService;
     private EventService eventService;
     private SolutionService solutionService;
@@ -131,7 +132,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
                         if (item.getSolutionId() == null) {
                             Long categoryId = item.getCategoryId();
                             Double budget = item.getBudget();
-                            Call<Collection<GetSolutionResponse>> call = solutionService.getAppropriateSolutions(categoryId, budget);
+                            Call<Collection<GetSolutionResponse>> call = solutionService.getAppropriateSolutions(categoryId, eventTypeId, budget);
                             call.enqueue(new Callback<Collection<GetSolutionResponse>>() {
                                 @Override
                                 public void onResponse(Call<Collection<GetSolutionResponse>> call, Response<Collection<GetSolutionResponse>> response) {
@@ -309,6 +310,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
             public void onResponse(Call<GetEventResponse> call, Response<GetEventResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     GetEventResponse event = response.body();
+                    eventTypeId = event.getEventTypeId();
                     binding.textEventName.setText(binding.textEventName.getText() + " " + event.getName());
                     Log.d("BudgetPlanningFragment", "Event successfully fetched: " + event.getName());
                 } else {
