@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
+import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
@@ -37,6 +38,7 @@ import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -260,8 +262,16 @@ public class SolutionDetailsFragment extends Fragment {
                     Toast.makeText(getContext(), "Product purchased successfully!", Toast.LENGTH_SHORT).show();
                     Log.i("SolutionDetailsFragment", "Buying product went successfully.");
                 } else {
-                    Toast.makeText(getContext(), "Failed to purchase product: " + response.code(), Toast.LENGTH_SHORT).show();
-                    Log.i("SolutionDetailsFragment", "Failed to purchase product: " + response.code());
+                    try {
+                        String errorJson = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorResponse errorResponse = gson.fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.i("SolutionDetailsFragment", "Purchase failed: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Purchase failed: unknown error", Toast.LENGTH_SHORT).show();
+                        Log.i("SolutionDetailsFragment", "Purchase failed: " + response.code());
+                    }
                 }
             }
 
@@ -300,12 +310,16 @@ public class SolutionDetailsFragment extends Fragment {
             navController.navigate(R.id.action_soltuionDetails_to_businessOwnerDetails, bundle);
         });
 
+        // Button for buying should be only visible to EventOrganizers
+        List<String> roles = AuthUtils.getUserRoles(getContext());
+        if (!solution.getIsAvailable() || !roles.contains("EventOrganizer"))
+            binding.buttonBuy.setVisibility(View.GONE);
+
         binding.buttonBuy.setOnClickListener( v -> {
             buy();
         });
 
         // button for adding to favorites should be only visible to EventOrganizers
-        List<String> roles = AuthUtils.getUserRoles(getContext());
         if(roles.contains("EventOrganizer")) {
             binding.addToFavorites.setOnClickListener(v -> {
                 Long userId = AuthUtils.getUserId(getContext());
@@ -313,6 +327,7 @@ public class SolutionDetailsFragment extends Fragment {
             });
         } else
             binding.addToFavorites.setVisibility(View.GONE);
+
     }
 
     private void populateBasicInfo() {
