@@ -20,6 +20,7 @@ import com.eventplanner.adapters.solutions.SolutionRecyclerViewAdapter;
 import com.eventplanner.databinding.FragmentBudgetPlanningBinding;
 import com.eventplanner.databinding.FragmentBudgetPlanningItemsBinding;
 import com.eventplanner.model.requests.requiredSolutions.UpdateRequiredSolutionRequest;
+import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.requiredSolutions.GetRequiredSolutionItemResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
@@ -28,7 +29,9 @@ import com.eventplanner.services.EventService;
 import com.eventplanner.services.RequiredSolutionService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.utils.HttpUtils;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -217,8 +220,16 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                     adapter.removeItemById(requiredSolutionId);
                                     calculateMaximumBudget();
                                 } else {
-                                    Log.i("BudgetPlanningItemsFragment", "Delete failed: " + response.code());
-                                    Toast.makeText(getContext(), "Delete failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                                    try {
+                                        String errorJson = response.errorBody().string();
+                                        Gson gson = new Gson();
+                                        ErrorResponse errorResponse = gson.fromJson(errorJson, ErrorResponse.class);
+                                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                                        Log.i("BudgetPlanningItemsFragment", "Delete failed: " + errorResponse.getError());
+                                    } catch (Exception e) {
+                                        Toast.makeText(getContext(), "Delete failed: unknown error", Toast.LENGTH_SHORT).show();
+                                        Log.i("BudgetPlanningItemsFragment", "Delete failed: " + response.code());
+                                    }
                                 }
                             }
 
@@ -258,8 +269,16 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                     Toast.makeText(getContext(), "Successfully updated!", Toast.LENGTH_SHORT).show();
                                     Log.i("BudgetPlanningItemsFragment", "Item's amount successfully updated.");
                                 } else {
-                                    Toast.makeText(getContext(), "Update failed: " + response.code(), Toast.LENGTH_SHORT).show();
-                                    Log.i("BudgetPlanningItemsFragment", "Update failed: " + response.code());
+                                    try {
+                                        String errorJson = response.errorBody().string();
+                                        Gson gson = new Gson();
+                                        ErrorResponse errorResponse = gson.fromJson(errorJson, ErrorResponse.class);
+                                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                                        Log.i("BudgetPlanningItemsFragment", "Delete failed: " + errorResponse.getError());
+                                    } catch (Exception e) {
+                                        Toast.makeText(getContext(), "Delete failed: unknown error", Toast.LENGTH_SHORT).show();
+                                        Log.i("BudgetPlanningItemsFragment", "Delete failed: " + response.code());
+                                    }
                                 }
                             }
 

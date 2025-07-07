@@ -9,6 +9,7 @@ import com.eventplanner.services.AuthService;
 import com.eventplanner.services.CommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
+import com.eventplanner.services.ProductService;
 import com.eventplanner.services.ReportService;
 import com.eventplanner.services.RequiredSolutionService;
 import com.eventplanner.services.ReviewService;
@@ -71,4 +72,5 @@ public class HttpUtils {
     public static ServiceService getServiceService() { return retrofit.create(ServiceService.class); }
     public static EventService getEventService() { return retrofit.create(EventService.class); }
     public static RequiredSolutionService getRequiredSolutionService() { return retrofit.create(RequiredSolutionService.class); }
+    public static ProductService getProductService() {return retrofit.create(ProductService.class); }
 }

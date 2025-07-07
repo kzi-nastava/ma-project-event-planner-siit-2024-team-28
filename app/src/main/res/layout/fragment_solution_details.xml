@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/black"
     tools:context=".fragments.solutions.SolutionDetailsFragment">
 
@@ -200,7 +201,7 @@
 
                     <Button
                         android:id="@+id/visitOwnerPageButton"
-                        android:backgroundTint="@null"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -211,7 +212,7 @@
 
                     <Button
                         android:id="@+id/addToFavorites"
-                        android:backgroundTint="@null"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -228,7 +229,8 @@
                     android:gravity="center">
 
                     <Button
-                        android:backgroundTint="@null"
+                        android:id="@+id/button_buy"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -238,7 +240,7 @@
                         android:background="@drawable/submit_button" />
 
                     <Button
-                        android:backgroundTint="@null"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
