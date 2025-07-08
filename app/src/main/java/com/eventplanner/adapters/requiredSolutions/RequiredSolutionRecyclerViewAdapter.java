@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,13 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
     @Override
     public void onBindViewHolder(@NonNull RequiredSolutionViewHolder holder, int position) {
         GetRequiredSolutionItemResponse requiredSolution = requiredSolutions.get(position);
+
+        if (requiredSolution.getSolutionId() != null) {
+            holder.rootLayout.setBackgroundResource(R.drawable.rounded_green_card);
+        } else {
+            holder.rootLayout.setBackgroundResource(R.drawable.rounded_purple_card);
+        }
+
         holder.categoryName.setText(requiredSolution.getCategoryName());
         holder.editTextAmount.setText(String.valueOf(requiredSolution.getBudget()));
 
@@ -95,6 +103,7 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
     }
 
     static class RequiredSolutionViewHolder extends RecyclerView.ViewHolder {
+        LinearLayout rootLayout;
         TextView categoryName;
         RecyclerView solutionsRecycler;
         EditText editTextAmount;
@@ -103,6 +112,7 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
 
         public RequiredSolutionViewHolder(@NonNull View itemView) {
             super(itemView);
+            rootLayout = itemView.findViewById(R.id.root_layout);
             categoryName = itemView.findViewById(R.id.category_name);
             solutionsRecycler = itemView.findViewById(R.id.recycler_solutions);
             editTextAmount = itemView.findViewById(R.id.editText_amount);

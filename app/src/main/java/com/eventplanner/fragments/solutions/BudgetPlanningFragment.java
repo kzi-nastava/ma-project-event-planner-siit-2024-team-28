@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentBudgetPlanningBinding;
 import com.eventplanner.model.requests.requiredSolutions.CreateRequiredSolutionRequest;
+import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.services.EventService;
@@ -25,6 +26,7 @@ import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.RequiredSolutionService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -262,8 +264,16 @@ public class BudgetPlanningFragment extends Fragment {
                     Log.d("BudgetPlanningFragment", "Created RequiredSolution with id: " + newId);
                     Toast.makeText(getContext(), "Required solution created successfully.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.e("BudgetPlanningFragment", "Failed to create required solution. Code: " + response.code());
-                    Toast.makeText(getContext(), "Failed to create required solution.", Toast.LENGTH_SHORT).show();
+                    try {
+                        String errorJson = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorResponse errorResponse = gson.fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.i("BudgetPlanningFragment", "Failed to create required solution: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Failed to create required solution: unknown error", Toast.LENGTH_SHORT).show();
+                        Log.i("BudgetPlanningFragment", "Failed to create required solution: " + response.code());
+                    }
                 }
             }
 

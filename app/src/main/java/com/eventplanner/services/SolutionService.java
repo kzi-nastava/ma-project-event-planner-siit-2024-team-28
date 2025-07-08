@@ -34,6 +34,7 @@ public interface SolutionService {
     @GET("solutions/required-solution/appropriate-solutions")
     Call<Collection<GetSolutionResponse>> getAppropriateSolutions(
             @Query("categoryId") Long categoryId,
+            @Query("eventTypeId") Long eventTypeId,
             @Query("amount") Double amount
     );
 }
