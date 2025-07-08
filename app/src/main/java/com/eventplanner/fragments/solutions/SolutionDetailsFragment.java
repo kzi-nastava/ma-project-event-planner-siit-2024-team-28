@@ -17,22 +17,30 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
+import com.eventplanner.model.requests.comments.CreateCommentRequest;
+import com.eventplanner.model.requests.reviews.CreateReviewRequest;
 import com.eventplanner.model.responses.ErrorResponse;
+import com.eventplanner.model.responses.comments.GetCommentResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
+import com.eventplanner.model.responses.reviews.GetReviewResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
+import com.eventplanner.services.CommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ProductService;
+import com.eventplanner.services.ReviewService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
@@ -60,6 +68,8 @@ public class SolutionDetailsFragment extends Fragment {
     private UserService userService;
     private EventService eventService;
     private ProductService productService;
+    private CommentService commentService;
+    private ReviewService reviewService;
 
 
     public static SolutionDetailsFragment newInstance(String solutionId) {
@@ -80,6 +90,8 @@ public class SolutionDetailsFragment extends Fragment {
         userService = HttpUtils.getUserService();
         eventService = HttpUtils.getEventService();
         productService = HttpUtils.getProductService();
+        commentService = HttpUtils.getCommentService();
+        reviewService = HttpUtils.getReviewService();
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
@@ -291,6 +303,145 @@ public class SolutionDetailsFragment extends Fragment {
         // TODO: make call to backend
     }
 
+    private void commentAndReview() {
+        if(!AuthUtils.getUserRoles(getContext()).contains("EventOrganizer"))
+            return;
+
+        canUserCommentReview(canCommentReview -> showCommentReviewDialog(canCommentReview, this::createComment, this::createReview));
+    }
+
+    private void canUserCommentReview(Consumer<Boolean> callback) {
+        Long eventOrganizerId = AuthUtils.getUserId(getContext());
+        solutionService.canUserCommentReview(Long.parseLong(solutionId), eventOrganizerId)
+                .enqueue(new Callback<Boolean>() {
+                    @Override
+                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                        if (response.isSuccessful()) {
+                            Boolean canCommentOrReview = response.body();
+                            callback.accept(canCommentOrReview);
+                        } else {
+                            Log.e("SolutionDetailsFragment", "Failed: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Boolean> call, Throwable t) {
+                        Log.e("SolutionDetailsFragment", "Network error", t);
+                    }
+                });
+    }
+
+    private void showCommentReviewDialog(boolean canReviewComment, Consumer<CreateCommentRequest> createComment, Consumer<CreateReviewRequest> createReview) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        if (canReviewComment) {
+            // Inflate custom layout
+            View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_comment_review, null);
+            EditText commentField = dialogView.findViewById(R.id.editText_comment);
+            RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
+
+            builder.setTitle("Leave a review")
+                    .setView(dialogView)
+                    .setPositiveButton("Submit", (dialog, which) -> {
+                        String commentText = commentField.getText().toString().trim();
+                        float rating = ratingBar.getRating();
+
+                        if (commentText.isEmpty()) {
+                            Toast.makeText(getContext(), "Comment cannot be empty.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (rating < 1.0f) {
+                            Toast.makeText(getContext(), "Please provide a rating between 1 and 5.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Long userId = AuthUtils.getUserId(getContext());
+                        Long solId = Long.parseLong(solutionId);
+
+                        CreateCommentRequest commentRequest = CreateCommentRequest.builder()
+                                .commenterId(userId)
+                                .solutionId(solId)
+                                .content(commentText)
+                                .build();
+                        createComment.accept(commentRequest);
+
+                        CreateReviewRequest reviewRequest = CreateReviewRequest.builder()
+                                .reviewerId(userId)
+                                .solutionId(solId)
+                                .rating((short) rating)
+                                .build();
+                        createReview.accept(reviewRequest);
+                    })
+                    .setNegativeButton("Cancel", null);
+        } else {
+            builder.setTitle("Not Allowed")
+                    .setMessage("You can only leave a comment and review after purchasing this solution.")
+                    .setPositiveButton("OK", null);
+        }
+
+        builder.show();
+    }
+
+    private void createComment(CreateCommentRequest request) {
+        commentService.createComment(request).enqueue(new Callback<GetCommentResponse>() {
+            @Override
+            public void onResponse(Call<GetCommentResponse> call, Response<GetCommentResponse> response) {
+                if (response.isSuccessful()) {
+                    GetCommentResponse comment = response.body();
+                    Toast.makeText(getContext(), "Comment created successfully!", Toast.LENGTH_SHORT).show();
+                    Log.i("SolutionDetailsFragment", "Comment created ID: " + comment.getId());
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorResponse errorResponse = gson.fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), "Error creating comment: " + errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("SolutionDetailsFragment", "Server error: " + response.code() + " - " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Unknown error", Toast.LENGTH_SHORT).show();
+                        Log.e("SolutionDetailsFragment", "Error : " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetCommentResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Network failure: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("CommentActivity", "Network failure: " + t.getMessage(), t);
+            }
+        });
+    }
+    private void createReview(CreateReviewRequest request) {
+            reviewService.createReview(request).enqueue(new Callback<GetReviewResponse>() {
+                @Override
+                public void onResponse(Call<GetReviewResponse> call, Response<GetReviewResponse> response) {
+                    if (response.isSuccessful()) {
+                        GetReviewResponse review = response.body();
+                        Toast.makeText(getContext(), "Review created successfully!", Toast.LENGTH_SHORT).show();
+                        Log.i("ReviewFragment", "Review created ID: " + review.getId());
+                    } else {
+                        try {
+                            String errorJson = response.errorBody().string();
+                            Gson gson = new Gson();
+                            ErrorResponse errorResponse = gson.fromJson(errorJson, ErrorResponse.class);
+                            Toast.makeText(getContext(), "Error creating review: " + errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                            Log.e("ReviewFragment", "Server error: " + response.code() + " - " + errorResponse.getError());
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Unknown error", Toast.LENGTH_SHORT).show();
+                            Log.e("ReviewFragment", "Error : " + response.code());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GetReviewResponse> call, Throwable t) {
+                    Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ReviewFragment", "Network failure: " + t.getMessage(), t);
+                }
+            });
+    }
+
     // method used to separate code for altering views from main code
     // a bit messy
     private void populateSolutionDetails() {
@@ -329,6 +480,14 @@ public class SolutionDetailsFragment extends Fragment {
         } else
             binding.addToFavorites.setVisibility(View.GONE);
 
+
+        // Button for commenting/reviewing should be only visible to EventOrganizers
+        if(roles.contains("EventOrganizer")) {
+            binding.buttonReview.setOnClickListener(v -> {
+                commentAndReview();
+            });
+        } else
+            binding.buttonReview.setVisibility(View.GONE);
     }
 
     private void populateBasicInfo() {

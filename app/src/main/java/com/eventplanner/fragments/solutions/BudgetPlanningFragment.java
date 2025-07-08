@@ -279,7 +279,7 @@ public class BudgetPlanningFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Long> call, Throwable t) {
-                Log.e("YourTag", "Network error", t);
+                Log.e("BudgetPlanningFragment", "Network error", t);
                 Toast.makeText(getContext(), "Network error occurred.", Toast.LENGTH_SHORT).show();
             }
         });

@@ -37,4 +37,10 @@ public interface SolutionService {
             @Query("eventTypeId") Long eventTypeId,
             @Query("amount") Double amount
     );
+
+    @GET("/api/solutions/{solutionId}/can-comment-review")
+    Call<Boolean> canUserCommentReview(
+            @Path("solutionId") Long solutionId,
+            @Query("userId") Long userId
+    );
 }
