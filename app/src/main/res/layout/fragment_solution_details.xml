@@ -240,6 +240,7 @@
                         android:background="@drawable/submit_button" />
 
                     <Button
+                        android:id="@+id/button_review"
                         app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
