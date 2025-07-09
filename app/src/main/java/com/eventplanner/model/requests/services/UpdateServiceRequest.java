@@ -5,7 +5,6 @@ import com.eventplanner.model.enums.ReservationType;
 import java.util.Collection;
 
 public class UpdateServiceRequest {
-    private Long categoryId;
     private String name;
     private String description;
     private Double price;
@@ -24,7 +23,6 @@ public class UpdateServiceRequest {
     private Collection<Long> eventTypeIds;
 
     private UpdateServiceRequest(Builder builder) {
-        this.categoryId = builder.categoryId;
         this.name = builder.name;
         this.description = builder.description;
         this.price = builder.price;
@@ -48,7 +46,6 @@ public class UpdateServiceRequest {
     }
 
     public static class Builder {
-        private Long categoryId;
         private String name;
         private String description;
         private Double price;
@@ -65,11 +62,6 @@ public class UpdateServiceRequest {
         private Integer cancellationDeadlineDays;
         private ReservationType reservationType;
         private Collection<Long> eventTypeIds;
-
-        public Builder categoryId(Long categoryId) {
-            this.categoryId = categoryId;
-            return this;
-        }
 
         public Builder name(String name) {
             this.name = name;
