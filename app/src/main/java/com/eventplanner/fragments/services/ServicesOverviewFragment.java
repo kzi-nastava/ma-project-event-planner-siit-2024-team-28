@@ -161,47 +161,14 @@ public class ServicesOverviewFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // fetching services
-        // fetchServices();
         filter();
     }
-
-    // function for fetching services that business owner owns
-    // TODO: skloniti
-    private void fetchServices() {
-        Call<PagedResponse<GetServiceResponse>> call = serviceService.getServicesByBusinessOwnerId(
-                AuthUtils.getUserId(getContext()), pageNumber, pageSize);
-
-        call.enqueue(new Callback<PagedResponse<GetServiceResponse>>() {
-            @Override
-            public void onResponse(Call<PagedResponse<GetServiceResponse>> call, Response<PagedResponse<GetServiceResponse>> response) {
-                if (response.isSuccessful()) {
-                    PagedResponse<GetServiceResponse> pagedResponse = response.body();
-                    if (pagedResponse != null && pagedResponse.getContent() != null) {
-                        List<GetServiceResponse> services = pagedResponse.getContent();
-                        Log.i("ServicesOverviewFragment", "Services successfully fetched, number of services: " + services.size());
-                        populateServiceListView(services);
-                    } else {
-                        Log.e("ServicesOverviewFragment", "Empty response or no content.");
-                        Toast.makeText(getContext(), "You have no services.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.e("ServicesOverviewFragment", "Error while fetching services: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PagedResponse<GetServiceResponse>> call, Throwable t) {
-                Log.e("ServiceOverviewFragment", "Network failure", t);
-            }
-        });
-    }
-
 
     // separated code for fetching all categories and creating radio buttons in bottom sheet filter
     private void populateCategoriesFilter(View dialogView) {
         Spinner spinner = dialogView.findViewById(R.id.spinner_categories);
 
-        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAllSolutionCategories();
+        Call<Collection<GetSolutionCategoryResponse>> call = categoryService.getAcceptedCategories();
         call.enqueue(new Callback<Collection<GetSolutionCategoryResponse>>() {
             @Override
             public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
@@ -212,10 +179,8 @@ public class ServicesOverviewFragment extends Fragment {
                     categoryNames.add("Select a category..."); // placeholder so nothing is initially selected
 
                     for (GetSolutionCategoryResponse category : response.body()) {
-                        if (category.getRequestStatus().equals(RequestStatus.ACCEPTED) && !category.getIsDeleted()) {
                             allCategories.add(category);
                             categoryNames.add(category.getName());
-                        }
                     }
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -275,7 +240,7 @@ public class ServicesOverviewFragment extends Fragment {
     private void populateEventTypesFilter(View dialogView) {
         Spinner spinner = dialogView.findViewById(R.id.spinner_eventTypes);
 
-        Call<Collection<GetEventTypeResponse>> call = eventTypeService.getAllEventTypes();
+        Call<Collection<GetEventTypeResponse>> call = eventTypeService.getActiveEventTypes();
         call.enqueue(new Callback<Collection<GetEventTypeResponse>>() {
             @Override
             public void onResponse(Call<Collection<GetEventTypeResponse>> call, Response<Collection<GetEventTypeResponse>> response) {

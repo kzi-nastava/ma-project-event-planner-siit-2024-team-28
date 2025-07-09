@@ -18,4 +18,7 @@ public interface EventTypeService {
 
     @GET("event-types/recommended-categories/{id}")
     Call<Collection<GetSolutionCategoryResponse>> getRecommendedCategories(@Path("id") Long id);
+
+    @GET("event-types/active")
+    Call<Collection<GetEventTypeResponse>> getActiveEventTypes();
 }

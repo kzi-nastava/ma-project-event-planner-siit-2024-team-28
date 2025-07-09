@@ -347,7 +347,6 @@ public class ServiceEditFragment extends Fragment {
                 .reservationDeadlineDays(reservationDeadlineDays)
                 .cancellationDeadlineDays(cancellationDeadlineDays)
                 .reservationType(reservationType)
-                .categoryId(service.getCategoryId())
                 .eventTypeIds(selectedEventTypeIds)
                 .build();
 

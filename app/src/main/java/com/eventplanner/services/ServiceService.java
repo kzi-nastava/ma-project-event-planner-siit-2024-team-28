@@ -25,11 +25,8 @@ public interface ServiceService {
     Call<GetServiceResponse> getServiceById(@Path("id") Long id);
 
     @GET("services/business-owner/{businessOwnerId}")
-    Call<PagedResponse<GetServiceResponse>> getServicesByBusinessOwnerId(
-            @Path("businessOwnerId") Long businessOwnerId,
-            @Query("page") int page,
-            @Query("size") int size
-    );
+    Call<Collection<GetServiceResponse>> getServicesByBusinessOwnerId(
+            @Path("businessOwnerId") Long businessOwnerId);
 
     @PUT("services/{id}")
     Call<Void> updateService(@Path("id") Long id, @Body UpdateServiceRequest request);
