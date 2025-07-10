@@ -20,31 +20,8 @@
     <string name="language">Language</string>
     <string name="select_category_service">Select the category of the service:</string>
     <string name="select_category_service_custom">… or make up your own category</string>
-    <string name="name_input">Name:</string>
-    <string name="description_input">Description:</string>
-    <string name="specifics_input">Specifics:</string>
-    <string name="price_input">Price:</string>
-    <string name="discount_input">Discount:</string>
-    <string name="which_events_input">For which types of events are your services available:</string>
-    <string name="service_visible">Make your service visible</string>
-    <string name="service_available">Make your service available</string>
-    <string name="duration_input">Duration:</string>
-    <string name="fixed">fixed</string>
-    <string name="min_max">min-max</string>
-    <string name="reservation_deadline_input">Reservation deadline (in days):</string>
-    <string name="cancellation_deadline_input">Cancellation deadline (in days):</string>
     <string name="confirmation_input">Method of confirmation:</string>
     <string name="auto">auto</string>
-    <string name="sort">Sort</string>
-    <string name="manual">manual</string>
-    <string name="filters">Filters</string>
-    <string name="category">Category</string>
-    <string name="min_price_input">Min price:</string>
-    <string name="max_price_input">Max price:</string>
-    <string name="event_type">Event type</string>
-    <string name="availability">Availability</string>
-    <string name="available">Available</string>
-    <string name="unavailable">Unavailable</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tristique commodo malesuada. Nullam in aliquet nisl. In dui augue, luctus in sem vitae, condimentum fermentum nulla. Quisque molestie maximus varius. Vivamus molestie sem dolor, in rhoncus felis dapibus ac. Integer eu lobortis felis.</string>
 
     <!-- fragment_registration -->
@@ -154,15 +131,11 @@
     <string name="next_text"><![CDATA[>]]></string>
     <string name="previous_text"><![CDATA[<]]></string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login">Login</string>
     <string name="home">Home</string>
-    <string name="my_services">My services</string>
-    <string name="buy">Buy</string>
-    <string name="add_to_favorites">Add to favorites</string>
-    <string name="visit_owner">Visit owner\'s page</string>
-    <string name="leave_review">Leave a review</string>
+
+    <!-- fragment services creation/edit/overview -->
+    <string name="add_new_service">+ Add new service</string>
     <string name="price">Price</string>
     <string name="price_discount">Price with discount</string>
     <string name="description">Description</string>
@@ -174,6 +147,33 @@
     <string name="reservation_deadline">Reservation deadline</string>
     <string name="cancellation_deadline">Cancellation deadline</string>
     <string name="reservation_type">Reservation type</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="sort">Sort</string>
+    <string name="manual">manual</string>
+    <string name="filters">Filters</string>
+    <string name="category">Category</string>
+    <string name="min_price_input">Min price:</string>
+    <string name="max_price_input">Max price:</string>
+    <string name="event_type">Event type</string>
+    <string name="availability">Availability</string>
+    <string name="available">Available</string>
+    <string name="unavailable">Unavailable</string>
+    <string name="name_input">Name:</string>
+    <string name="description_input">Description:</string>
+    <string name="specifics_input">Specifics:</string>
+    <string name="price_input">Price:</string>
+    <string name="discount_input">Discount:</string>
+    <string name="which_events_input">For which types of events are your services available:</string>
+    <string name="service_visible">Make your service visible</string>
+    <string name="service_available">Make your service available</string>
+    <string name="duration_input">Duration:</string>
+    <string name="fixed">fixed</string>
+    <string name="min_max">min-max</string>
+    <string name="reservation_deadline_input">Reservation deadline (in days):</string>
+    <string name="cancellation_deadline_input">Cancellation deadline (in days):</string>
+
+    <!-- fragment business owner details -->
     <string name="full_name_input">Full name:</string>
     <string name="address_input">Address:</string>
     <string name="phone_number_input">Phone number:</string>
@@ -181,13 +181,8 @@
     <string name="status_input">Status:</string>
     <string name="comments">Comments</string>
     <string name="reviews">Reviews</string>
-    <string name="add_new_service">+ Add new service</string>
-    <string name="edit">Edit</string>
-    <string name="delete">Delete</string>
-    <string name="to_pdf">Export to PDF file</string>
-    <string name="price_list">Price list</string>
-    <string name="price_list_title">Here\'s the price list for your solutions:</string>
-    <string name="total_price">Total price:</string>
+
+    <!-- fragment categories -->
     <string name="create_category">Create category</string>
     <string name="pending_categories">Pending categories</string>
     <string name="categorize">Categorize</string>
@@ -200,6 +195,14 @@
     <string name="choose_category">Choose one of the categories:</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+
+    <!-- fragment price list -->
+    <string name="to_pdf">Export to PDF file</string>
+    <string name="price_list">Price list</string>
+    <string name="price_list_title">Here\'s the price list for your solutions:</string>
+    <string name="total_price">Total price:</string>
+
+    <!-- fragment budget planning -->
     <string name="budget_planning_title">Let\'s help you plan budget for your event!</string>
     <string name="choose_event">Choose one of your events:</string>
     <string name="create_item_manual">Create an item by selecting category and entering an amount</string>
@@ -209,4 +212,17 @@
     <string name="items_title">Items for:</string>
     <string name="maximum_budget">Maximum budget:</string>
     <string name="budget_planning">Budget planning</string>
+
+    <!-- fragment chat -->
+    <string name="my_conversations">My conversations</string>
+    <string name="message_input">Enter a message...</string>
+    <string name="send">Send</string>
+
+    <string name="my_services">My services</string>
+    <string name="buy">Buy</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="visit_owner">Visit owner\'s page</string>
+    <string name="leave_review">Leave a review</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
