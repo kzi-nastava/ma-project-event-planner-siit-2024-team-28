@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import com.eventplanner.BuildConfig;
 import com.eventplanner.adapters.typeAdapters.LocalDateAdapter;
 import com.eventplanner.services.AuthService;
+import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
 import com.eventplanner.services.CommentService;
 import com.eventplanner.services.EventService;
@@ -74,5 +75,6 @@ public class HttpUtils {
     public static EventService getEventService() { return retrofit.create(EventService.class); }
     public static RequiredSolutionService getRequiredSolutionService() { return retrofit.create(RequiredSolutionService.class); }
     public static ProductService getProductService() { return retrofit.create(ProductService.class); }
-    public static ChatService getChatService() { return  retrofit.create(ChatService.class); }
+    public static ChatService getChatService() { return retrofit.create(ChatService.class); }
+    public static ChatMessageService getChatMessageService() { return retrofit.create(ChatMessageService.class); }
 }

@@ -4,6 +4,7 @@ import com.eventplanner.model.requests.chats.CreateChatRequest;
 import com.eventplanner.model.requests.chats.FindChatRequest;
 import com.eventplanner.model.responses.chats.FindChatResponse;
 import com.eventplanner.model.responses.chats.GetChatListResponse;
+import com.eventplanner.model.responses.chats.GetChatResponse;
 
 import java.util.Collection;
 
@@ -16,6 +17,9 @@ import retrofit2.http.Path;
 public interface ChatService {
     @POST("chats")
     Call<Long> createChat(@Body CreateChatRequest request);
+
+    @GET("chats/{id}")
+    Call<GetChatResponse> getChat(@Path("id") Long chatId);
 
     @GET("chats/chat-list/{userId}")
     Call<Collection<GetChatListResponse>> getUsersChatList(@Path("userId") Long userId);

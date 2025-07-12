@@ -220,6 +220,7 @@
     <string name="message_input">Enter a message...</string>
     <string name="send">Send</string>
     <string name="no_chats">You have no conversations currently</string>
+    <string name="theme_for">For:</string>
 
     <string name="my_services">My services</string>
     <string name="buy">Buy</string>

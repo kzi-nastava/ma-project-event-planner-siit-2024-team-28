@@ -4,46 +4,45 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.eventplanner.R;
+import com.eventplanner.adapters.chatMessages.ChatMessageListAdapter;
+import com.eventplanner.databinding.FragmentChatBinding;
+import com.eventplanner.model.responses.ErrorResponse;
+import com.eventplanner.model.responses.chatMessages.GetChatMessageResponse;
+import com.eventplanner.model.responses.chats.GetChatResponse;
+import com.eventplanner.services.ChatMessageService;
+import com.eventplanner.services.ChatService;
+import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.HttpUtils;
+import com.google.gson.Gson;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChatFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ChatFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private FragmentChatBinding binding;
+    private static final String ARG_CHAT_ID = "chatId";
+    private static Long chatId;
+    private ChatService chatService;
+    private ChatMessageService chatMessageService;
 
     public ChatFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChatFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ChatFragment newInstance(String param1, String param2) {
+    public static ChatFragment newInstance() {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putLong(ARG_CHAT_ID, chatId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,16 +50,93 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        if(getArguments() != null) {
+            chatId = getArguments().getLong(ARG_CHAT_ID);
         }
+        chatService = HttpUtils.getChatService();
+        chatMessageService = HttpUtils.getChatMessageService();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false);
+        binding = FragmentChatBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+        loadChatDetails();
+        loadMessages();
+
+        return view;
+    }
+
+    private void loadChatDetails() {
+        Call<GetChatResponse> call = chatService.getChat(chatId);
+
+        call.enqueue(new Callback<GetChatResponse>() {
+            @Override
+            public void onResponse(Call<GetChatResponse> call, Response<GetChatResponse> response) {
+                if (response.isSuccessful()) {
+                    GetChatResponse chatResponse = response.body();
+                    if (chatResponse != null) {
+                        // TODO: srediti sliku
+                        if(!AuthUtils.getUserId(getContext()).equals(chatResponse.getParticipant1Id()))
+                            binding.userName.setText(chatResponse.getParticipant1Name());
+                        else
+                            binding.userName.setText(chatResponse.getParticipant2Name());
+                        binding.themeName.setText(getString(R.string.theme_for) + " " + chatResponse.getThemeName());
+                    }
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Failed to fetch chat: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Failed to fetch chat", Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Failed to fetch chat: " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetChatResponse> call, Throwable t) {
+                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void loadMessages() {
+        Call<List<GetChatMessageResponse>> call = chatMessageService.getMessagesByChatId(chatId);
+
+        call.enqueue(new Callback<List<GetChatMessageResponse>>() {
+            @Override
+            public void onResponse(Call<List<GetChatMessageResponse>> call, Response<List<GetChatMessageResponse>> response) {
+                if (response.isSuccessful()) {
+                    List<GetChatMessageResponse> messages = response.body();
+                    setChatMessagesAdapter(messages);
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Failed to get messages: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Failed to get messages", Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Failed to get messages: " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<GetChatMessageResponse>> call, Throwable t) {
+                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    };
+
+    private void setChatMessagesAdapter(List<GetChatMessageResponse> messages) {
+        ChatMessageListAdapter adapter = new ChatMessageListAdapter(getContext(), messages, AuthUtils.getUserId(getContext()));
+        binding.messagesListView.setAdapter(adapter);
     }
 }
