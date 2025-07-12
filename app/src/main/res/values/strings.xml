@@ -90,6 +90,7 @@
     <string name="navbar_login">Login</string>
     <string name="navbar_logout">Logout</string>
     <string name="navbar_create_service">Create service</string>
+    <string name="chat_list">My chats</string>
     <string name="navbar_profile">My profile</string>
 
     <!-- fragment_profile -->
@@ -181,6 +182,7 @@
     <string name="status_input">Status:</string>
     <string name="comments">Comments</string>
     <string name="reviews">Reviews</string>
+    <string name="chat_with_owner">Chat with owner</string>
 
     <!-- fragment categories -->
     <string name="create_category">Create category</string>
@@ -217,7 +219,6 @@
     <string name="my_conversations">My conversations</string>
     <string name="message_input">Enter a message...</string>
     <string name="send">Send</string>
-    <string name="chat_list">My chats</string>
     <string name="no_chats">You have no conversations currently</string>
 
     <string name="my_services">My services</string>

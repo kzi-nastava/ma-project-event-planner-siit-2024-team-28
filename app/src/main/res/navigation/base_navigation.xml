@@ -224,6 +224,13 @@
         <action
             android:id="@+id/action_soltuionDetails_to_businessOwnerDetails"
             app:destination="@id/business_owner_details_fragment" />
+        <action
+            android:id="@+id/action_solutionDetails_to_chat"
+            app:destination="@+id/nav_chat" >
+            <argument
+                android:name="chatId"
+                app:argType="long" />
+        </action>
     </fragment>
 
     <fragment
