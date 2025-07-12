@@ -17,14 +17,29 @@
         android:padding="16dp"
         android:gravity="center"/>
 
-    <ListView
-        android:id="@+id/serviceListView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="5dp"
-        tools:listitem="@layout/chat_card"/>
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/chatListListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5dp"
+            tools:listitem="@layout/chat_card"/>
+
+        <TextView
+            android:id="@+id/emptyChatListText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/no_chats"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:visibility="gone"/>
+    </FrameLayout>
 
 </LinearLayout>

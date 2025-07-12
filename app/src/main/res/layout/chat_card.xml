@@ -24,7 +24,7 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/serviceImage"
+                android:id="@+id/chatterImage"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:scaleType="centerCrop"
@@ -45,6 +45,16 @@
                 android:layout_marginBottom="4dp"
                 android:text="Chatter name"
                 android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/chatSubject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Chat subject"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/white"/>
 
