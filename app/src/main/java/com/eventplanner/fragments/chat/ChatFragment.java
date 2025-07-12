@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.eventplanner.R;
 import com.eventplanner.adapters.chatMessages.ChatMessageListAdapter;
 import com.eventplanner.databinding.FragmentChatBinding;
+import com.eventplanner.model.requests.chatMessages.CreateChatMessageRequest;
 import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.chatMessages.GetChatMessageResponse;
 import com.eventplanner.model.responses.chats.GetChatResponse;
@@ -32,6 +33,8 @@ public class ChatFragment extends Fragment {
     private FragmentChatBinding binding;
     private static final String ARG_CHAT_ID = "chatId";
     private static Long chatId;
+    private GetChatResponse chat;
+    private ChatMessageListAdapter messageListAdapter;
     private ChatService chatService;
     private ChatMessageService chatMessageService;
 
@@ -66,6 +69,11 @@ public class ChatFragment extends Fragment {
         loadChatDetails();
         loadMessages();
 
+        binding.sendButton.setOnClickListener(v -> {
+            if(!binding.messageInput.getText().equals(""))
+                sendMessage();
+        });
+
         return view;
     }
 
@@ -76,14 +84,14 @@ public class ChatFragment extends Fragment {
             @Override
             public void onResponse(Call<GetChatResponse> call, Response<GetChatResponse> response) {
                 if (response.isSuccessful()) {
-                    GetChatResponse chatResponse = response.body();
-                    if (chatResponse != null) {
+                    chat = response.body();
+                    if (chat != null) {
                         // TODO: srediti sliku
-                        if(!AuthUtils.getUserId(getContext()).equals(chatResponse.getParticipant1Id()))
-                            binding.userName.setText(chatResponse.getParticipant1Name());
+                        if(!AuthUtils.getUserId(getContext()).equals(chat.getParticipant1Id()))
+                            binding.userName.setText(chat.getParticipant1Name());
                         else
-                            binding.userName.setText(chatResponse.getParticipant2Name());
-                        binding.themeName.setText(getString(R.string.theme_for) + " " + chatResponse.getThemeName());
+                            binding.userName.setText(chat.getParticipant2Name());
+                        binding.themeName.setText(getString(R.string.theme_for) + " " + chat.getThemeName());
                     }
                 } else {
                     try {
@@ -136,7 +144,61 @@ public class ChatFragment extends Fragment {
     };
 
     private void setChatMessagesAdapter(List<GetChatMessageResponse> messages) {
-        ChatMessageListAdapter adapter = new ChatMessageListAdapter(getContext(), messages, AuthUtils.getUserId(getContext()));
-        binding.messagesListView.setAdapter(adapter);
+        messageListAdapter = new ChatMessageListAdapter(getContext(), messages, AuthUtils.getUserId(getContext()));
+        binding.messagesListView.setAdapter(messageListAdapter);
+        scrollToTop();
+    }
+
+    private void sendMessage() {
+        Long recipientId = chat.getParticipant1Id().equals(AuthUtils.getUserId(getContext())) ? chat.getParticipant2Id() : chat.getParticipant1Id();
+        String content = binding.messageInput.getText().toString().trim();
+
+        CreateChatMessageRequest request = new CreateChatMessageRequest.Builder()
+                .content(content)
+                .senderId(AuthUtils.getUserId(getContext()))
+                .recipientId(recipientId)
+                .chatId(chatId)
+                .build();
+
+        Call<GetChatMessageResponse> call = chatMessageService.createChatMessage(request);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<GetChatMessageResponse> call, Response<GetChatMessageResponse> response) {
+                if (response.isSuccessful()) {
+                    GetChatMessageResponse message = response.body();
+                    addNewMessage(message);
+                    binding.messageInput.setText("");
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Send failed: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Send failed: Unknown error" + response.code(), Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Send failed: " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetChatMessageResponse> call, Throwable t) {
+                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void addNewMessage(GetChatMessageResponse message) {
+        if (messageListAdapter != null) {
+            messageListAdapter.addNewMessage(message);
+            scrollToTop();
+        }
+    }
+
+    private void scrollToTop() {
+        binding.messagesListView.post(() -> {
+            binding.messagesListView.setSelection(messageListAdapter.getCount() - 1);
+        });
     }
 }

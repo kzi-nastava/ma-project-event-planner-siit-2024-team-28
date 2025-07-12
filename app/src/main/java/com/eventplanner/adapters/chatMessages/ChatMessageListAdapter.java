@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.eventplanner.model.responses.chatMessages.GetChatMessageResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatMessageListAdapter extends ArrayAdapter<GetChatMessageResponse> {
@@ -33,20 +35,23 @@ public class ChatMessageListAdapter extends ArrayAdapter<GetChatMessageResponse>
 
         GetChatMessageResponse message = getItem(position);
 
-        LinearLayout messageContainer = convertView.findViewById(R.id.messageContainer);
+        FrameLayout messageContainer = convertView.findViewById(R.id.messageContainer);
         TextView messageText = convertView.findViewById(R.id.messageText);
         TextView messageTime = convertView.findViewById(R.id.messageTime);
 
         // Setting up the view
         if (message != null) {
-            // Bubble message modification in relation to sender
+            // Bubbles modification in relation to sender
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) messageContainer.getLayoutParams();
             if (message.getSenderId().equals(userId)) {
+                params.gravity = Gravity.END;
                 messageContainer.setBackgroundResource(R.drawable.bg_chat_bubble_user);
-                messageContainer.setGravity(Gravity.END);
             } else {
+                params.gravity = Gravity.START;
                 messageContainer.setBackgroundResource(R.drawable.bg_chat_bubble_other);
-                messageContainer.setGravity(Gravity.START);
             }
+
+            messageContainer.setLayoutParams(params);
             // Message and timestamp
             if (message.getContent() != null)
                 messageText.setText(message.getContent());
@@ -55,6 +60,21 @@ public class ChatMessageListAdapter extends ArrayAdapter<GetChatMessageResponse>
         }
 
         return convertView;
+    }
+
+    @Override
+    public int getCount() {
+        return super.getCount();
+    }
+
+    @Override
+    public GetChatMessageResponse getItem(int position) {
+        return super.getItem(getCount() - 1 - position);
+    }
+
+    public void addNewMessage(GetChatMessageResponse message) {
+        super.insert(message, 0);
+        notifyDataSetChanged();
     }
 
     private String formatMessageTime(LocalDateTime timestamp) {

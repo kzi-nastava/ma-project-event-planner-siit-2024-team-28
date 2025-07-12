@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.eventplanner.BuildConfig;
 import com.eventplanner.adapters.typeAdapters.LocalDateAdapter;
+import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.services.AuthService;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
@@ -23,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -45,6 +47,7 @@ public class HttpUtils {
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .create();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
