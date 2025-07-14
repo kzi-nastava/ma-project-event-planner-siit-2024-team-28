@@ -25,9 +25,13 @@ import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
+import com.eventplanner.model.enums.ChatTheme;
+import com.eventplanner.model.requests.chats.CreateChatRequest;
+import com.eventplanner.model.requests.chats.FindChatRequest;
 import com.eventplanner.model.requests.comments.CreateCommentRequest;
 import com.eventplanner.model.requests.reviews.CreateReviewRequest;
 import com.eventplanner.model.responses.ErrorResponse;
+import com.eventplanner.model.responses.chats.FindChatResponse;
 import com.eventplanner.model.responses.comments.GetCommentResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
@@ -36,6 +40,7 @@ import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryRe
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
+import com.eventplanner.services.ChatService;
 import com.eventplanner.services.CommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
@@ -70,6 +75,8 @@ public class SolutionDetailsFragment extends Fragment {
     private ProductService productService;
     private CommentService commentService;
     private ReviewService reviewService;
+    private ChatService chatService;
+    private NavController navController;
 
 
     public static SolutionDetailsFragment newInstance(String solutionId) {
@@ -92,6 +99,8 @@ public class SolutionDetailsFragment extends Fragment {
         productService = HttpUtils.getProductService();
         commentService = HttpUtils.getCommentService();
         reviewService = HttpUtils.getReviewService();
+        chatService = HttpUtils.getChatService();
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             solutionId = getArguments().getString(ARG_SOLUTION_ID);
@@ -442,6 +451,110 @@ public class SolutionDetailsFragment extends Fragment {
             });
     }
 
+    /**
+     * Method that contains chatWithOwner logic
+     * On click either routes to existing chat or creates new chat with business owner
+     * */
+    private void chatWithOwner() {
+        if(!AuthUtils.getUserRoles(getContext()).contains("EventOrganizer"))
+            return;
+
+        findChat();
+    }
+
+    private void navigateToChat(Long chatId) {
+        Bundle bundle = new Bundle();
+        bundle.putLong("chatId", chatId);
+        navController.navigate(R.id.action_solutionDetails_to_chat, bundle);
+    }
+
+    /**
+     * Function for making call to backend to find chat by participants and theme (SOLUTION always)
+     * If chat is found navigate to chat
+     * If chat is not found create and navigate to a new chat
+     * */
+    private void findChat() {
+        FindChatRequest request = new FindChatRequest(AuthUtils.getUserId(getContext()), solution.getBusinessOwnerId(), ChatTheme.SOLUTION, Long.parseLong(solutionId));
+        Call<FindChatResponse> call = chatService.getChatByParticipantsAndTheme(request);
+
+        call.enqueue(new Callback<FindChatResponse>() {
+            @Override
+            public void onResponse(Call<FindChatResponse> call, Response<FindChatResponse> response) {
+                if (response.isSuccessful()) {
+                    FindChatResponse result = response.body();
+                    if(result != null && result.isFound()) {
+                        navigateToChat(result.getChat().getId());
+                    }
+                    else {
+                        createChat();
+                    }
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("SolutionDetailsFragment", "Find chat failed: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Find chat failed: " + response.code(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.e("SolutionDetailsFragment", "Find chat failed", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FindChatResponse> call, Throwable t) {
+                Log.e("SolutionDetailsFragmentt", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Function for making request to backend for creating new chat
+     * After successfully creating, navigates to newly created chat
+     * */
+    private void createChat() {
+        // Creating request
+        CreateChatRequest request = new CreateChatRequest.Builder()
+                .participant1Id(AuthUtils.getUserId(getContext()))
+                .participant2Id(solution.getBusinessOwnerId())
+                .theme(ChatTheme.SOLUTION)
+                .themeId(Long.parseLong(solutionId))
+                .build();
+
+        Call<Long> call = chatService.createChat(request);
+
+        call.enqueue(new Callback<Long>() {
+            @Override
+            public void onResponse(Call<Long> call, Response<Long> response) {
+                if (response.isSuccessful()) {
+                    Long chatId = response.body();
+                    Toast.makeText(getContext(), "Chat created with ID: " + chatId, Toast.LENGTH_SHORT).show();
+                    Log.e("SolutionDetailsFragment", "Chat created with ID: " + chatId);
+                    navigateToChat(chatId);
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("SolutionDetailsFragment", "Create failed: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Create failed: Unknown error", Toast.LENGTH_SHORT).show();
+                        Log.e("SolutionDetailsFragment", "Create failed: " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Long> call, Throwable t) {
+                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     // method used to separate code for altering views from main code
     // a bit messy
     private void populateSolutionDetails() {
@@ -458,7 +571,6 @@ public class SolutionDetailsFragment extends Fragment {
             Log.i("SolutionDetailsFragment", "Visiting business owner page for id: " + solution.getBusinessOwnerId());
             Bundle bundle = new Bundle();
             bundle.putString("businessOwnerId", String.valueOf(solution.getBusinessOwnerId()));
-            NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_soltuionDetails_to_businessOwnerDetails, bundle);
         });
 
@@ -488,6 +600,13 @@ public class SolutionDetailsFragment extends Fragment {
             });
         } else
             binding.buttonReview.setVisibility(View.GONE);
+
+        if(roles.contains("EventOrganizer")) {
+            binding.buttonChatWithOwner.setOnClickListener(v -> {
+                chatWithOwner();
+            });
+        } else
+            binding.buttonChatWithOwner.setVisibility(View.GONE);
     }
 
     private void populateBasicInfo() {

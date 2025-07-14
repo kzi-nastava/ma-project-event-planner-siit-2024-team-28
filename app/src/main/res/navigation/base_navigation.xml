@@ -30,6 +30,9 @@
             android:id="@+id/action_home_to_categories_overview"
             app:destination="@id/nav_categories_overview" />
         <action
+            android:id="@+id/action_home_to_chat_list"
+            app:destination="@id/nav_chat_list" />
+        <action
             android:id="@+id/action_home_to_solutionDetails"
             app:destination="@id/nav_solution_details" />
         <action
@@ -51,6 +54,25 @@
             android:id="@+id/action_budget_planning_items_to_solution_details"
             app:destination="@+id/nav_solution_details" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_chat_list"
+        android:name="com.eventplanner.fragments.chat.ChatListFragment"
+        android:label="Chat list"
+        tools:layout="@layout/fragment_chat_list">
+        <action
+            android:id="@+id/action_chat_list_to_chat"
+            app:destination="@id/nav_chat">
+            <argument
+                android:name="chatId"
+                app:argType="long"/>
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/nav_chat"
+        android:name="com.eventplanner.fragments.chat.ChatFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_chat"
+        />
     <fragment
         android:id="@+id/nav_budget_planning"
         android:name="com.eventplanner.fragments.solutions.BudgetPlanningFragment"
@@ -202,6 +224,13 @@
         <action
             android:id="@+id/action_soltuionDetails_to_businessOwnerDetails"
             app:destination="@id/business_owner_details_fragment" />
+        <action
+            android:id="@+id/action_solutionDetails_to_chat"
+            app:destination="@+id/nav_chat" >
+            <argument
+                android:name="chatId"
+                app:argType="long" />
+        </action>
     </fragment>
 
     <fragment

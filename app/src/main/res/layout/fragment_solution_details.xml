@@ -226,6 +226,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginBottom="8dp"
                     android:gravity="center">
 
                     <Button
@@ -248,6 +249,25 @@
                         android:text="@string/leave_review"
                         android:background="@drawable/button_rounded"
                         android:textColor="@android:color/white" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/button_chat_with_owner"
+                        app:backgroundTint="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/chat_with_owner"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/button_rounded" />
+
                 </LinearLayout>
 
             </LinearLayout>
