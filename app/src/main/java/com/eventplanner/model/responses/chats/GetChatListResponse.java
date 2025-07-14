@@ -7,8 +7,7 @@ public class GetChatListResponse {
     private ChatTheme theme;
     private String participantName;
     private String participantImage;
-    private String solutionName;
-    private String eventName;
+    private String themeName;
     private String lastMessage;
 
     public Long chatId() {
@@ -27,12 +26,8 @@ public class GetChatListResponse {
         return participantImage;
     }
 
-    public String solutionName() {
-        return solutionName;
-    }
-
-    public String eventName() {
-        return eventName;
+    public String themeName() {
+        return themeName;
     }
 
     public String lastMessage() {

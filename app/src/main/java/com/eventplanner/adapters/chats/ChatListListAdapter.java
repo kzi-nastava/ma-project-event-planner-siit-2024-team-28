@@ -37,11 +37,8 @@ public class ChatListListAdapter extends ArrayAdapter<GetChatListResponse> {
         ImageView chatterImage = convertView.findViewById(R.id.chatterImage);
 
         chatterName.setText(chat.participantName());
-        if(chat.theme().equals(ChatTheme.SOLUTION))
-            chatSubject.setText(chat.solutionName());
-        else if(chat.theme().equals(ChatTheme.EVENT))
-            chatSubject.setText(chat.eventName());
-        lastMessage.setText(chat.lastMessage() != null ? chat.lastMessage() : "No messages");
+        chatSubject.setText(chat.themeName());
+        lastMessage.setText(chat.lastMessage() != null ? "\"" + chat.lastMessage() + "\"" : "No messages");
 
         // Setting on click listener
         convertView.setOnClickListener(v -> {
