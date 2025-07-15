@@ -1,5 +1,6 @@
 package com.eventplanner.model.responses.services;
 
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
 import com.eventplanner.model.enums.SolutionStatus;
 
@@ -16,6 +17,7 @@ public class GetServiceResponse {
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
+    private DurationType durationType;
     private Integer fixedDurationInSeconds;
     private Integer minDurationInSeconds;
     private Integer maxDurationInSeconds;
@@ -67,6 +69,8 @@ public class GetServiceResponse {
         return specifics;
     }
 
+    public DurationType getDurationType() {return durationType; }
+
     public Integer getFixedDurationInSeconds() {
         return fixedDurationInSeconds;
     }
@@ -102,7 +106,6 @@ public class GetServiceResponse {
     public SolutionStatus getStatus() {
         return status;
     }
-
 
     public Collection<Long> getEventTypeIds() {
         return eventTypeIds;

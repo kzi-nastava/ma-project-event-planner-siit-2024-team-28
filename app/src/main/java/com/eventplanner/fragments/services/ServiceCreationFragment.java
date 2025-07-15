@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentServiceCreationBinding;
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.enums.ReservationType;
 import com.eventplanner.model.enums.SolutionStatus;
@@ -38,6 +39,8 @@ import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -181,7 +184,7 @@ public class ServiceCreationFragment extends Fragment {
             try {
                 price = Double.parseDouble(priceStr);
                 if (price <= 0) {
-                    Toast.makeText(getContext(), "Invalid price input.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Price cannot be negative or 0.", Toast.LENGTH_SHORT).show();
                     return;
                 }
             } catch (Exception e) {
@@ -198,8 +201,8 @@ public class ServiceCreationFragment extends Fragment {
         } else {
             try {
                 discount = Double.parseDouble(discountStr);
-                if (discount >= 100) {
-                    Toast.makeText(getContext(), "Invalid discount input.", Toast.LENGTH_SHORT).show();
+                if (discount >= 100 || discount < 0) {
+                    Toast.makeText(getContext(), "Discount has to be between 0 and 99.", Toast.LENGTH_SHORT).show();
                     return;
                 }
             } catch (Exception e) {
@@ -228,7 +231,9 @@ public class ServiceCreationFragment extends Fragment {
         Integer fixedDuration = null;
         Integer minDuration = null;
         Integer maxDuration = null;
+        DurationType durationType;
         if (binding.radioButtonFixed.isChecked()) {
+            durationType = DurationType.FIXED;
             String fixedDruationStr = binding.editTextFixedDuration.getText().toString().trim();
             try {
                 Double fixedDurationHrs = Double.parseDouble(fixedDruationStr);
@@ -240,6 +245,7 @@ public class ServiceCreationFragment extends Fragment {
             }
         }
         else if (binding.radioButtonMinMax.isChecked()) {
+            durationType = DurationType.MINMAX;
             String minDurationStr = binding.editTextMinDuration.getText().toString().trim();
             String maxDurationStr = binding.editTextMaxDuration.getText().toString().trim();
             try {
@@ -302,9 +308,9 @@ public class ServiceCreationFragment extends Fragment {
                 .price(price)
                 .discount(discount)
                 .specifics(specifics)
-                .isDeleted(false)
                 .isVisibleForEventOrganizers(isVisible)
                 .isAvailable(isAvailable)
+                .durationType(durationType)
                 .fixedDurationInSeconds(fixedDuration)
                 .minDurationInSeconds(minDuration)
                 .maxDurationInSeconds(maxDuration)
@@ -333,8 +339,16 @@ public class ServiceCreationFragment extends Fragment {
                     Long newServiceId = response.body();
                     Toast.makeText(getContext(), "Service created! ID: " + newServiceId, Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "An error has occured while creating service.", Toast.LENGTH_SHORT).show();
-                    Log.i("ServiceCreationFragment", "Error while creating service: " + + response.code());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("ServiceCreationFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("ServiceCreationFragment", "Error: " + message);
                 }
             }
 
@@ -358,8 +372,16 @@ public class ServiceCreationFragment extends Fragment {
                     serviceRequest.setCategoryId(newCategoryId);
                     createService(serviceRequest);
                 } else {
-                    Toast.makeText(getContext(), "An error has occured.", Toast.LENGTH_SHORT).show();
-                    Log.i("ServiceCreationFragment", "Error while creating category: " + + response.code());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("ServiceCreationFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("ServiceCreationFragment", "Error: " + message);
                 }
             }
 

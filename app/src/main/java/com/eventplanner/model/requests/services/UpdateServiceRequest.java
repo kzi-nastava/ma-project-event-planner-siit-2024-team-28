@@ -1,5 +1,6 @@
 package com.eventplanner.model.requests.services;
 
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
 
 import java.util.Collection;
@@ -10,10 +11,10 @@ public class UpdateServiceRequest {
     private Double price;
     private Double discount;
     private String imageBase64;
-    private Boolean isDeleted;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
+    private DurationType durationType;
     private Integer fixedDurationInSeconds;
     private Integer minDurationInSeconds;
     private Integer maxDurationInSeconds;
@@ -28,10 +29,10 @@ public class UpdateServiceRequest {
         this.price = builder.price;
         this.discount = builder.discount;
         this.imageBase64 = builder.imageBase64;
-        this.isDeleted = builder.isDeleted;
         this.isVisibleForEventOrganizers = builder.isVisibleForEventOrganizers;
         this.isAvailable = builder.isAvailable;
         this.specifics = builder.specifics;
+        this.durationType = builder.durationType;
         this.fixedDurationInSeconds = builder.fixedDurationInSeconds;
         this.minDurationInSeconds = builder.minDurationInSeconds;
         this.maxDurationInSeconds = builder.maxDurationInSeconds;
@@ -51,10 +52,10 @@ public class UpdateServiceRequest {
         private Double price;
         private Double discount;
         private String imageBase64;
-        private Boolean isDeleted;
         private Boolean isVisibleForEventOrganizers;
         private Boolean isAvailable;
         private String specifics;
+        private DurationType durationType;
         private Integer fixedDurationInSeconds;
         private Integer minDurationInSeconds;
         private Integer maxDurationInSeconds;
@@ -88,11 +89,6 @@ public class UpdateServiceRequest {
             return this;
         }
 
-        public Builder isDeleted(Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
         public Builder isVisibleForEventOrganizers(Boolean isVisibleForEventOrganizers) {
             this.isVisibleForEventOrganizers = isVisibleForEventOrganizers;
             return this;
@@ -105,6 +101,11 @@ public class UpdateServiceRequest {
 
         public Builder specifics(String specifics) {
             this.specifics = specifics;
+            return this;
+        }
+
+        public Builder durationType(DurationType durationType) {
+            this.durationType = durationType;
             return this;
         }
 
