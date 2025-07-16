@@ -11,63 +11,47 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.eventplanner.R;
+import com.eventplanner.model.constants.Constants;
+import com.eventplanner.model.requests.eventTypes.CreateEventTypeRequest;
+import com.eventplanner.model.requests.eventTypes.UpdateEventTypeRequest;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
+import com.eventplanner.services.EventTypeService;
+import com.eventplanner.services.SolutionCategoryService;
+import com.eventplanner.utils.HttpUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EventTypeFragment extends Fragment {
-
-    public interface OnEventTypeSubmitListener {
-        void onEventTypeSubmit(GetEventTypeResponse eventType);
-        void onCancel();
-    }
-
-    private OnEventTypeSubmitListener listener;
-
-    private static final String ARG_EVENT_TYPE = "arg_event_type";
-    private static final String ARG_CATEGORIES = "arg_categories";
-
     private GetEventTypeResponse eventType;
     private List<GetSolutionCategoryResponse> categories;
-
     private EditText nameEditText;
     private EditText descriptionEditText;
     private LinearLayout categoriesContainer;
     private TextView categoriesLabel;
     private Button submitButton;
-
-    private final Set<String> selectedCategoryIds = new HashSet<>();
-
-    // Factory method to create fragment with data
-    public static EventTypeFragment newInstance(
-            @Nullable GetEventTypeResponse eventType,
-            @NonNull ArrayList<GetSolutionCategoryResponse> categories) {
-        EventTypeFragment fragment = new EventTypeFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_EVENT_TYPE, (Serializable) eventType);
-        args.putSerializable(ARG_CATEGORIES, categories);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public void setOnEventTypeSubmitListener(OnEventTypeSubmitListener listener) {
-        this.listener = listener;
-    }
+    private final Set<Long> selectedCategoryIds = new HashSet<>();
+    private boolean isEditMode = false;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_event_type, container, false);
     }
 
@@ -75,13 +59,7 @@ public class EventTypeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Get arguments
-        if (getArguments() != null) {
-            eventType = (GetEventTypeResponse) getArguments().getSerializable(ARG_EVENT_TYPE);
-            categories = (List<GetSolutionCategoryResponse>) getArguments().getSerializable(ARG_CATEGORIES);
-        }
-
-        // Find views
+        // Setup views
         TextView titleTextView = view.findViewById(R.id.titleTextView);
         nameEditText = view.findViewById(R.id.nameEditText);
         descriptionEditText = view.findViewById(R.id.descriptionEditText);
@@ -90,78 +68,88 @@ public class EventTypeFragment extends Fragment {
         Button cancelButton = view.findViewById(R.id.cancelButton);
         submitButton = view.findViewById(R.id.submitButton);
 
-        // Setup title and editability
-        boolean isEditMode = eventType != null;
+        // Determine if in edit mode
+        long eventTypeId = getArguments() != null ? getArguments().getLong("eventTypeId", Constants.NullId) : Constants.NullId;
+        isEditMode = eventTypeId != Constants.NullId;
+
+        cancelButton.setOnClickListener(v -> NavHostFragment.findNavController(EventTypeFragment.this).navigateUp());
+
         titleTextView.setText(isEditMode ? getString(R.string.edit_event_type) : getString(R.string.create_event_type));
         nameEditText.setEnabled(!isEditMode);
 
-        // Fill form if editing
-        if (isEditMode) {
-            nameEditText.setText(eventType.getName());
-            descriptionEditText.setText(eventType.getDescription());
-            if (eventType.getRecommendedSolutionCategories() != null && !eventType.getRecommendedSolutionCategories().isEmpty()) {
-                categoriesLabel.setVisibility(View.VISIBLE);
+        descriptionEditText.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-        } else {
-            categoriesLabel.setVisibility(View.GONE);
-        }
 
-        // Setup categories checkboxes
-        setupCategoryCheckboxes();
-
-        // Text change listeners for validation
-        TextWatcher formWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start,int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start,int before, int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 validateForm();
             }
-            @Override
-            public void afterTextChanged(Editable s) {}
-        };
-        descriptionEditText.addTextChangedListener(formWatcher);
 
-        // Cancel button
-        cancelButton.setOnClickListener(v -> {
-            if (listener != null) listener.onCancel();
+            public void afterTextChanged(Editable s) {
+            }
         });
 
-        // Submit button
-        submitButton.setOnClickListener(v -> {
-            if (!validateForm()) return;
+        submitButton.setOnClickListener(v -> handleSubmit());
 
-            GetEventTypeResponse newEventType = new GetEventTypeResponse();
-            if (isEditMode) {
-                newEventType.setId(eventType.getId());
-                newEventType.setActive(eventType.getIsActive());
-            } else {
-                newEventType.setActive(true);
-            }
-            newEventType.setName(nameEditText.getText().toString());
-            newEventType.setDescription(descriptionEditText.getText().toString());
+        if (isEditMode) {
+            fetchEventType(eventTypeId);
+        } else {
+            fetchAcceptedCategories(null);
+        }
+    }
 
-            // Filter selected categories
-            List<GetSolutionCategoryResponse> selectedCategories = new ArrayList<>();
-            if (categories != null) {
-                for (GetSolutionCategoryResponse cat : categories) {
-                    if (selectedCategoryIds.contains(cat.getId())) {
-                        selectedCategories.add(cat);
-                    }
+    private void fetchEventType(long id) {
+        EventTypeService service = HttpUtils.getEventTypeService();
+        service.getEventTypeById(id).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<GetEventTypeResponse> call, @NonNull Response<GetEventTypeResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    eventType = response.body();
+                    nameEditText.setText(eventType.getName());
+                    descriptionEditText.setText(eventType.getDescription());
+                    fetchAcceptedCategories(eventType.getRecommendedSolutionCategories());
+                } else {
+                    Toast.makeText(getContext(), "Failed to load event type", Toast.LENGTH_SHORT).show();
                 }
             }
-            newEventType.setRecommendedSolutionCategories(selectedCategories);
 
-            if (listener != null) listener.onEventTypeSubmit(newEventType);
+            @Override
+            public void onFailure(@NonNull Call<GetEventTypeResponse> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Error loading event type", Toast.LENGTH_SHORT).show();
+            }
         });
+    }
 
-        // Initial validation
-        validateForm();
+    private void fetchAcceptedCategories(@Nullable Collection<GetSolutionCategoryResponse> preselected) {
+        SolutionCategoryService service = HttpUtils.getSolutionCategoryService();
+        service.getAcceptedCategories().enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Collection<GetSolutionCategoryResponse>> call, @NonNull Response<Collection<GetSolutionCategoryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    categories = new ArrayList<>(response.body());
+
+                    if (preselected != null) {
+                        for (GetSolutionCategoryResponse cat : preselected) {
+                            selectedCategoryIds.add(cat.getId());
+                        }
+                    }
+
+                    setupCategoryCheckboxes();
+                    validateForm();
+                } else {
+                    Toast.makeText(getContext(), "Failed to load categories", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Collection<GetSolutionCategoryResponse>> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Error loading categories", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupCategoryCheckboxes() {
         categoriesContainer.removeAllViews();
-
         if (categories == null || categories.isEmpty()) {
             categoriesLabel.setVisibility(View.GONE);
             return;
@@ -173,19 +161,12 @@ public class EventTypeFragment extends Fragment {
             checkBox.setText(category.getName());
             checkBox.setTag(category.getId());
 
-            // Pre-select if editing and category is recommended
-            if (eventType != null && eventType.getRecommendedSolutionCategories() != null) {
-                for (GetSolutionCategoryResponse recCat : eventType.getRecommendedSolutionCategories()) {
-                    if (recCat.getId().equals(category.getId())) {
-                        checkBox.setChecked(true);
-                        selectedCategoryIds.add(category.getId().toString());
-                        break;
-                    }
-                }
+            if (selectedCategoryIds.contains(category.getId())) {
+                checkBox.setChecked(true);
             }
 
             checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                String id = (String) buttonView.getTag();
+                Long id = (Long) buttonView.getTag();
                 if (isChecked) {
                     selectedCategoryIds.add(id);
                 } else {
@@ -199,19 +180,16 @@ public class EventTypeFragment extends Fragment {
     }
 
     private boolean validateForm() {
-        boolean descriptionChanged = true;
-        boolean categoriesChanged = true;
-        boolean isValid = false;
+        boolean descriptionChanged;
+        boolean categoriesChanged;
+        boolean isValid;
 
         if (eventType != null) {
-            // Editing mode: require description changed or categories changed
             descriptionChanged = !descriptionEditText.getText().toString().equals(eventType.getDescription());
             categoriesChanged = hasCategoriesChanged();
             isValid = descriptionChanged || categoriesChanged;
         } else {
-            // Creation mode: require non-empty description and name
-            isValid = !nameEditText.getText().toString().trim().isEmpty()
-                    && !descriptionEditText.getText().toString().trim().isEmpty();
+            isValid = !nameEditText.getText().toString().trim().isEmpty() && !descriptionEditText.getText().toString().trim().isEmpty();
         }
 
         submitButton.setEnabled(isValid);
@@ -219,11 +197,64 @@ public class EventTypeFragment extends Fragment {
     }
 
     private boolean hasCategoriesChanged() {
-        if (eventType == null || eventType.getRecommendedSolutionCategories() == null) return false;
-        Set<String> initialIds = new HashSet<>();
-        for (GetSolutionCategoryResponse c : eventType.getRecommendedSolutionCategories()) {
-            initialIds.add(c.getId().toString());
+        if (eventType == null || eventType.getRecommendedSolutionCategories() == null) {
+            return false;
         }
+
+        Set<Long> initialIds = eventType.getRecommendedSolutionCategories().stream().map(GetSolutionCategoryResponse::getId).collect(Collectors.toSet());
+
         return !initialIds.equals(selectedCategoryIds);
+    }
+
+    private void handleSubmit() {
+        if (!validateForm()) {
+            return;
+        }
+
+        String name = nameEditText.getText().toString();
+        String description = descriptionEditText.getText().toString();
+
+        List<GetSolutionCategoryResponse> selectedCategories = categories != null ? categories.stream().filter(cat -> selectedCategoryIds.contains(cat.getId())).collect(Collectors.toList()) : new ArrayList<>();
+
+        List<Long> selectedCategoryIdsList = selectedCategories.stream().map(GetSolutionCategoryResponse::getId).collect(Collectors.toList());
+
+        EventTypeService service = HttpUtils.getEventTypeService();
+
+        if (isEditMode) {
+            UpdateEventTypeRequest update = new UpdateEventTypeRequest();
+            update.setDescription(description);
+            update.setRecommendedSolutionCategoryIds(selectedCategoryIdsList);
+
+            service.updateEventType(eventType.getId(), update).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                    Toast.makeText(getContext(), response.isSuccessful() ? "Event type updated" : "Update failed", Toast.LENGTH_SHORT).show();
+                    NavHostFragment.findNavController(EventTypeFragment.this).navigateUp();
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), "Update error", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else {
+            CreateEventTypeRequest create = new CreateEventTypeRequest();
+            create.setName(name);
+            create.setDescription(description);
+            create.setRecommendedSolutionCategoryIds(selectedCategoryIdsList);
+
+            service.createEventType(create).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<GetEventTypeResponse> call, @NonNull Response<GetEventTypeResponse> response) {
+                    Toast.makeText(getContext(), response.isSuccessful() ? "Event type created" : "Creation failed", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<GetEventTypeResponse> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), "Failed to create event type", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

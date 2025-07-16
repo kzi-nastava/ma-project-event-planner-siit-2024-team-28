@@ -12,4 +12,20 @@ public class UpdateEventTypeRequest {
         this.description = description;
         this.recommendedSolutionCategoryIds = categoryIds;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Long> getRecommendedSolutionCategoryIds() {
+        return recommendedSolutionCategoryIds;
+    }
+
+    public void setRecommendedSolutionCategoryIds(List<Long> recommendedSolutionCategoryIds) {
+        this.recommendedSolutionCategoryIds = recommendedSolutionCategoryIds;
+    }
 }

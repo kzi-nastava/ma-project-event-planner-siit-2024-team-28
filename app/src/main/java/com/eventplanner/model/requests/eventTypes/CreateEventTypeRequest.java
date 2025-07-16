@@ -14,4 +14,28 @@ public class CreateEventTypeRequest {
         this.description = description;
         this.recommendedSolutionCategoryIds = categoryIds;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Long> getRecommendedSolutionCategoryIds() {
+        return recommendedSolutionCategoryIds;
+    }
+
+    public void setRecommendedSolutionCategoryIds(List<Long> recommendedSolutionCategoryIds) {
+        this.recommendedSolutionCategoryIds = recommendedSolutionCategoryIds;
+    }
 }

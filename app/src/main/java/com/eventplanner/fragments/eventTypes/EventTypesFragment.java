@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.eventTypes.EventTypesAdapter;
+import com.eventplanner.model.constants.Constants;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.utils.HttpUtils;
@@ -78,7 +79,8 @@ public class EventTypesFragment extends Fragment {
         toggleInactive.setOnCheckedChangeListener((buttonView, isChecked) -> filterEventTypes());
 
         btnAdd.setOnClickListener(v -> {
-            Bundle bundle = new Bundle(); // no eventTypeId means "create"
+            Bundle bundle = new Bundle();
+            bundle.putLong("eventTypeId", Constants.NullId);
             NavHostFragment.findNavController(this)
                     .navigate(R.id.action_eventTypes_to_eventTypeForm, bundle);
         });
@@ -108,7 +110,7 @@ public class EventTypesFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Collection<GetEventTypeResponse>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error loading event types", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load event types", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -141,7 +143,7 @@ public class EventTypesFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    Toast.makeText(getContext(), "Failed to deactivate", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to deactivate event types", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -153,7 +155,7 @@ public class EventTypesFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    Toast.makeText(getContext(), "Failed to activate", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to activate event types", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -161,10 +163,9 @@ public class EventTypesFragment extends Fragment {
 
     private void onEditEventType(GetEventTypeResponse type) {
         Bundle bundle = new Bundle();
-        bundle.putString("eventTypeId", type.getId().toString()); // pass ID to load for editing
+        bundle.putLong("eventTypeId", type.getId()); // pass ID to load for editing
 
         NavHostFragment.findNavController(this)
                 .navigate(R.id.action_eventTypes_to_eventTypeForm, bundle);
     }
-
 }

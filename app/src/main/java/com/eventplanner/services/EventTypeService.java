@@ -26,7 +26,7 @@ public interface EventTypeService {
     Call<GetEventTypeResponse> createEventType(@Body CreateEventTypeRequest request);
 
     @PUT("event-types/{id}")
-    Call<GetEventTypeResponse> updateEventType(@Path("id") Long id, @Body UpdateEventTypeRequest request);
+    Call<Void> updateEventType(@Path("id") Long id, @Body UpdateEventTypeRequest request);
 
     @PATCH("event-types/{id}/activate")
     Call<Void> activateEventType(@Path("id") Long id);
