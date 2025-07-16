@@ -6,7 +6,6 @@ import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 
 import java.util.Collection;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,9 +18,6 @@ import retrofit2.http.Path;
 public interface EventTypeService {
     @GET("event-types")
     Call<Collection<GetEventTypeResponse>> getAllEventTypes();
-
-    @GET("event-types/active")
-    Call<Collection<GetEventTypeResponse>> getActiveEventTypes();
 
     @GET("event-types/{id}")
     Call<GetEventTypeResponse> getEventTypeById(@Path("id") Long id);
@@ -39,5 +35,8 @@ public interface EventTypeService {
     Call<Void> deactivateEventType(@Path("id") Long id);
 
     @GET("event-types/recommended-categories/{id}")
-    Call<List<GetSolutionCategoryResponse>> getRecommendedCategories(@Path("id") Long eventTypeId);
+    Call<Collection<GetSolutionCategoryResponse>> getRecommendedCategories(@Path("id") Long id);
+
+    @GET("event-types/active")
+    Call<Collection<GetEventTypeResponse>> getActiveEventTypes();
 }

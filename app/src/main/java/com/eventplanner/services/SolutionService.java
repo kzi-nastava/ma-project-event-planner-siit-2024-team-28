@@ -27,4 +27,20 @@ public interface SolutionService {
 
     @PATCH("solutions/{id}/discount")
     Call<Void> updateSolutionDiscount(@Path("id") Long solutionId, @Query("newDiscount") Double newDiscount);
+
+    @GET("solutions/pending-solutions")
+    Call<Collection<GetSolutionResponse>> getPendingSolutions();
+
+    @GET("solutions/required-solution/appropriate-solutions")
+    Call<Collection<GetSolutionResponse>> getAppropriateSolutions(
+            @Query("categoryId") Long categoryId,
+            @Query("eventTypeId") Long eventTypeId,
+            @Query("amount") Double amount
+    );
+
+    @GET("/api/solutions/{solutionId}/can-comment-review")
+    Call<Boolean> canUserCommentReview(
+            @Path("solutionId") Long solutionId,
+            @Query("userId") Long userId
+    );
 }

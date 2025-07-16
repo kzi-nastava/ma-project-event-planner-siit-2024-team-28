@@ -67,6 +67,7 @@ public class ServiceListAdapter extends ArrayAdapter<GetServiceResponse> {
         deleteButton.setOnClickListener(v -> {
             GetServiceResponse serviceToDelete = getItem(position);
 
+            // TODO: refactor so that adapter implements interfaces that handle Http Requests in fragments
             serviceService.deleteService(serviceToDelete.getId()).enqueue(new Callback<DeleteServiceResponse>() {
                 @Override
                 public void onResponse(Call<DeleteServiceResponse> call, Response<DeleteServiceResponse> response) {

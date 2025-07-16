@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/black"
     tools:context=".fragments.solutions.SolutionDetailsFragment">
 
@@ -200,7 +201,7 @@
 
                     <Button
                         android:id="@+id/visitOwnerPageButton"
-                        android:backgroundTint="@null"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -211,7 +212,7 @@
 
                     <Button
                         android:id="@+id/addToFavorites"
-                        android:backgroundTint="@null"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -225,10 +226,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginBottom="8dp"
                     android:gravity="center">
 
                     <Button
-                        android:backgroundTint="@null"
+                        android:id="@+id/button_buy"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -238,13 +241,33 @@
                         android:background="@drawable/submit_button" />
 
                     <Button
-                        android:backgroundTint="@null"
+                        android:id="@+id/button_review"
+                        app:backgroundTint="@null"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/leave_review"
                         android:background="@drawable/button_rounded"
                         android:textColor="@android:color/white" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/button_chat_with_owner"
+                        app:backgroundTint="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/chat_with_owner"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/button_rounded" />
+
                 </LinearLayout>
 
             </LinearLayout>

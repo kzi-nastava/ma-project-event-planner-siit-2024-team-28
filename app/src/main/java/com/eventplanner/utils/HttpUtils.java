@@ -4,16 +4,27 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.eventplanner.BuildConfig;
+import com.eventplanner.adapters.typeAdapters.LocalDateAdapter;
+import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.services.AuthService;
+import com.eventplanner.services.ChatMessageService;
+import com.eventplanner.services.ChatService;
 import com.eventplanner.services.CommentService;
+import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
+import com.eventplanner.services.ProductService;
 import com.eventplanner.services.ReportService;
+import com.eventplanner.services.RequiredSolutionService;
 import com.eventplanner.services.ReviewService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -34,6 +45,11 @@ public class HttpUtils {
             return sharedPreferences.getString(TOKEN_KEY, null);
         });
 
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(jwtInterceptor)
                 .connectTimeout(30, TimeUnit.SECONDS)
@@ -44,7 +60,7 @@ public class HttpUtils {
                 .baseUrl(BACKEND_BASE_URL)
                 .client(okHttpClient)
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
 
@@ -59,4 +75,9 @@ public class HttpUtils {
     public static CommentService getCommentService() { return retrofit.create(CommentService.class); }
     public static ReviewService getReviewService() { return retrofit.create(ReviewService.class); }
     public static ServiceService getServiceService() { return retrofit.create(ServiceService.class); }
+    public static EventService getEventService() { return retrofit.create(EventService.class); }
+    public static RequiredSolutionService getRequiredSolutionService() { return retrofit.create(RequiredSolutionService.class); }
+    public static ProductService getProductService() { return retrofit.create(ProductService.class); }
+    public static ChatService getChatService() { return retrofit.create(ChatService.class); }
+    public static ChatMessageService getChatMessageService() { return retrofit.create(ChatMessageService.class); }
 }
