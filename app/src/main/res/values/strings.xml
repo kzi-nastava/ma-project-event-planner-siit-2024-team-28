@@ -188,4 +188,14 @@
     <string name="price_list">Price list</string>
     <string name="price_list_title">Here\'s the price list for your solutions:</string>
     <string name="total_price">Total price:</string>
+
+    <!-- fragment_event_types && fragment_event_type -->
+    <string name="deactivate">Deactivate</string>
+    <string name="create_event_type">Create event type</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="recommended_categories">Recommended categories</string>
+    <string name="event_type_description">Event type description</string>
+    <string name="event_type_name">Event type name</string>
+    <string name="edit_event_type">Edit event type</string>
 </resources>

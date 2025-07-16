@@ -24,8 +24,11 @@
             android:id="@+id/action_home_to_price_list"
             app:destination="@id/nav_price_list" />
         <action
-            android:id="@+id/action_home_to_solutionDetails"
+            android:id="@+id/action_home_to_solution_details"
             app:destination="@id/solution_details_fragment" />
+        <action
+            android:id="@+id/action_home_to_event_types"
+            app:destination="@id/nav_event_types" />
         <action
             android:id="@+id/action_home_to_profile"
             app:destination="@id/nav_profile" />
@@ -166,4 +169,27 @@
         android:name="com.eventplanner.fragments.profile.ChangePasswordFragment"
         android:label="Change Password"
         tools:layout="@layout/fragment_change_password" />
+
+    <fragment
+        android:id="@+id/nav_event_types"
+        android:name="com.eventplanner.fragments.eventTypes.EventTypesFragment"
+        android:label="Event types"
+        tools:layout="@layout/fragment_event_types">
+        <action
+            android:id="@+id/action_eventTypes_to_eventTypeForm"
+            app:destination="@id/nav_event_type_form" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_event_type_form"
+        android:name="com.eventplanner.fragments.eventTypes.EventTypeFragment"
+        android:label="Event Type Form"
+        tools:layout="@layout/fragment_event_type">
+
+        <!-- Optional argument: eventTypeId for editing -->
+        <argument
+            android:name="eventTypeId"
+            app:argType=""
+            android:defaultValue="@null" />
+    </fragment>
 </navigation>

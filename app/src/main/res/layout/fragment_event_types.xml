@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contentContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnAddEventType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+ Create New Event Type" />
+
+    <LinearLayout
+        android:id="@+id/filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/editSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="Search by name" />
+
+        <ToggleButton
+            android:id="@+id/toggleActive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="Show Active"
+            android:textOff="Hide Active"
+            android:checked="true" />
+
+        <ToggleButton
+            android:id="@+id/toggleInactive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="Show Inactive"
+            android:textOff="Hide Inactive"
+            android:checked="true" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerEventTypes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="8dp" />
+
+</LinearLayout>
