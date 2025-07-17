@@ -1,6 +1,13 @@
 package com.eventplanner.fragments.solutions;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.RatingBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,19 +16,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RatingBar;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
@@ -33,20 +27,14 @@ import com.eventplanner.model.requests.reviews.CreateReviewRequest;
 import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.chats.FindChatResponse;
 import com.eventplanner.model.responses.comments.GetCommentResponse;
-import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.reviews.GetReviewResponse;
-import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
-import com.eventplanner.model.responses.solutions.GetSolutionResponse;
-import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.services.ChatService;
 import com.eventplanner.services.CommentService;
 import com.eventplanner.services.EventService;
-import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ProductService;
 import com.eventplanner.services.ReviewService;
-import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
@@ -56,7 +44,6 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
