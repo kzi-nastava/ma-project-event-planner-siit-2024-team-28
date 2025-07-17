@@ -248,6 +248,7 @@ public class EventTypeFragment extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call<GetEventTypeResponse> call, @NonNull Response<GetEventTypeResponse> response) {
                     Toast.makeText(getContext(), response.isSuccessful() ? "Event type created" : "Creation failed", Toast.LENGTH_SHORT).show();
+                    NavHostFragment.findNavController(EventTypeFragment.this).navigateUp();
                 }
 
                 @Override
