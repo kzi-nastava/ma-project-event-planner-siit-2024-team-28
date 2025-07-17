@@ -26,6 +26,7 @@ import com.eventplanner.R;
 import com.eventplanner.fragments.FragmentTransition;
 import com.eventplanner.fragments.events.TopEventsFragment;
 import com.eventplanner.fragments.solutions.TopSolutionsFragment;
+import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.navigation.NavigationView;
@@ -128,6 +129,12 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem profileItem = menu.findItem(R.id.nav_profile);
         if (profileItem != null) {
             profileItem.setVisible(loggedIn);
+        }
+
+        MenuItem eventTypesItem = menu.findItem(R.id.nav_event_types);
+        if (eventTypesItem != null) {
+            boolean isAdmin = AuthUtils.getUserRoles(this).contains(UserRoles.ADMIN);
+            eventTypesItem.setVisible(isAdmin);
         }
 
         navigationView.invalidate();

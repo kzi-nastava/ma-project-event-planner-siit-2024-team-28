@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -62,7 +61,7 @@ public class TopSolutionsFragment extends Fragment {
             bundle.putString("solutionId", String.valueOf(1)); //TODO: srediti treba proslediti vrednosti id solutiona
 
             NavController navController = Navigation.findNavController(rootView);
-            navController.navigate(R.id.action_home_to_solutionDetails, bundle);
+            navController.navigate(R.id.action_home_to_solution_details, bundle);
         });
 
         NavController navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);

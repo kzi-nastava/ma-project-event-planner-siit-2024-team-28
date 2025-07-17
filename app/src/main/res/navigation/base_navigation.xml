@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/base_navigation"
-    app:startDestination="@id/nav_home"
-    >
+    app:startDestination="@id/nav_home">
+
     <fragment
         android:id="@+id/nav_home"
         android:name="com.eventplanner.fragments.home.HomeFragment"
@@ -24,6 +23,9 @@
             android:id="@+id/action_home_to_price_list"
             app:destination="@id/nav_price_list" />
         <action
+            android:id="@+id/action_home_to_solution_details"
+            app:destination="@id/nav_solution_details" />
+        <action
             android:id="@+id/action_home_to_budget_planning"
             app:destination="@id/nav_budget_planning" />
         <action
@@ -33,27 +35,29 @@
             android:id="@+id/action_home_to_chat_list"
             app:destination="@id/nav_chat_list" />
         <action
-            android:id="@+id/action_home_to_solutionDetails"
-            app:destination="@id/nav_solution_details" />
+            android:id="@+id/action_home_to_event_types"
+            app:destination="@id/nav_event_types" />
         <action
             android:id="@+id/action_home_to_profile"
             app:destination="@id/nav_profile" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_top_events"
         android:name="com.eventplanner.fragments.events.TopEventsFragment"
         android:label="Top events"
-        tools:layout="@layout/fragment_top_events"
-        />
+        tools:layout="@layout/fragment_top_events" />
+
     <fragment
         android:id="@+id/nav_budget_planning_items"
         android:name="com.eventplanner.fragments.solutions.BudgetPlanningItemsFragment"
         android:label="Budget planning items"
-        tools:layout="@layout/budget_planning_item_card" >
+        tools:layout="@layout/budget_planning_item_card">
         <action
             android:id="@+id/action_budget_planning_items_to_solution_details"
-            app:destination="@+id/nav_solution_details" />
+            app:destination="@id/nav_solution_details" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_chat_list"
         android:name="com.eventplanner.fragments.chat.ChatListFragment"
@@ -64,33 +68,36 @@
             app:destination="@id/nav_chat">
             <argument
                 android:name="chatId"
-                app:argType="long"/>
+                app:argType="long" />
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/nav_chat"
         android:name="com.eventplanner.fragments.chat.ChatFragment"
         android:label="Chat"
-        tools:layout="@layout/fragment_chat"
-        />
+        tools:layout="@layout/fragment_chat" />
+
     <fragment
         android:id="@+id/nav_budget_planning"
         android:name="com.eventplanner.fragments.solutions.BudgetPlanningFragment"
         android:label="Budget planning"
-        tools:layout="@layout/fragment_budget_planning" >
+        tools:layout="@layout/fragment_budget_planning">
         <action
             android:id="@+id/action_budget_planning_to_budget_planning_items"
             app:destination="@id/nav_budget_planning_items">
             <argument
                 android:name="eventId"
-                app:argType="long"/>
+                app:argType="long" />
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/nav_category_acception"
         android:name="com.eventplanner.fragments.categories.CategoryAcceptionFragment"
         android:label="Category acception"
         tools:layout="@layout/fragment_category_acception" />
+
     <fragment
         android:id="@+id/nav_categories_overview"
         android:name="com.eventplanner.fragments.categories.CategoriesOverviewFragment"
@@ -98,83 +105,86 @@
         tools:layout="@layout/fragment_categories_overview">
         <action
             android:id="@+id/action_categories_overview_to_category_creation"
-            app:destination="@id/nav_category_creation"/>
+            app:destination="@id/nav_category_creation" />
         <action
             android:id="@+id/action_categories_overview_to_category_edit"
             app:destination="@id/nav_category_edit">
             <argument
                 android:name="solutionId"
-                app:argType="long"/>
+                app:argType="long" />
         </action>
-        <action android:id="@+id/action_categories_overview_to_categorize_solution"
-            app:destination="@+id/nav_categorize_solution"/>
-        <action android:id="@+id/action_categories_overview_to_category_acception"
-            app:destination="@+id/nav_category_acception"/>
+        <action
+            android:id="@+id/action_categories_overview_to_categorize_solution"
+            app:destination="@id/nav_categorize_solution" />
+        <action
+            android:id="@+id/action_categories_overview_to_category_acception"
+            app:destination="@id/nav_category_acception" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_categorize_solution"
         android:name="com.eventplanner.fragments.categories.CategorizeSolutionFragment"
         android:label="Categorize solution"
-        tools:layout="@layout/fragment_categorize_solution"
-        />
+        tools:layout="@layout/fragment_categorize_solution" />
+
     <fragment
         android:id="@+id/nav_category_edit"
         android:name="com.eventplanner.fragments.categories.CategoryEditFragment"
         android:label="Category edit"
-        tools:layout="@layout/fragment_category_edit"
-        />
+        tools:layout="@layout/fragment_category_edit" />
+
     <fragment
         android:id="@+id/nav_category_creation"
         android:name="com.eventplanner.fragments.categories.CategoryCreationFragment"
         android:label="Category creation"
-        tools:layout="@layout/fragment_category_creation"
-        />
+        tools:layout="@layout/fragment_category_creation" />
+
     <fragment
         android:id="@+id/nav_price_list"
         android:name="com.eventplanner.fragments.solutions.PriceListFragment"
         android:label="Price list"
-        tools:layout="@layout/fragment_price_list"
-        />
+        tools:layout="@layout/fragment_price_list" />
+
     <fragment
         android:id="@+id/nav_top_solutions"
         android:name="com.eventplanner.fragments.solutions.TopSolutionsFragment"
         android:label="Top solutions"
-        tools:layout="@layout/fragment_top_solutions"
-        >
+        tools:layout="@layout/fragment_top_solutions">
         <action
             android:id="@+id/action_topSolutions_to_solutionDetails"
             app:destination="@id/nav_solution_details" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_registration"
         android:name="com.eventplanner.fragments.auth.RegistrationFragment"
         android:label="Registration"
-        tools:layout="@layout/fragment_registration"
-        />
+        tools:layout="@layout/fragment_registration" />
+
     <fragment
         android:id="@+id/nav_business_owner_registration"
         android:name="com.eventplanner.fragments.auth.BusinessOwnerRegistrationFragment"
         android:label="Business owner registration"
-        tools:layout="@layout/fragment_business_owner_registration"
-        />
+        tools:layout="@layout/fragment_business_owner_registration" />
+
     <fragment
         android:id="@+id/nav_event_organizer_registration"
         android:name="com.eventplanner.fragments.auth.EventOrganizerRegistrationFragment"
         android:label="Event organizer registration"
-        tools:layout="@layout/fragment_event_organizer_registration"
-        />
+        tools:layout="@layout/fragment_event_organizer_registration" />
+
     <fragment
         android:id="@+id/nav_login"
         android:name="com.eventplanner.fragments.auth.LoginFragment"
         android:label="Login"
-        tools:layout="@layout/fragment_login"
-        />
+        tools:layout="@layout/fragment_login" />
+
     <fragment
         android:id="@+id/nav_service_creation"
         android:name="com.eventplanner.fragments.services.ServiceCreationFragment"
         android:label="Service creation"
-        tools:layout="@layout/fragment_service_creation"
-        />
+        tools:layout="@layout/fragment_service_creation" />
+
     <fragment
         android:id="@+id/nav_service_overview"
         android:name="com.eventplanner.fragments.services.ServicesOverviewFragment"
@@ -182,17 +192,18 @@
         tools:layout="@layout/fragment_services_overview">
         <action
             android:id="@+id/action_servicesOverview_to_createService"
-            app:destination="@+id/nav_service_creation"/>
+            app:destination="@id/nav_service_creation" />
         <action
             android:id="@+id/action_services_overview_to_service_edit"
-            app:destination="@+id/nav_service_edit"/>
+            app:destination="@id/nav_service_edit" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_all_events"
         android:name="com.eventplanner.fragments.events.AllEventsFragment"
         android:label="All events"
-        tools:layout="@layout/fragment_all_events"
-        />
+        tools:layout="@layout/fragment_all_events" />
+
     <fragment
         android:id="@+id/nav_all_products"
         android:name="com.eventplanner.fragments.solutions.AllProductsFragment"
@@ -201,13 +212,13 @@
         <action
             android:id="@+id/action_allProducts_to_solutionDetails"
             app:destination="@id/nav_solution_details" />
-        </fragment>
+    </fragment>
+
     <fragment
         android:id="@+id/nav_all_services"
         android:name="com.eventplanner.fragments.solutions.AllServicesFragment"
         android:label="All services"
-        tools:layout="@layout/fragment_all_services"
-        >
+        tools:layout="@layout/fragment_all_services">
         <action
             android:id="@+id/action_allServices_to_solutionDetails"
             app:destination="@id/nav_solution_details" />
@@ -216,17 +227,17 @@
     <fragment
         android:id="@+id/nav_solution_details"
         android:name="com.eventplanner.fragments.solutions.SolutionDetailsFragment"
-        tools:layout="@layout/fragment_solution_details"
-        android:label="Solution Details">
+        android:label="Solution Details"
+        tools:layout="@layout/fragment_solution_details">
         <argument
             android:name="solutionId"
             app:argType="string" />
         <action
-            android:id="@+id/action_soltuionDetails_to_businessOwnerDetails"
+            android:id="@+id/action_solutionDetails_to_businessOwnerDetails"
             app:destination="@id/business_owner_details_fragment" />
         <action
             android:id="@+id/action_solutionDetails_to_chat"
-            app:destination="@+id/nav_chat" >
+            app:destination="@id/nav_chat">
             <argument
                 android:name="chatId"
                 app:argType="long" />
@@ -236,8 +247,8 @@
     <fragment
         android:id="@+id/business_owner_details_fragment"
         android:name="com.eventplanner.fragments.users.BusinessOwnerDetailsFragment"
-        tools:layout="@layout/fragment_business_owner_details"
-        android:label="Business Owner Details">
+        android:label="Business Owner Details"
+        tools:layout="@layout/fragment_business_owner_details">
         <argument
             android:name="businessOwnerId"
             app:argType="string" />
@@ -246,8 +257,8 @@
     <fragment
         android:id="@+id/nav_service_edit"
         android:name="com.eventplanner.fragments.services.ServiceEditFragment"
-        tools:layout="@layout/fragment_service_edit"
-        android:label="Service Edit">
+        android:label="Service Edit"
+        tools:layout="@layout/fragment_service_edit">
         <argument
             android:name="serviceId"
             app:argType="string" />
@@ -258,7 +269,6 @@
         android:name="com.eventplanner.fragments.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile">
-
         <action
             android:id="@+id/action_profile_to_change_password"
             app:destination="@id/nav_change_password" />
@@ -269,4 +279,24 @@
         android:name="com.eventplanner.fragments.profile.ChangePasswordFragment"
         android:label="Change Password"
         tools:layout="@layout/fragment_change_password" />
+
+    <fragment
+        android:id="@+id/nav_event_types"
+        android:name="com.eventplanner.fragments.eventTypes.EventTypesFragment"
+        android:label="Event types"
+        tools:layout="@layout/fragment_event_types">
+        <action
+            android:id="@+id/action_eventTypes_to_eventTypeForm"
+            app:destination="@id/nav_event_type_form" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_event_type_form"
+        android:name="com.eventplanner.fragments.eventTypes.EventTypeFragment"
+        android:label="Event Type Form"
+        tools:layout="@layout/fragment_event_type">
+        <argument
+            android:name="eventTypeId"
+            app:argType="long" />
+    </fragment>
 </navigation>

@@ -10,7 +10,6 @@ public class GetSolutionCategoryResponse {
     private RequestStatus requestStatus;
     private Boolean isDeleted;
 
-
     public Long getId() {
         return id;
     }

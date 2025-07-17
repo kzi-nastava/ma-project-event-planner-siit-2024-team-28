@@ -25,5 +25,8 @@
             android:title="@string/navbar_profile" />
         <item android:id="@+id/nav_logout"
             android:title="@string/navbar_logout" />
+        <item
+            android:id="@+id/nav_event_types"
+            android:title="@string/event_types" />
     </group>
 </menu>

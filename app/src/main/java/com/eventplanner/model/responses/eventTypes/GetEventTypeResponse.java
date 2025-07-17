@@ -30,4 +30,24 @@ public class GetEventTypeResponse {
     public Collection<GetSolutionCategoryResponse> getRecommendedSolutionCategories() {
         return recommendedSolutionCategories;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public void setRecommendedSolutionCategories(Collection<GetSolutionCategoryResponse> recommendedSolutionCategories) {
+        this.recommendedSolutionCategories = recommendedSolutionCategories;
+    }
 }
