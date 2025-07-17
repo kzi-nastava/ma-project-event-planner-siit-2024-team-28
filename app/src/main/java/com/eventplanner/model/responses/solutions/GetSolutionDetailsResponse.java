@@ -1,5 +1,6 @@
 package com.eventplanner.model.responses.solutions;
 
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
 
 import java.util.Collection;
@@ -16,6 +17,7 @@ public class GetSolutionDetailsResponse {
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
+    private DurationType durationType;
     private Integer fixedDurationInSeconds;
     private Integer minDurationInSeconds;
     private Integer maxDurationInSeconds;
@@ -72,6 +74,8 @@ public class GetSolutionDetailsResponse {
     public String getSpecifics() {
         return specifics;
     }
+
+    public DurationType getDurationType() { return durationType; }
 
     public Integer getFixedDurationInSeconds() {
         return fixedDurationInSeconds;

@@ -7,8 +7,6 @@ public class GetSolutionCategoryResponse {
     private Long id;
     private String name;
     private String description;
-    private RequestStatus requestStatus;
-    private Boolean isDeleted;
 
     public Long getId() {
         return id;
@@ -22,11 +20,4 @@ public class GetSolutionCategoryResponse {
         return description;
     }
 
-    public RequestStatus getRequestStatus() {
-        return requestStatus;
-    }
-
-    public Boolean getIsDeleted() {
-        return isDeleted;
-    }
 }

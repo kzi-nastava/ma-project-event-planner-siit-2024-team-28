@@ -108,7 +108,7 @@ public class CategoryEditFragment extends Fragment {
             return;
         }
 
-        UpdateSolutionCategoryRequest updateRequest = new UpdateSolutionCategoryRequest(categoryName,categoryDescription,null);
+        UpdateSolutionCategoryRequest updateRequest = new UpdateSolutionCategoryRequest(categoryName,categoryDescription);
         Call<Void> call = categoryService.updateCategory(categoryId, updateRequest);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -116,8 +116,16 @@ public class CategoryEditFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Category edited successfully.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "There has been an error.", Toast.LENGTH_SHORT).show();
-                    Log.i("CategoryEditFragment", "An error while editing category: "  + response.code());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("CategoryAcceptionFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("CategoryAcceptionFragment", "Error: " + message);
                 }
             }
 

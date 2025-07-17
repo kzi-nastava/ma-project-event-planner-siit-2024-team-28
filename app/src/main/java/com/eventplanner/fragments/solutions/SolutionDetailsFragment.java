@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
 import com.eventplanner.model.enums.ChatTheme;
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.requests.chats.CreateChatRequest;
 import com.eventplanner.model.requests.chats.FindChatRequest;
 import com.eventplanner.model.requests.comments.CreateCommentRequest;
@@ -620,7 +621,7 @@ public class SolutionDetailsFragment extends Fragment {
 
     private void populateServiceSpecifics() {
         binding.textSpecifics.setText("Specifics: " + solution.getSpecifics());
-        if (solution.getFixedDurationInSeconds() != null) {
+        if (solution.getDurationType() == DurationType.FIXED) {
             binding.textMinDuration.setVisibility(View.GONE);
             binding.textMaxDuration.setVisibility(View.GONE);
             binding.textDuration.setText(String.format("Duration: %.2f hrs", convertSecondsToHours(solution.getFixedDurationInSeconds())));

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentServiceCreationBinding;
 import com.eventplanner.databinding.FragmentServiceEditBinding;
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.services.UpdateServiceRequest;
@@ -30,6 +31,8 @@ import com.eventplanner.services.ServiceService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.chip.Chip;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,7 +133,7 @@ public class ServiceEditFragment extends Fragment {
         });
 
         // Duration fields initialization
-        if(service.getFixedDurationInSeconds() != null) {
+        if(service.getDurationType() == DurationType.FIXED) {
             binding.radioButtonFixed.setChecked(true);
             binding.radioButtonMinMax.setChecked(false);
             binding.editTextFixedDuration.setText(String.valueOf(convertSecondsToHours(service.getFixedDurationInSeconds())));
@@ -237,7 +240,7 @@ public class ServiceEditFragment extends Fragment {
             try {
                 price = Double.parseDouble(priceStr);
                 if (price <= 0) {
-                    Toast.makeText(getContext(), "Invalid price input.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Price cannot be 0 or negative.", Toast.LENGTH_SHORT).show();
                     return;
                 }
             } catch (Exception e) {
@@ -254,8 +257,8 @@ public class ServiceEditFragment extends Fragment {
         } else {
             try {
                 discount = Double.parseDouble(discountStr);
-                if (discount >= 100) {
-                    Toast.makeText(getContext(), "Invalid discount input.", Toast.LENGTH_SHORT).show();
+                if (discount >= 100 || discount < 0) {
+                    Toast.makeText(getContext(), "Discount has to be between 0-99.", Toast.LENGTH_SHORT).show();
                     return;
                 }
             } catch (Exception e) {
@@ -284,7 +287,9 @@ public class ServiceEditFragment extends Fragment {
         Integer fixedDuration = null;
         Integer minDuration = null;
         Integer maxDuration = null;
+        DurationType durationType = null;
         if (binding.radioButtonFixed.isChecked()) {
+            durationType = DurationType.FIXED;
             String fixedDruationStr = binding.editTextFixedDuration.getText().toString().trim();
             try {
                 Double fixedDurationHrs = Double.parseDouble(fixedDruationStr);
@@ -296,6 +301,7 @@ public class ServiceEditFragment extends Fragment {
             }
         }
         else if (binding.radioButtonMinMax.isChecked()) {
+            durationType = DurationType.MINMAX;
             String minDurationStr = binding.editTextMinDuration.getText().toString().trim();
             String maxDurationStr = binding.editTextMaxDuration.getText().toString().trim();
             try {
@@ -338,9 +344,9 @@ public class ServiceEditFragment extends Fragment {
                 .price(price)
                 .discount(discount)
                 .specifics(specifics)
-                .isDeleted(false)
                 .isVisibleForEventOrganizers(isVisible)
                 .isAvailable(isAvailable)
+                .durationType(durationType)
                 .fixedDurationInSeconds(fixedDuration)
                 .minDurationInSeconds(minDuration)
                 .maxDurationInSeconds(maxDuration)
@@ -361,7 +367,16 @@ public class ServiceEditFragment extends Fragment {
                     Toast.makeText(getContext(), "Service updated successfuly", Toast.LENGTH_SHORT).show();
                     Log.d("ServiceEditFragment", "Service updated successfully");
                 } else {
-                    Log.e("ServiceEditFragmente", "Update failed: " + response.code());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("ServiceEditFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("ServiceEditFragment", "Error: " + message);
                 }
             }
 
