@@ -1,5 +1,7 @@
 package com.eventplanner.services;
 
+import com.eventplanner.model.requests.solutionCategories.CategoryAcceptionRequest;
+import com.eventplanner.model.requests.solutionCategories.CreatePendingCategoryRequest;
 import com.eventplanner.model.requests.solutionCategories.CreateSolutionCategoryRequest;
 import com.eventplanner.model.requests.solutionCategories.UpdateSolutionCategoryRequest;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
@@ -19,6 +21,9 @@ public interface SolutionCategoryService {
     @POST("categories")
     Call<Long> createCategory(@Body CreateSolutionCategoryRequest request);
 
+    @POST("categories/pending-category")
+    Call<Long> createPendingCategory(@Body CreatePendingCategoryRequest request);
+
     @GET("categories/{id}")
     Call<GetSolutionCategoryResponse> getSolutionCategoryById(@Path("id") Long id);
 
@@ -33,6 +38,9 @@ public interface SolutionCategoryService {
 
     @PUT("categories/{id}")
     Call<Void> updateCategory(@Path("id") Long id, @Body UpdateSolutionCategoryRequest request);
+
+    @PUT("categories/category-acception")
+    Call<Void> categoryAcception(@Body CategoryAcceptionRequest request);
 
     @DELETE("categories/{id}")
     Call<Void> deleteCategory(@Path("id") Long id);

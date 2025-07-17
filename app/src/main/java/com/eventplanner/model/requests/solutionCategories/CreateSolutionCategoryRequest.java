@@ -5,11 +5,9 @@ import com.eventplanner.model.enums.RequestStatus;
 public class CreateSolutionCategoryRequest {
     String name;
     String description;
-    RequestStatus status;
 
-    public CreateSolutionCategoryRequest(String name, String description, RequestStatus status) {
+    public CreateSolutionCategoryRequest(String name, String description) {
         this.name = name;
         this.description = description;
-        this.status = status;
     }
 }

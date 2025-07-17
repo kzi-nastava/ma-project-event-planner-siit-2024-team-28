@@ -66,7 +66,7 @@ public class CategoryCreationFragment extends Fragment {
             return;
         }
 
-        CreateSolutionCategoryRequest newCategory = new CreateSolutionCategoryRequest(categoryName,categoryDescription, RequestStatus.ACCEPTED);
+        CreateSolutionCategoryRequest newCategory = new CreateSolutionCategoryRequest(categoryName,categoryDescription);
 
         Call<Long> call = categoryService.createCategory(newCategory);
         call.enqueue(new Callback<Long>() {

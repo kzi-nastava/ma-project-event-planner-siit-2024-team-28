@@ -16,10 +16,13 @@ import android.widget.Toast;
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentCategoryAcceptionBinding;
 import com.eventplanner.model.enums.RequestStatus;
+import com.eventplanner.model.requests.solutionCategories.CategoryAcceptionRequest;
 import com.eventplanner.model.requests.solutionCategories.UpdateSolutionCategoryRequest;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.utils.HttpUtils;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,16 +161,24 @@ public class CategoryAcceptionFragment extends Fragment {
             return;
         }
 
-        UpdateSolutionCategoryRequest updateRequest = new UpdateSolutionCategoryRequest(categoryName,categoryDescription, RequestStatus.ACCEPTED);
-        Call<Void> call = categoryService.updateCategory(selectedCategoryId, updateRequest);
+        CategoryAcceptionRequest acceptionRequest = new CategoryAcceptionRequest(selectedCategoryId, categoryName,categoryDescription, RequestStatus.ACCEPTED);
+        Call<Void> call = categoryService.categoryAcception(acceptionRequest);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Category accepted successfully.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "There has been an error.", Toast.LENGTH_SHORT).show();
-                    Log.i("CategoryAcceptionFragment", "An error while accepting category: "  + response.code());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("CategoryAcceptionFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("CategoryAcceptionFragment", "Error: " + message);
                 }
             }
 
@@ -190,16 +201,24 @@ public class CategoryAcceptionFragment extends Fragment {
             return;
         }
 
-        UpdateSolutionCategoryRequest updateRequest = new UpdateSolutionCategoryRequest(categoryName,categoryDescription, RequestStatus.REJECTED);
-        Call<Void> call = categoryService.updateCategory(selectedCategoryId, updateRequest);
+        CategoryAcceptionRequest acceptionRequest= new CategoryAcceptionRequest(selectedCategoryId, categoryName,categoryDescription, RequestStatus.REJECTED);
+        Call<Void> call = categoryService.categoryAcception(acceptionRequest);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Category rejected successfully.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "There has been an error.", Toast.LENGTH_SHORT).show();
-                    Log.i("CategoryAcceptionFragment", "An error while rejecting category: "  + response.code());
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("CategoryAcceptionFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("CategoryAcceptionFragment", "Error: " + message);
                 }
             }
 

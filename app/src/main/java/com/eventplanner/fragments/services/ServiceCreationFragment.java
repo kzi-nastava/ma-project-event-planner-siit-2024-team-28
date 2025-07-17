@@ -29,6 +29,7 @@ import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.enums.ReservationType;
 import com.eventplanner.model.enums.SolutionStatus;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
+import com.eventplanner.model.requests.solutionCategories.CreatePendingCategoryRequest;
 import com.eventplanner.model.requests.solutionCategories.CreateSolutionCategoryRequest;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
@@ -362,8 +363,8 @@ public class ServiceCreationFragment extends Fragment {
 
     // Function for making request to backend for creating new Category and then for creating new Service
     private void createCustomCategory(CreateServiceRequest serviceRequest, String customCategoryName) {
-        CreateSolutionCategoryRequest request = new CreateSolutionCategoryRequest(customCategoryName,"",RequestStatus.PENDING);
-        categoryService.createCategory(request).enqueue(new Callback<Long>() {
+        CreatePendingCategoryRequest request = new CreatePendingCategoryRequest(customCategoryName);
+        categoryService.createPendingCategory(request).enqueue(new Callback<Long>() {
             @Override
             public void onResponse(Call<Long> call, Response<Long> response) {
                 if (response.isSuccessful() && response.body() != null) {
