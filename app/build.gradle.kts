@@ -26,7 +26,7 @@ android {
             "String",
             "BACKEND_BASE_URL",
             "\"http://10.0.2.2:8080/api/\""
-//            "\"http://192.168.1.7:8080/api/\""
+            //"\"http://192.168.1.7:8080/api/\""
         )
     }
 
@@ -58,9 +58,9 @@ dependencies {
     implementation(libs.navigation.runtime)
     implementation(libs.navigation.ui)
     implementation(libs.navigation.fragment)
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.converter.scalars)
     implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
