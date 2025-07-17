@@ -204,7 +204,6 @@
     <string name="price_list_title">Here\'s the price list for your solutions:</string>
     <string name="total_price">Total price:</string>
 
-<<<<<<< HEAD
     <!-- fragment_event_types && fragment_event_type -->
     <string name="deactivate">Deactivate</string>
     <string name="create_event_type">Create event type</string>
@@ -215,8 +214,6 @@
     <string name="event_type_name">Event type name</string>
     <string name="edit_event_type">Edit event type</string>
 
-=======
->>>>>>> 958b0d73fb620f387a542e7c7a8276d4f7afe304
     <!-- fragment budget planning -->
     <string name="budget_planning_title">Let\'s help you plan budget for your event!</string>
     <string name="choose_event">Choose one of your events:</string>

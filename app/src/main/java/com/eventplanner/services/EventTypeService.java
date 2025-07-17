@@ -19,7 +19,6 @@ public interface EventTypeService {
     @GET("event-types")
     Call<Collection<GetEventTypeResponse>> getAllEventTypes();
 
-<<<<<<< HEAD
     @GET("event-types/{id}")
     Call<GetEventTypeResponse> getEventTypeById(@Path("id") Long id);
 
@@ -35,8 +34,6 @@ public interface EventTypeService {
     @PATCH("event-types/{id}/deactivate")
     Call<Void> deactivateEventType(@Path("id") Long id);
 
-=======
->>>>>>> 958b0d73fb620f387a542e7c7a8276d4f7afe304
     @GET("event-types/recommended-categories/{id}")
     Call<Collection<GetSolutionCategoryResponse>> getRecommendedCategories(@Path("id") Long id);
 

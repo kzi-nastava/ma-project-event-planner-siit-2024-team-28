@@ -571,11 +571,7 @@ public class SolutionDetailsFragment extends Fragment {
             Log.i("SolutionDetailsFragment", "Visiting business owner page for id: " + solution.getBusinessOwnerId());
             Bundle bundle = new Bundle();
             bundle.putString("businessOwnerId", String.valueOf(solution.getBusinessOwnerId()));
-<<<<<<< HEAD
             navController.navigate(R.id.action_solutionDetails_to_businessOwnerDetails, bundle);
-=======
-            navController.navigate(R.id.action_soltuionDetails_to_businessOwnerDetails, bundle);
->>>>>>> 958b0d73fb620f387a542e7c7a8276d4f7afe304
         });
 
         // Button for buying should be only visible to EventOrganizers
