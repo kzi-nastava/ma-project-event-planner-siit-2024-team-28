@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -23,9 +22,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.eventplanner.R;
-import com.eventplanner.fragments.FragmentTransition;
-import com.eventplanner.fragments.events.TopEventsFragment;
-import com.eventplanner.fragments.solutions.TopSolutionsFragment;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
@@ -42,67 +38,72 @@ public class HomeActivity extends AppCompatActivity {
 
         // Check for Internet permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            // Request permission if not granted
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_PERMISSION);
         } else {
-            // Proceed if permission is already granted
-            init();
+            initializeApp();
         }
     }
 
-    private void init() {
+    private void initializeApp() {
         EdgeToEdge.enable(this);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_home);
 
         HttpUtils.initialize(getApplicationContext());
-        Button eventsButton = findViewById(R.id.top_events_button);
-        eventsButton.setOnClickListener(v -> FragmentTransition.to(TopEventsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top));
-        Button solutionsButton = findViewById(R.id.top_solutions_button);
-        solutionsButton.setOnClickListener(v -> FragmentTransition.to(TopSolutionsFragment.newInstance(), HomeActivity.this, false, R.id.fragment_top));
+        setupNavigation();
+        setupWindowInsets();
+    }
 
+    private void setupNavigation() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        navController = Navigation.findNavController(this, R.id.fragment_nav_content_main);
+
+        // Set up navigation drawer
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home,
+                R.id.nav_top_events,
+                R.id.nav_top_solutions,
+                R.id.nav_profile)
+                .setOpenableLayout(drawer)
+                .build();
+
+        NavigationUI.setupWithNavController(navigationView, navController);
+
+        // Handle custom navigation items
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_logout) {
+                handleLogout();
+                drawer.closeDrawers();
+                return true;
+            }
+
+            // Let NavigationUI handle other items
+            boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
+            if (handled) {
+                drawer.closeDrawers();
+            }
+            return handled;
+        });
+
+        updateNavMenu();
+    }
+
+    private void setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        setUpNavBar();
     }
 
-    private void setUpNavBar() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-
-        navController = Navigation.findNavController(this, R.id.fragment_nav_content_main);
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        NavigationUI.setupWithNavController(navigationView, navController);
-
-        // Handle menu item clicks
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_logout) {
-                AuthUtils.clearToken(this);
-                updateNavMenu();
-                drawer.closeDrawers();
-                navController.navigate(R.id.nav_home);
-                return true;
-            } else {
-                // For all other items, let NavigationUI handle navigation
-                boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
-                if (handled) {
-                    drawer.closeDrawers();
-                }
-                return handled;
-            }
-        });
-
-        mAppBarConfiguration = new AppBarConfiguration
-                .Builder(R.id.nav_home)
-                .setOpenableLayout(drawer)
-                .build();
-
+    private void handleLogout() {
+        AuthUtils.clearToken(this);
         updateNavMenu();
+        navController.navigate(R.id.nav_home);
     }
 
     public void updateNavMenu() {
@@ -111,45 +112,29 @@ public class HomeActivity extends AppCompatActivity {
 
         boolean loggedIn = AuthUtils.getToken(this) != null;
 
-        MenuItem loginItem = menu.findItem(R.id.nav_login);
-        if (loginItem != null) {
-            loginItem.setVisible(!loggedIn);
-        }
+        // Auth-related items
+        menu.findItem(R.id.nav_login).setVisible(!loggedIn);
+        menu.findItem(R.id.nav_registration).setVisible(!loggedIn);
+        menu.findItem(R.id.nav_logout).setVisible(loggedIn);
+        menu.findItem(R.id.nav_profile).setVisible(loggedIn);
 
-        MenuItem registerItem = menu.findItem(R.id.nav_registration);
-        if (registerItem != null) {
-            registerItem.setVisible(!loggedIn);
-        }
-
-        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
-        if (logoutItem != null) {
-            logoutItem.setVisible(loggedIn);
-        }
-
-        MenuItem profileItem = menu.findItem(R.id.nav_profile);
-        if (profileItem != null) {
-            profileItem.setVisible(loggedIn);
-        }
-
-        MenuItem eventTypesItem = menu.findItem(R.id.nav_event_types);
-        if (eventTypesItem != null) {
-            boolean isAdmin = AuthUtils.getUserRoles(this).contains(UserRoles.ADMIN);
-            eventTypesItem.setVisible(isAdmin);
-        }
+        // Admin-only items
+        boolean isAdmin = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.ADMIN);
+        menu.findItem(R.id.nav_event_types).setVisible(isAdmin);
 
         navigationView.invalidate();
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        navController = Navigation.findNavController(this, R.id.fragment_nav_content_main);
-        return NavigationUI.onNavDestinationSelected(item, navController) || super.onOptionsItemSelected(item);
+        return NavigationUI.onNavDestinationSelected(item, navController) ||
+                super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        navController = Navigation.findNavController(this, R.id.fragment_nav_content_main);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration) ||
+                super.onSupportNavigateUp();
     }
 
     @Override
@@ -157,12 +142,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_INTERNET_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed with app
-                init();
+                initializeApp();
             } else {
-                // Permission denied, terminate the app
                 finish();
-                System.exit(0);
             }
         }
     }
