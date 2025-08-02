@@ -1,11 +1,11 @@
-package com.eventplanner.model.requests.reviews;
+package com.eventplanner.model.requests.solutionReviews;
 
-public class CreateReviewRequest {
+public class CreateSolutionReviewRequest {
     Short rating;
     Long solutionId;
     Long reviewerId;
 
-    private CreateReviewRequest(Builder builder) {
+    private CreateSolutionReviewRequest(Builder builder) {
         this.rating = builder.rating;
         this.solutionId = builder.solutionId;
         this.reviewerId = builder.reviewerId;
@@ -47,8 +47,8 @@ public class CreateReviewRequest {
             return this;
         }
 
-        public CreateReviewRequest build() {
-            return new CreateReviewRequest(this);
+        public CreateSolutionReviewRequest build() {
+            return new CreateSolutionReviewRequest(this);
         }
     }
 }

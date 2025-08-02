@@ -1,6 +1,6 @@
-package com.eventplanner.model.responses.comments;
+package com.eventplanner.model.responses.solutionComments;
 
-public class GetCommentPreviewResponse {
+public class GetSolutionCommentPreviewResponse {
     private Long id;
     private String content;
     private String solutionName;

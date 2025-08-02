@@ -9,13 +9,13 @@ import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.services.AuthService;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
-import com.eventplanner.services.CommentService;
+import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ProductService;
 import com.eventplanner.services.ReportService;
 import com.eventplanner.services.RequiredSolutionService;
-import com.eventplanner.services.ReviewService;
+import com.eventplanner.services.SolutionReviewService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.services.SolutionService;
@@ -72,8 +72,8 @@ public class HttpUtils {
     public static UserService getUserService() { return retrofit.create(UserService.class); }
     public static EventTypeService getEventTypeService() { return retrofit.create(EventTypeService.class); }
     public static ReportService getReportService() { return retrofit.create(ReportService.class); }
-    public static CommentService getCommentService() { return retrofit.create(CommentService.class); }
-    public static ReviewService getReviewService() { return retrofit.create(ReviewService.class); }
+    public static SolutionCommentService getCommentService() { return retrofit.create(SolutionCommentService.class); }
+    public static SolutionReviewService getReviewService() { return retrofit.create(SolutionReviewService.class); }
     public static ServiceService getServiceService() { return retrofit.create(ServiceService.class); }
     public static EventService getEventService() { return retrofit.create(EventService.class); }
     public static RequiredSolutionService getRequiredSolutionService() { return retrofit.create(RequiredSolutionService.class); }

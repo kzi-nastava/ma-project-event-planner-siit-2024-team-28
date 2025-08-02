@@ -17,18 +17,17 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.comments.CommentListAdapter;
-import com.eventplanner.adapters.reviews.ReviewListAdapter;
+import com.eventplanner.adapters.solutionComments.SolutionCommentListAdapter;
+import com.eventplanner.adapters.solutionReviews.SolutionReviewListAdapter;
 import com.eventplanner.databinding.FragmentBusinessOwnerDetailsBinding;
-import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
 import com.eventplanner.model.requests.reports.CreateReportRequest;
-import com.eventplanner.model.responses.comments.GetCommentPreviewResponse;
+import com.eventplanner.model.responses.solutionComments.GetSolutionCommentPreviewResponse;
 import com.eventplanner.model.responses.reports.GetReportResponse;
-import com.eventplanner.model.responses.reviews.GetReviewPreviewResponse;
+import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewPreviewResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
-import com.eventplanner.services.CommentService;
+import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.ReportService;
-import com.eventplanner.services.ReviewService;
+import com.eventplanner.services.SolutionReviewService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -47,8 +46,8 @@ public class BusinessOwnerDetailsFragment extends Fragment {
     private static final String ARG_BUSINESS_OWNER_ID = "businessOwnerId";
     private UserService userService;
     private ReportService reportService;
-    private CommentService commentService;
-    private ReviewService reviewService;
+    private SolutionCommentService solutionCommentService;
+    private SolutionReviewService solutionReviewService;
     private String businessOwnerId;
     private GetUserResponse businessOwner;
 
@@ -69,8 +68,8 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         userService = HttpUtils.getUserService();
         reportService = HttpUtils.getReportService();
-        commentService = HttpUtils.getCommentService();
-        reviewService = HttpUtils.getReviewService();
+        solutionCommentService = HttpUtils.getCommentService();
+        solutionReviewService = HttpUtils.getReviewService();
         if (getArguments() != null) {
             businessOwnerId = getArguments().getString(ARG_BUSINESS_OWNER_ID);
         }
@@ -209,15 +208,15 @@ public class BusinessOwnerDetailsFragment extends Fragment {
     }
 
     private void fetchComments(Long businessOwnerId, ListView commentsListView) {
-        Call<Collection<GetCommentPreviewResponse>> call = commentService.getAllCommentsByBusinessOwnerId(businessOwnerId);
+        Call<Collection<GetSolutionCommentPreviewResponse>> call = solutionCommentService.getAllCommentsByBusinessOwnerId(businessOwnerId);
 
-        call.enqueue(new Callback<Collection<GetCommentPreviewResponse>>() {
+        call.enqueue(new Callback<Collection<GetSolutionCommentPreviewResponse>>() {
             @Override
-            public void onResponse(Call<Collection<GetCommentPreviewResponse>> call, Response<Collection<GetCommentPreviewResponse>> response) {
+            public void onResponse(Call<Collection<GetSolutionCommentPreviewResponse>> call, Response<Collection<GetSolutionCommentPreviewResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Collection<GetCommentPreviewResponse> comments = response.body();
+                    Collection<GetSolutionCommentPreviewResponse> comments = response.body();
                     Log.i("BusinessOwnerDetailsFragment", "Number of comments fetched: " + comments.size());
-                    CommentListAdapter adapter = new CommentListAdapter(getContext(), new ArrayList<>(comments));
+                    SolutionCommentListAdapter adapter = new SolutionCommentListAdapter(getContext(), new ArrayList<>(comments));
                     commentsListView.setAdapter(adapter);
 
                 } else {
@@ -227,7 +226,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<Collection<GetCommentPreviewResponse>> call, Throwable t) {
+            public void onFailure(Call<Collection<GetSolutionCommentPreviewResponse>> call, Throwable t) {
                 Log.e("BusinessOwnerDetailsFragment", "Network error", t);
                 showErrorDialog();
             }
@@ -235,15 +234,15 @@ public class BusinessOwnerDetailsFragment extends Fragment {
     }
 
     private void fetchReviews(Long businessOwnerId, ListView reviewsListView) {
-        Call<Collection<GetReviewPreviewResponse>> call = reviewService.getAllReviewsByBusinessOwnerId(businessOwnerId);
+        Call<Collection<GetSolutionReviewPreviewResponse>> call = solutionReviewService.getAllReviewsByBusinessOwnerId(businessOwnerId);
 
-        call.enqueue(new Callback<Collection<GetReviewPreviewResponse>>() {
+        call.enqueue(new Callback<Collection<GetSolutionReviewPreviewResponse>>() {
             @Override
-            public void onResponse(Call<Collection<GetReviewPreviewResponse>> call, Response<Collection<GetReviewPreviewResponse>> response) {
+            public void onResponse(Call<Collection<GetSolutionReviewPreviewResponse>> call, Response<Collection<GetSolutionReviewPreviewResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Collection<GetReviewPreviewResponse> reviews = response.body();
+                    Collection<GetSolutionReviewPreviewResponse> reviews = response.body();
                     Log.i("BusinessOwnerDetailsFragment", "Number of reviews fetched: " + reviews.size());
-                    ReviewListAdapter adapter = new ReviewListAdapter(getContext(), new ArrayList<>(reviews));
+                    SolutionReviewListAdapter adapter = new SolutionReviewListAdapter(getContext(), new ArrayList<>(reviews));
                     reviewsListView.setAdapter(adapter);
                 } else {
                     Log.w("BusinessOwnerDetailsFragment", "Error while fetching reviews: " + response.code());
@@ -251,7 +250,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<Collection<GetReviewPreviewResponse>> call, Throwable t) {
+            public void onFailure(Call<Collection<GetSolutionReviewPreviewResponse>> call, Throwable t) {
                 Log.e("BusinessOwnerDetailsFragment", "Network failure: " + t.getMessage(), t);
             }
         });

@@ -1,11 +1,11 @@
-package com.eventplanner.model.requests.comments;
+package com.eventplanner.model.requests.solutionComments;
 
-public class CreateCommentRequest {
+public class CreateSolutionCommentRequest {
     private String content;
     private Long commenterId;
     private Long solutionId;
 
-    private CreateCommentRequest(Builder builder) {
+    private CreateSolutionCommentRequest(Builder builder) {
         this.content = builder.content;
         this.commenterId = builder.commenterId;
         this.solutionId = builder.solutionId;
@@ -47,8 +47,8 @@ public class CreateCommentRequest {
             return this;
         }
 
-        public CreateCommentRequest build() {
-            return new CreateCommentRequest(this);
+        public CreateSolutionCommentRequest build() {
+            return new CreateSolutionCommentRequest(this);
         }
     }
 }

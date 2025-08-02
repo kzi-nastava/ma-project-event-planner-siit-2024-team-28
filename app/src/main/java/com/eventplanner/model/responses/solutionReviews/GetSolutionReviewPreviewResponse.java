@@ -1,6 +1,6 @@
-package com.eventplanner.model.responses.reviews;
+package com.eventplanner.model.responses.solutionReviews;
 
-public class GetReviewPreviewResponse {
+public class GetSolutionReviewPreviewResponse {
     private Long id;
     private Short rating;
     private String solutionName;

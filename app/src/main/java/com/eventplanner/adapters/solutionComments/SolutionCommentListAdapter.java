@@ -1,4 +1,4 @@
-package com.eventplanner.adapters.comments;
+package com.eventplanner.adapters.solutionComments;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,12 +9,12 @@ import android.widget.TextView;
 
 import com.eventplanner.R;
 
-import com.eventplanner.model.responses.comments.GetCommentPreviewResponse;
+import com.eventplanner.model.responses.solutionComments.GetSolutionCommentPreviewResponse;
 
 import java.util.List;
 
-public class CommentListAdapter extends ArrayAdapter<GetCommentPreviewResponse> {
-    public CommentListAdapter(Context context, List<GetCommentPreviewResponse> comments) {
+public class SolutionCommentListAdapter extends ArrayAdapter<GetSolutionCommentPreviewResponse> {
+    public SolutionCommentListAdapter(Context context, List<GetSolutionCommentPreviewResponse> comments) {
         super(context, 0, comments);
     }
 
@@ -24,7 +24,7 @@ public class CommentListAdapter extends ArrayAdapter<GetCommentPreviewResponse> 
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.comment_card, parent, false);
         }
 
-        GetCommentPreviewResponse comment = getItem(position);
+        GetSolutionCommentPreviewResponse comment = getItem(position);
 
         TextView commentText = convertView.findViewById(R.id.comment);
         TextView commenter = convertView.findViewById(R.id.commenter);

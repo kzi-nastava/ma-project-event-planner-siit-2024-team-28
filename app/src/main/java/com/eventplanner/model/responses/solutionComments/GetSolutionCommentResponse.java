@@ -1,8 +1,8 @@
-package com.eventplanner.model.responses.comments;
+package com.eventplanner.model.responses.solutionComments;
 
 import com.eventplanner.model.enums.RequestStatus;
 
-public class GetCommentResponse {
+public class GetSolutionCommentResponse {
     Long id;
     String content;
     Long solutionId;

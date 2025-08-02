@@ -1,4 +1,4 @@
-package com.eventplanner.adapters.reviews;
+package com.eventplanner.adapters.solutionReviews;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,13 +8,12 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.eventplanner.R;
-import com.eventplanner.model.responses.reviews.GetReviewPreviewResponse;
+import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewPreviewResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewListAdapter extends ArrayAdapter<GetReviewPreviewResponse> {
-    public ReviewListAdapter(Context context, List<GetReviewPreviewResponse> reviews) {
+public class SolutionReviewListAdapter extends ArrayAdapter<GetSolutionReviewPreviewResponse> {
+    public SolutionReviewListAdapter(Context context, List<GetSolutionReviewPreviewResponse> reviews) {
         super(context,0, reviews);
     }
 
@@ -24,7 +23,7 @@ public class ReviewListAdapter extends ArrayAdapter<GetReviewPreviewResponse> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.review_card, parent, false);
         }
 
-        GetReviewPreviewResponse review = getItem(position);
+        GetSolutionReviewPreviewResponse review = getItem(position);
 
         TextView rating = convertView.findViewById(R.id.rating);
         TextView reviewer = convertView.findViewById(R.id.reviewer);
