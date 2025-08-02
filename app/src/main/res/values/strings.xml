@@ -239,4 +239,32 @@
     <string name="leave_review">Leave a review</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- fragment_event -->
+    <string name="start_date">Start date</string>
+    <string name="upload_image">Upload image</string>
+    <string name="max_participants">Max participants</string>
+    <string name="privacy_type">Privacy type</string>
+    <string name="end_date">End date</string>
+    <string name="event_location">Event location</string>
+    <string name="event_activities">Event activities</string>
+    <string name="download_guest_list">Download guest list</string>
+    <string name="download_details">Download details</string>
+
+    <!-- item_activity -->
+    <string name="remove_activity">Remove activity</string>
+
+    <!-- fragment_location_dialog -->
+    <string name="location_name">Location name</string>
+    <string name="address">Address</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="previous">previous</string>
+    <string name="next">next</string>
+    <string name="date_closest">Date closest</string>
+    <string name="date_furthest">Date furthest</string>
+    <string name="search_events">Search events</string>
+    <string name="create_event">Create event</string>
+    <string name="start_time">Start time</string>
+    <string name="end_time">End time</string>
 </resources>

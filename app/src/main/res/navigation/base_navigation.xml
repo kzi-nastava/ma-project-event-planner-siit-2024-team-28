@@ -11,6 +11,16 @@
         android:label="Home"
         tools:layout="@layout/fragment_home">
         <action
+            android:id="@+id/action_home_to_event"
+            app:destination="@id/nav_event">
+            <argument
+                android:name="eventId"
+                app:argType="long" />
+        </action>
+        <action
+            android:id="@+id/action_home_to_all_events"
+            app:destination="@id/nav_all_events" />
+        <action
             android:id="@+id/action_home_to_registration"
             app:destination="@id/nav_registration" />
         <action
@@ -46,7 +56,7 @@
         android:id="@+id/nav_top_events"
         android:name="com.eventplanner.fragments.events.TopEventsFragment"
         android:label="Top events"
-        tools:layout="@layout/fragment_top_events" />
+        tools:layout="@layout/fragment_top_events"/>
 
     <fragment
         android:id="@+id/nav_budget_planning_items"
@@ -202,7 +212,15 @@
         android:id="@+id/nav_all_events"
         android:name="com.eventplanner.fragments.events.AllEventsFragment"
         android:label="All events"
-        tools:layout="@layout/fragment_all_events" />
+        tools:layout="@layout/fragment_all_events">
+        <action
+            android:id="@+id/action_all_events_to_event"
+            app:destination="@id/nav_event">
+            <argument
+                android:name="eventId"
+                app:argType="long" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/nav_all_products"
@@ -299,4 +317,51 @@
             android:name="eventTypeId"
             app:argType="long" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_event"
+        android:name="com.eventplanner.fragments.events.EventFragment"
+        android:label="Event"
+        tools:layout="@layout/fragment_event">
+        <argument
+            android:name="eventId"
+            android:defaultValue="-1L"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_event_to_location_dialog"
+            app:destination="@id/nav_location_dialog" />
+
+        <action
+            android:id="@+id/action_event_to_activities_dialog"
+            app:destination="@id/nav_activities_dialog" />
+    </fragment>
+
+    <!-- Location Dialog Fragment -->
+    <dialog
+        android:id="@+id/nav_location_dialog"
+        android:name="com.eventplanner.fragments.locations.LocationDialogFragment"
+        android:label="Location"
+        tools:layout="@layout/fragment_location_dialog">
+        <argument
+            android:name="location"
+            app:argType="string" />
+        <argument
+            android:name="isReadOnly"
+            app:argType="boolean" />
+    </dialog>
+
+    <!-- Activities Dialog Fragment -->
+    <dialog
+        android:id="@+id/nav_activities_dialog"
+        android:name="com.eventplanner.fragments.activities.ActivitiesDialogFragment"
+        android:label="Activities"
+        tools:layout="@layout/fragment_activities_dialog">
+        <argument
+            android:name="activities"
+            app:argType="string" />
+        <argument
+            android:name="isReadOnly"
+            app:argType="boolean" />
+    </dialog>
 </navigation>

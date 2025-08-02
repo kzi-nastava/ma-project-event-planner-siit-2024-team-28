@@ -41,7 +41,6 @@ import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1001;
-
     private EditText email, phoneNumber, address, businessName, businessDescription, firstName, lastName;
     private ImageView profilePicturePreview;
     private String profilePictureBase64 = null;

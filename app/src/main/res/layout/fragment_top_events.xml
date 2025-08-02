@@ -1,32 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/top_events_textview"
+        android:id="@+id/top_events_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/top_events"
+        android:textSize="24sp"
         android:gravity="center"
-        android:textSize="40sp"
-        />
+        android:padding="16dp"/>
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:listitem="@layout/event_card" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/event_card"/>
 
     <Button
         android:id="@+id/browse_events_button"
-        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/browse_events_button" />
-
+        android:text="@string/browse_events_button"
+        android:layout_margin="16dp"/>
 </LinearLayout>
