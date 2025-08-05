@@ -15,6 +15,7 @@ import java.util.Base64;
 
 public class Base64Util {
     private static final String TAG = "Base64Util";
+    public static final String DEFAULT_IMAGE_URI= "http://10.0.2.2:8080/images/default-image.png";
 
     public static String encodeImageToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

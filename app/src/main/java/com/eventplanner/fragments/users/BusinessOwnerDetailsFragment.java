@@ -55,7 +55,6 @@ public class BusinessOwnerDetailsFragment extends Fragment {
     private ReviewService reviewService;
     private String businessOwnerId;
     private GetUserResponse businessOwner;
-    private final String DEFAULT_IMAGE_URI= "http://10.0.2.2:8080/images/default-image.png"; // Static resource on backend
 
     public BusinessOwnerDetailsFragment() {
         // Required empty public constructor
@@ -154,7 +153,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
                         binding.imageUser.setImageBitmap(bitmap);
                     } else {
                         Glide.with(requireContext())
-                                .load(DEFAULT_IMAGE_URI)
+                                .load(Base64Util.DEFAULT_IMAGE_URI)
                                 .into(binding.imageUser);
                     }
                 } else {

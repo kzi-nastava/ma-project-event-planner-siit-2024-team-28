@@ -69,7 +69,6 @@ public class SolutionDetailsFragment extends Fragment {
     private ReviewService reviewService;
     private ChatService chatService;
     private NavController navController;
-    private final String DEFAULT_IMAGE_URI= "http://10.0.2.2:8080/images/default-image.png"; // Static resource on backend
     private int globalImageIndex = 0;
 
 
@@ -613,7 +612,7 @@ public class SolutionDetailsFragment extends Fragment {
             // Glide is a library for efficient loading and displaying of images from various sources (URL, Base64, files, etc.),
             // which automatically caches images and optimizes memory usage. It helps load images quickly and smoothly without blocking the UI.
             Glide.with(requireContext())
-                    .load(DEFAULT_IMAGE_URI)
+                    .load(Base64Util.DEFAULT_IMAGE_URI)
                     .into(binding.imageSolution);
         } else {
             // Set first picture as current one

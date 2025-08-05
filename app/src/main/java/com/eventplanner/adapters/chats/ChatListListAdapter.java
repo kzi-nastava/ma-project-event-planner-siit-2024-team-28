@@ -1,6 +1,7 @@
 package com.eventplanner.adapters.chats;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.eventplanner.R;
 import com.eventplanner.model.enums.ChatTheme;
 import com.eventplanner.model.responses.chats.GetChatListResponse;
+import com.eventplanner.utils.Base64Util;
 
 import java.util.List;
 
@@ -33,8 +36,15 @@ public class ChatListListAdapter extends ArrayAdapter<GetChatListResponse> {
         TextView chatterName = convertView.findViewById(R.id.chatterName);
         TextView chatSubject = convertView.findViewById(R.id.chatSubject);
         TextView lastMessage = convertView.findViewById(R.id.lastMessage);
-        // TODO: srediti slike
         ImageView chatterImage = convertView.findViewById(R.id.chatterImage);
+        if (chat.participantImage() == null) {
+            Glide.with(getContext())
+                    .load(Base64Util.DEFAULT_IMAGE_URI)
+                    .into(chatterImage);
+        } else {
+            Bitmap bitmap = Base64Util.decodeBase64ToBitmap(chat.participantImage());
+            chatterImage.setImageBitmap(bitmap);
+        }
 
         chatterName.setText(chat.participantName());
         chatSubject.setText(chat.themeName());
