@@ -25,8 +25,8 @@ android {
         buildConfigField(
             "String",
             "BACKEND_BASE_URL",
-            //"\"http://10.0.2.2:8080/api/\""
-            "\"http://192.168.1.224:8080/api/\""
+            "\"http://10.0.2.2:8080/api/\""
+            //"\"http://192.168.1.224:8080/api/\""
         )
     }
 

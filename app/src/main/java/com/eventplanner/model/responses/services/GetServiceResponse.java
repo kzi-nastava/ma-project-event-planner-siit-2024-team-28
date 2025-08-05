@@ -5,6 +5,7 @@ import com.eventplanner.model.enums.ReservationType;
 import com.eventplanner.model.enums.SolutionStatus;
 
 import java.util.Collection;
+import java.util.List;
 
 public class GetServiceResponse {
     private Long id;
@@ -12,7 +13,7 @@ public class GetServiceResponse {
     private String description;
     private Double price;
     private Double discount;
-    private String imageBase64;
+    private List<String> imageBase64;
     private Boolean isDeleted;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
@@ -49,7 +50,7 @@ public class GetServiceResponse {
         return discount;
     }
 
-    public String getImageBase64() {
+    public List<String> getImageBase64() {
         return imageBase64;
     }
 

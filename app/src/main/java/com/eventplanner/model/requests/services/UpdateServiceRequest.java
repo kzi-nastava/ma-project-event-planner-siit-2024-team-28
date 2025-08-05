@@ -4,13 +4,14 @@ import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
 
 import java.util.Collection;
+import java.util.List;
 
 public class UpdateServiceRequest {
     private String name;
     private String description;
     private Double price;
     private Double discount;
-    private String imageBase64;
+    private List<String> imageBase64;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
@@ -51,7 +52,7 @@ public class UpdateServiceRequest {
         private String description;
         private Double price;
         private Double discount;
-        private String imageBase64;
+        private List<String> imageBase64;
         private Boolean isVisibleForEventOrganizers;
         private Boolean isAvailable;
         private String specifics;
@@ -84,7 +85,7 @@ public class UpdateServiceRequest {
             return this;
         }
 
-        public Builder imageBase64(String imageBase64) {
+        public Builder imageBase64(List<String> imageBase64) {
             this.imageBase64 = imageBase64;
             return this;
         }
