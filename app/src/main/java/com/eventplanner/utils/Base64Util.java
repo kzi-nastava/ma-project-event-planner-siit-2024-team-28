@@ -1,10 +1,16 @@
 package com.eventplanner.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 
 public class Base64Util {
@@ -35,6 +41,20 @@ public class Base64Util {
             return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
         } catch (Exception e) {
             Log.e(TAG, "Error decoding base64 to bitmap", e);
+            return null;
+        }
+    }
+
+    public static Bitmap getBitmapFromUri(Context context, Uri uri) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), uri);
+                return ImageDecoder.decodeBitmap(source);
+            } else {
+                return MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }
