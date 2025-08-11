@@ -279,4 +279,5 @@
     <string name="create_event">Create event</string>
     <string name="start_time">Start time</string>
     <string name="end_time">End time</string>
+    <string name="download_event_reviews">Download event reviews</string>
 </resources>

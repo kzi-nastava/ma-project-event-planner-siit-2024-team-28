@@ -292,5 +292,13 @@
                     android:layout_marginStart="8dp" />
             </LinearLayout>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/downloadReviewsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/download_event_reviews"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

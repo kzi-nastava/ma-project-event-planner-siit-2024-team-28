@@ -91,7 +91,6 @@ public class EventFragment extends Fragment {
     private GetEventReviewResponse currentUserReview;
     private RatingBar ratingBar;
     private Button submitReviewButton, deleteReviewButton;
-    private LinearLayout reviewSection;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -129,10 +128,11 @@ public class EventFragment extends Fragment {
         binding.deleteButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadDetailsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
+        binding.downloadReviewsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
 
         eventReviewService = HttpUtils.getEventReviewService();
 
-        reviewSection = binding.getRoot().findViewById(R.id.reviewSection);
+        LinearLayout reviewSection = binding.getRoot().findViewById(R.id.reviewSection);
         ratingBar = binding.getRoot().findViewById(R.id.ratingBar);
         submitReviewButton = binding.getRoot().findViewById(R.id.submitReviewButton);
         deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
@@ -355,6 +355,7 @@ public class EventFragment extends Fragment {
         binding.deleteButton.setOnClickListener(v -> confirmDelete());
         binding.downloadGuestListButton.setOnClickListener(v -> downloadGuestList());
         binding.downloadDetailsButton.setOnClickListener(v -> downloadEventDetails());
+        binding.downloadReviewsButton.setOnClickListener(v -> downloadEventReviews());
         binding.favoriteButton.setOnClickListener(v -> toggleFavorite());
         binding.startDate.setOnClickListener(v -> showDatePicker(binding.startDate));
         binding.endDate.setOnClickListener(v -> showDatePicker(binding.endDate));
@@ -614,6 +615,25 @@ public class EventFragment extends Fragment {
                     savePdfFile(response.body(), "event_" + eventId + "_details.pdf");
                 } else {
                     Toast.makeText(requireContext(), "Failed to download event details", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void downloadEventReviews() {
+        eventService.getEventReviewsReport(eventId).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Save PDF file
+                    savePdfFile(response.body(), "event_" + eventId + "_reviews.pdf");
+                } else {
+                    Toast.makeText(requireContext(), "Failed to download event reviews", Toast.LENGTH_SHORT).show();
                 }
             }
 

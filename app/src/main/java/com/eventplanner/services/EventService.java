@@ -61,4 +61,7 @@ public interface EventService {
 
     @GET("events/{eventId}/details")
     Call<ResponseBody> getEventDetails(@Path("eventId") Long eventId);
+
+    @GET("events/{eventId}/reviews")
+    Call<ResponseBody> getEventReviewsReport(@Path("eventId") Long eventId);
 }
