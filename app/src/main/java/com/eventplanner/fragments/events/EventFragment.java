@@ -137,13 +137,18 @@ public class EventFragment extends Fragment {
         submitReviewButton = binding.getRoot().findViewById(R.id.submitReviewButton);
         deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
 
-        if (isEditMode && AuthUtils.getUserId(getContext()) != null) {
-            reviewSection.setVisibility(View.VISIBLE);
-            loadUserReview(AuthUtils.getUserId(getContext()), eventId);
-        }
+        if (AuthUtils.getUserId(getContext()) != null) {
+            submitReviewButton.setOnClickListener(v -> submitReview());
+            deleteReviewButton.setOnClickListener(v -> deleteReview());
 
-        submitReviewButton.setOnClickListener(v -> submitReview());
-        deleteReviewButton.setOnClickListener(v -> deleteReview());
+            if (isEditMode) {
+                reviewSection.setVisibility(View.VISIBLE);
+                loadUserReview(AuthUtils.getUserId(getContext()), eventId);
+            }
+        } else {
+            submitReviewButton.setVisibility(View.GONE);
+            deleteReviewButton.setVisibility(View.GONE);
+        }
     }
 
     private void setupForm() {
