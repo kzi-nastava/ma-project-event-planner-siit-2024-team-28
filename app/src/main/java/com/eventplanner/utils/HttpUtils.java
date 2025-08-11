@@ -9,6 +9,7 @@ import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.services.AuthService;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
+import com.eventplanner.services.EventReviewService;
 import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
@@ -67,17 +68,60 @@ public class HttpUtils {
     public static AuthService getAuthService() {
         return retrofit.create(AuthService.class);
     }
-    public static SolutionService getSolutionService() { return retrofit.create(SolutionService.class); }
-    public static SolutionCategoryService getSolutionCategoryService() { return retrofit.create(SolutionCategoryService.class); }
-    public static UserService getUserService() { return retrofit.create(UserService.class); }
-    public static EventTypeService getEventTypeService() { return retrofit.create(EventTypeService.class); }
-    public static ReportService getReportService() { return retrofit.create(ReportService.class); }
-    public static SolutionCommentService getCommentService() { return retrofit.create(SolutionCommentService.class); }
-    public static SolutionReviewService getReviewService() { return retrofit.create(SolutionReviewService.class); }
-    public static ServiceService getServiceService() { return retrofit.create(ServiceService.class); }
-    public static EventService getEventService() { return retrofit.create(EventService.class); }
-    public static RequiredSolutionService getRequiredSolutionService() { return retrofit.create(RequiredSolutionService.class); }
-    public static ProductService getProductService() { return retrofit.create(ProductService.class); }
-    public static ChatService getChatService() { return retrofit.create(ChatService.class); }
-    public static ChatMessageService getChatMessageService() { return retrofit.create(ChatMessageService.class); }
+
+    public static SolutionService getSolutionService() {
+        return retrofit.create(SolutionService.class);
+    }
+
+    public static SolutionCategoryService getSolutionCategoryService() {
+        return retrofit.create(SolutionCategoryService.class);
+    }
+
+    public static UserService getUserService() {
+        return retrofit.create(UserService.class);
+    }
+
+    public static EventTypeService getEventTypeService() {
+        return retrofit.create(EventTypeService.class);
+    }
+
+    public static ReportService getReportService() {
+        return retrofit.create(ReportService.class);
+    }
+
+    public static SolutionCommentService getCommentService() {
+        return retrofit.create(SolutionCommentService.class);
+    }
+
+    public static SolutionReviewService getReviewService() {
+        return retrofit.create(SolutionReviewService.class);
+    }
+
+    public static ServiceService getServiceService() {
+        return retrofit.create(ServiceService.class);
+    }
+
+    public static EventService getEventService() {
+        return retrofit.create(EventService.class);
+    }
+
+    public static RequiredSolutionService getRequiredSolutionService() {
+        return retrofit.create(RequiredSolutionService.class);
+    }
+
+    public static ProductService getProductService() {
+        return retrofit.create(ProductService.class);
+    }
+
+    public static ChatService getChatService() {
+        return retrofit.create(ChatService.class);
+    }
+
+    public static ChatMessageService getChatMessageService() {
+        return retrofit.create(ChatMessageService.class);
+    }
+
+    public static EventReviewService getEventReviewService() {
+        return retrofit.create(EventReviewService.class);
+    }
 }

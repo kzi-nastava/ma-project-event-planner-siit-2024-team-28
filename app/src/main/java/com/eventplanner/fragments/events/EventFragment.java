@@ -5,7 +5,6 @@ import static com.eventplanner.utils.Base64Util.decodeBase64ToBitmap;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
@@ -19,6 +18,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,12 +38,16 @@ import com.eventplanner.fragments.activities.ActivitiesDialogFragment;
 import com.eventplanner.fragments.locations.LocationDialogFragment;
 import com.eventplanner.model.enums.PrivacyType;
 import com.eventplanner.model.requests.activities.CreateActivityRequest;
+import com.eventplanner.model.requests.eventReviews.CreateEventReviewRequest;
+import com.eventplanner.model.requests.eventReviews.UpdateEventReviewRequest;
 import com.eventplanner.model.requests.events.CreateEventRequest;
 import com.eventplanner.model.requests.events.UpdateEventRequest;
 import com.eventplanner.model.requests.locations.CreateLocationRequest;
 import com.eventplanner.model.responses.activities.GetActivityResponse;
+import com.eventplanner.model.responses.eventReviews.GetEventReviewResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
+import com.eventplanner.services.EventReviewService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.utils.AuthUtils;
@@ -57,7 +63,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -82,6 +87,11 @@ public class EventFragment extends Fragment {
     private List<CreateActivityRequest> activities = new ArrayList<>();
     private List<GetEventTypeResponse> eventTypes = new ArrayList<>();
     private String imageBase64;
+    private EventReviewService eventReviewService;
+    private GetEventReviewResponse currentUserReview;
+    private RatingBar ratingBar;
+    private Button submitReviewButton, deleteReviewButton;
+    private LinearLayout reviewSection;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -119,6 +129,21 @@ public class EventFragment extends Fragment {
         binding.deleteButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadDetailsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
+
+        eventReviewService = HttpUtils.getEventReviewService();
+
+        reviewSection = binding.getRoot().findViewById(R.id.reviewSection);
+        ratingBar = binding.getRoot().findViewById(R.id.ratingBar);
+        submitReviewButton = binding.getRoot().findViewById(R.id.submitReviewButton);
+        deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
+
+        if (isEditMode && AuthUtils.getUserId(getContext()) != null) {
+            reviewSection.setVisibility(View.VISIBLE);
+            loadUserReview(AuthUtils.getUserId(getContext()), eventId);
+        }
+
+        submitReviewButton.setOnClickListener(v -> submitReview());
+        deleteReviewButton.setOnClickListener(v -> deleteReview());
     }
 
     private void setupForm() {
@@ -376,7 +401,8 @@ public class EventFragment extends Fragment {
         getChildFragmentManager().setFragmentResultListener("activities_request", this, (requestKey, result) -> {
             String activitiesJson = result.getString("activities");
             Gson gson = new Gson();
-            Type type = new TypeToken<List<CreateActivityRequest>>(){}.getType();
+            Type type = new TypeToken<List<CreateActivityRequest>>() {
+            }.getType();
             activities = gson.fromJson(activitiesJson, type);
             updateActivitiesSummary();
         });
@@ -750,7 +776,8 @@ public class EventFragment extends Fragment {
         if (!editText.getText().toString().isEmpty()) {
             try {
                 currentDate = LocalDate.parse(editText.getText().toString());
-            } catch (DateTimeParseException ignored) {}
+            } catch (DateTimeParseException ignored) {
+            }
         }
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -766,36 +793,92 @@ public class EventFragment extends Fragment {
         datePickerDialog.show();
     }
 
-    private void showDateTimePicker(TextInputEditText editText, DateTimeFormatter formatter) {
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        if (!editText.getText().toString().isEmpty()) {
-            try {
-                currentDateTime = LocalDateTime.parse(editText.getText().toString(), formatter);
-            } catch (DateTimeParseException ignored) {}
+    private void loadUserReview(Long userId, Long eventId) {
+        eventReviewService.getReviewByUserAndEvent(userId, eventId).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<GetEventReviewResponse> call, @NonNull Response<GetEventReviewResponse> response) {
+                if (response.isSuccessful()) {
+                    currentUserReview = response.body();
+                    if (currentUserReview != null) {
+                        ratingBar.setRating(currentUserReview.getRating());
+                        deleteReviewButton.setVisibility(View.VISIBLE);
+                        submitReviewButton.setText(getString(R.string.submit_review));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GetEventReviewResponse> call, @NonNull Throwable t) {
+                Toast.makeText(requireContext(), R.string.failed_to_load_review, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void submitReview() {
+        short rating = (short) ratingBar.getRating();
+        if (rating < 1 || rating > 5) {
+            Toast.makeText(requireContext(), getString(R.string.please_select_a_rating_1_5), Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        LocalDateTime finalCurrentDateTime = currentDateTime;
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                requireContext(),
-                (dateView, year, month, dayOfMonth) -> {
-                    TimePickerDialog timePickerDialog = new TimePickerDialog(
-                            requireContext(),
-                            (timeView, hourOfDay, minute) -> {
-                                LocalDateTime selectedDateTime = LocalDateTime.of(
-                                        year, month + 1, dayOfMonth, hourOfDay, minute
-                                );
-                                editText.setText(selectedDateTime.format(formatter));
-                            },
-                            finalCurrentDateTime.getHour(),
-                            finalCurrentDateTime.getMinute(),
-                            true
-                    );
-                    timePickerDialog.show();
-                },
-                currentDateTime.getYear(),
-                currentDateTime.getMonthValue() - 1,
-                currentDateTime.getDayOfMonth()
-        );
-        datePickerDialog.show();
+        if (currentUserReview != null) {
+            // Update
+            eventReviewService.updateReview(currentUserReview.getId(), new UpdateEventReviewRequest(rating))
+                    .enqueue(new Callback<>() {
+                        @Override
+                        public void onResponse(@NonNull Call<GetEventReviewResponse> call, @NonNull Response<GetEventReviewResponse> response) {
+                            if (response.isSuccessful()) {
+                                currentUserReview = response.body();
+                                Toast.makeText(requireContext(), getString(R.string.review_updated), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<GetEventReviewResponse> call, @NonNull Throwable t) {
+                            Toast.makeText(requireContext(), getString(R.string.error_updating_review), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            // Create
+            eventReviewService.createReview(new CreateEventReviewRequest(rating, eventId))
+                    .enqueue(new Callback<>() {
+                        @Override
+                        public void onResponse(@NonNull Call<GetEventReviewResponse> call, @NonNull Response<GetEventReviewResponse> response) {
+                            if (response.isSuccessful()) {
+                                currentUserReview = response.body();
+                                deleteReviewButton.setVisibility(View.VISIBLE);
+                                submitReviewButton.setText(R.string.update_review);
+                                Toast.makeText(requireContext(), getString(R.string.review_created), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<GetEventReviewResponse> call, @NonNull Throwable t) {
+                            Toast.makeText(requireContext(), R.string.error_creating_review, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+    private void deleteReview() {
+        if (currentUserReview == null) return;
+
+        eventReviewService.deleteReview(currentUserReview.getId()).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    currentUserReview = null;
+                    ratingBar.setRating(0);
+                    deleteReviewButton.setVisibility(View.GONE);
+                    submitReviewButton.setText(getString(R.string.submit_review));
+                    Toast.makeText(requireContext(), R.string.review_deleted, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Toast.makeText(requireContext(), R.string.error_deleting_review, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

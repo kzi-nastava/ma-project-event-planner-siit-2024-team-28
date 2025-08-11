@@ -250,6 +250,18 @@
     <string name="event_activities">Event activities</string>
     <string name="download_guest_list">Download guest list</string>
     <string name="download_details">Download details</string>
+    <string name="submit_review">Submit Review</string>
+    <string name="delete_review">Delete Review</string>
+    <string name="your_review">Your Review</string>
+    <string name="update_review">Update Review</string>
+    <string name="review_updated">Review updated</string>
+    <string name="error_updating_review">Error updating review</string>
+    <string name="review_created">Review created</string>
+    <string name="error_creating_review">Error creating review</string>
+    <string name="please_select_a_rating_1_5">Please select a rating 1–5</string>
+    <string name="failed_to_load_review">Failed to load review</string>
+    <string name="review_deleted">Review deleted</string>
+    <string name="error_deleting_review">Error deleting review</string>
 
     <!-- item_activity -->
     <string name="remove_activity">Remove activity</string>
