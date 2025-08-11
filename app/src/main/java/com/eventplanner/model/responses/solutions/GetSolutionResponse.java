@@ -2,6 +2,7 @@ package com.eventplanner.model.responses.solutions;
 import com.eventplanner.model.enums.ReservationType;
 
 import java.util.Collection;
+import java.util.List;
 
 
 public class GetSolutionResponse {
@@ -11,7 +12,7 @@ public class GetSolutionResponse {
     private String description;
     private Double price;
     private Double discount;
-    private String imageBase64;
+    private List<String> imageBase64;
     private Boolean isDeleted;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
@@ -50,7 +51,7 @@ public class GetSolutionResponse {
         return discount;
     }
 
-    public String getImageBase64() {
+    public List<String> getImageBase64() {
         return imageBase64;
     }
 

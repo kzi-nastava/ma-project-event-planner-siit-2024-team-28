@@ -21,7 +21,7 @@
             android:background="@color/light_black">
 
             <ImageView
-                android:id="@+id/userAvatar"
+                android:id="@+id/userProfilePicture"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/ketering"

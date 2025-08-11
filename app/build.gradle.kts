@@ -25,8 +25,8 @@ android {
         buildConfigField(
             "String",
             "BACKEND_BASE_URL",
-            //"\"http://10.0.2.2:8080/api/\""
-            "\"http://192.168.1.224:8080/api/\""
+            "\"http://10.0.2.2:8080/api/\""
+            //"\"http://192.168.1.224:8080/api/\""
         )
     }
 
@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.converter.scalars)
     implementation(libs.gson)
+    implementation(libs.glide)
+    annotationProcessor(libs.glideCompiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

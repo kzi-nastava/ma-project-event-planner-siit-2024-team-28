@@ -6,13 +6,14 @@ import com.eventplanner.model.enums.SolutionStatus;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 
 public class CreateServiceRequest {
     private String name;
     private String description;
     private Double price;
     private Double discount;
-    private String imageBase64;
+    private List<String> imageBase64;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
@@ -60,7 +61,7 @@ public class CreateServiceRequest {
         private String description;
         private Double price;
         private Double discount;
-        private String imageBase64;
+        private List<String> imageBase64;
         private Boolean isVisibleForEventOrganizers;
         private Boolean isAvailable;
         private String specifics;
@@ -96,7 +97,7 @@ public class CreateServiceRequest {
             return this;
         }
 
-        public Builder imageBase64(String imageBase64) {
+        public Builder imageBase64(List<String> imageBase64) {
             this.imageBase64 = imageBase64;
             return this;
         }

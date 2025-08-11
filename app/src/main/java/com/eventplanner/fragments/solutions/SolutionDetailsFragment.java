@@ -1,5 +1,6 @@
 package com.eventplanner.fragments.solutions;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
+import com.eventplanner.BuildConfig;
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
 import com.eventplanner.model.enums.ChatTheme;
@@ -39,6 +42,7 @@ import com.eventplanner.services.ReviewService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
 
@@ -65,6 +69,7 @@ public class SolutionDetailsFragment extends Fragment {
     private ReviewService reviewService;
     private ChatService chatService;
     private NavController navController;
+    private int globalImageIndex = 0;
 
 
     public static SolutionDetailsFragment newInstance(String solutionId) {
@@ -601,6 +606,28 @@ public class SolutionDetailsFragment extends Fragment {
         binding.textTitle.setText(solution.getName());
         binding.textCategory.setText(solution.getCategoryName());
         binding.textAuthor.setText(solution.getBusinessOwnerName());
+
+        // Image
+        if (solution.getImageBase64().isEmpty()) {
+            // Glide is a library for efficient loading and displaying of images from various sources (URL, Base64, files, etc.),
+            // which automatically caches images and optimizes memory usage. It helps load images quickly and smoothly without blocking the UI.
+            Glide.with(requireContext())
+                    .load(Base64Util.DEFAULT_IMAGE_URI)
+                    .into(binding.imageSolution);
+        } else {
+            // Set first picture as current one
+            Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImageBase64().get(globalImageIndex));
+            binding.imageSolution.setImageBitmap(bitmap);
+            // Listeners for buttons that cycle through pictures
+            binding.buttonPreviousImage.setOnClickListener(this::changeImage);
+            binding.buttonNextImage.setOnClickListener(this::changeImage);
+        }
+        // If there is no more than one picture hide buttons for cycling
+        if (!(solution.getImageBase64().size() > 1)) {
+            binding.buttonPreviousImage.setVisibility(View.GONE);
+            binding.buttonNextImage.setVisibility(View.GONE);
+        }
+
         String availabilityStatus = (solution.getIsAvailable()) ? "Available" : "Unavailable";
         binding.textAvailability.setText(binding.textAvailability.getText() + ": " + availabilityStatus);
         binding.textDescription.setText(binding.textDescription.getText() + ": " + solution.getDescription());
@@ -643,6 +670,30 @@ public class SolutionDetailsFragment extends Fragment {
         binding.textReservationDeadline.setVisibility(View.GONE);
         binding.textCancellationDeadline.setVisibility(View.GONE);
         binding.textReservationType.setVisibility(View.GONE);
+    }
+
+    // Changes image in image view
+    // Operates with globalImageIndex -> ++ if buttonNextImage; -- if buttonPreviousImage
+    private void changeImage(View v) {
+        int lastIndex = solution.getImageBase64().size() - 1;
+        // If buttonPreviousImage is clicked
+        if (v == binding.buttonPreviousImage) {
+            // If current image is the first one and previous is clicked -> set last image as current one
+            if (globalImageIndex == 0)
+                globalImageIndex = lastIndex;
+            else
+                globalImageIndex--;
+        }
+        // If buttonNextImage is clicked
+        if (v == binding.buttonNextImage) {
+            // If current image is the last one and next is clicked -> set first image as current one
+            if (globalImageIndex == lastIndex)
+                globalImageIndex = 0;
+            else
+                globalImageIndex++;
+        }
+        Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImageBase64().get(globalImageIndex));
+        binding.imageSolution.setImageBitmap(bitmap);
     }
 
     private Double convertSecondsToHours(Integer seconds) {
