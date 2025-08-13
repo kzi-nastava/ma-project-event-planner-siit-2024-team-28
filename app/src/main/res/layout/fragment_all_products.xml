@@ -24,7 +24,7 @@
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Search services"
+            android:queryHint="Search products by name"
             android:iconifiedByDefault="false"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,12 +47,36 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 app:backgroundTint="@color/cool_purple"
                 android:background="@drawable/button_rounded"
                 android:text="@string/filter" />
+
+            <Button
+                android:id="@+id/button_clear_filters"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="5dp"
+                app:backgroundTint="@android:color/darker_gray"
+                android:background="@drawable/button_rounded"
+                android:text="Clear Filters" />
+
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Products RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_products"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="16dp"
+        tools:listitem="@layout/item_product" />
+
+    <!-- Pagination -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,42 +85,97 @@
         android:padding="15dp">
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/button_previous"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:text="@string/previous_text"
             android:layout_marginEnd="8dp"
-            />
+            app:backgroundTint="@color/cool_purple"
+            android:background="@drawable/button_rounded" />
+
+        <LinearLayout
+            android:id="@+id/container_page_numbers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_page_1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="1"
+                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/cool_purple"
+                android:background="@drawable/button_rounded" />
+
+            <Button
+                android:id="@+id/button_page_2"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="2"
+                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/cool_purple"
+                android:background="@drawable/button_rounded" />
+
+            <Button
+                android:id="@+id/button_page_3"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="3"
+                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/cool_purple"
+                android:background="@drawable/button_rounded" />
+
+        </LinearLayout>
+
         <Button
-            android:id="@+id/button3"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text="1"
-            android:layout_marginEnd="8dp"/>
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text="2"
-            android:layout_marginEnd="8dp"/>
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text="3"
-            android:layout_marginEnd="8dp"/>
-        <Button
-            android:id="@+id/button6"
+            android:id="@+id/button_next"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:text="@string/next_text"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            app:backgroundTint="@color/cool_purple"
+            android:background="@drawable/button_rounded" />
+
     </LinearLayout>
 
-    <ListView
-        android:id="@android:id/list"
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/empty_state"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No products found"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Try adjusting your search or filters"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray" />
+
+    </LinearLayout>
+
+    <!-- Floating Action Button for creating products -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_create_product"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/solution_card"/>
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:contentDescription="Create Product"
+        app:backgroundTint="@color/cool_purple"
+        android:visibility="gone" />
 
 </LinearLayout>
