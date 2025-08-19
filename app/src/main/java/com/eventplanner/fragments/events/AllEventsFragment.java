@@ -18,6 +18,7 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.events.EventListAdapter;
+import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.services.EventService;
@@ -133,7 +134,7 @@ public class AllEventsFragment extends Fragment {
     }
 
     private void setupCreateEventButton(View rootView) {
-        if (AuthUtils.getUserRoles(requireContext()).contains("EventOrganizer")) {
+        if (AuthUtils.getUserRoles(requireContext()).contains(UserRoles.EventOrganizer)) {
             Button createButton = rootView.findViewById(R.id.button_create_event);
             createButton.setVisibility(View.VISIBLE);
             createButton.setOnClickListener(v -> {

@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.eventplanner.BuildConfig;
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentSolutionDetailsBinding;
+import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.enums.ChatTheme;
 import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.requests.chats.CreateChatRequest;
@@ -306,7 +307,7 @@ public class SolutionDetailsFragment extends Fragment {
     }
 
     private void commentAndReview() {
-        if(!AuthUtils.getUserRoles(getContext()).contains("EventOrganizer"))
+        if(!AuthUtils.getUserRoles(getContext()).contains(UserRoles.EventOrganizer))
             return;
 
         canUserCommentReview(canCommentReview -> showCommentReviewDialog(canCommentReview, this::createComment, this::createReview));
@@ -569,7 +570,7 @@ public class SolutionDetailsFragment extends Fragment {
 
         // Button for buying should be only visible to EventOrganizers
         List<String> roles = AuthUtils.getUserRoles(getContext());
-        if (!solution.getIsAvailable() || !roles.contains("EventOrganizer"))
+        if (!solution.getIsAvailable() || !roles.contains(UserRoles.EventOrganizer))
             binding.buttonBuy.setVisibility(View.GONE);
 
         binding.buttonBuy.setOnClickListener( v -> {
@@ -577,7 +578,7 @@ public class SolutionDetailsFragment extends Fragment {
         });
 
         // button for adding to favorites should be only visible to EventOrganizers
-        if(roles.contains("EventOrganizer")) {
+        if(roles.contains(UserRoles.EventOrganizer)) {
             binding.addToFavorites.setOnClickListener(v -> {
                 Long userId = AuthUtils.getUserId(getContext());
                 addToFavorites(userId, Long.parseLong(solutionId));
@@ -587,14 +588,14 @@ public class SolutionDetailsFragment extends Fragment {
 
 
         // Button for commenting/reviewing should be only visible to EventOrganizers
-        if(roles.contains("EventOrganizer")) {
+        if(roles.contains(UserRoles.EventOrganizer)) {
             binding.buttonReview.setOnClickListener(v -> {
                 commentAndReview();
             });
         } else
             binding.buttonReview.setVisibility(View.GONE);
 
-        if(roles.contains("EventOrganizer")) {
+        if(roles.contains(UserRoles.EventOrganizer)) {
             binding.buttonChatWithOwner.setOnClickListener(v -> {
                 chatWithOwner();
             });

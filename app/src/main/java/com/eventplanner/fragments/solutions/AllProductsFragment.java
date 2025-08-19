@@ -23,6 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.products.AllProductsAdapter;
+import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.products.GetProductResponse;
@@ -127,7 +128,7 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
 
         // Show FAB only for logged in business owners
         if (AuthUtils.getToken(requireContext()) != null &&
-            AuthUtils.getUserRoles(requireContext()).contains("BUSINESS_OWNER")) {
+            AuthUtils.getUserRoles(requireContext()).contains(UserRoles.BusinessOwner)) {
             fabCreateProduct.setVisibility(View.VISIBLE);
 
             fabCreateProduct.setOnClickListener(v -> {
