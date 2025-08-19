@@ -57,6 +57,7 @@ public class ProfileFragment extends Fragment {
     private TextInputLayout businessNameLayout, businessDescriptionLayout, firstNameLayout, lastNameLayout;
     private ListView favoriteEventsList;
     private TextView favoriteEventsHeader;
+    private TextView noFavoriteEventsText;
     private List<GetEventResponse> favoriteEvents = new ArrayList<>();
 
     @Override
@@ -78,6 +79,7 @@ public class ProfileFragment extends Fragment {
         lastNameLayout = view.findViewById(R.id.lastNameLayout);
         favoriteEventsList = view.findViewById(R.id.favoriteEventsList);
         favoriteEventsHeader = view.findViewById(R.id.favoriteEventsHeader);
+        noFavoriteEventsText = view.findViewById(R.id.noFavoriteEventsText);
 
         // Get current user info
         userId = AuthUtils.getUserId(requireContext());
@@ -153,6 +155,7 @@ public class ProfileFragment extends Fragment {
         // Favorite events section is visible for all authenticated users
         favoriteEventsHeader.setVisibility(View.VISIBLE);
         favoriteEventsList.setVisibility(View.VISIBLE);
+        // noFavoriteEventsText visibility will be handled in setupFavoriteEventsList()
     }
 
     private void loadUserData() {
@@ -503,25 +506,39 @@ public class ProfileFragment extends Fragment {
             public void onResponse(@NonNull Call<Collection<GetEventResponse>> call, @NonNull Response<Collection<GetEventResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     favoriteEvents = new ArrayList<>(response.body());
-                    setupFavoriteEventsList();
+                } else {
+                    favoriteEvents = new ArrayList<>();
                 }
+                setupFavoriteEventsList();
             }
 
             @Override
             public void onFailure(@NonNull Call<Collection<GetEventResponse>> call, @NonNull Throwable t) {
-                // Handle error silently or show message
+                // Handle error by showing empty list
+                favoriteEvents = new ArrayList<>();
+                setupFavoriteEventsList();
             }
         });
     }
 
     private void setupFavoriteEventsList() {
-        EventListAdapter adapter = new EventListAdapter(requireContext(), favoriteEvents);
-        favoriteEventsList.setAdapter(adapter);
+        if (favoriteEvents.isEmpty()) {
+            // Show "no favorite events" message and hide the list
+            noFavoriteEventsText.setVisibility(View.VISIBLE);
+            favoriteEventsList.setVisibility(View.GONE);
+        } else {
+            // Show the list and hide the "no favorite events" message
+            noFavoriteEventsText.setVisibility(View.GONE);
+            favoriteEventsList.setVisibility(View.VISIBLE);
 
-        favoriteEventsList.setOnItemClickListener((parent, view, position, id) -> {
-            GetEventResponse event = favoriteEvents.get(position);
-            navigateToEventDetails(event.getId());
-        });
+            EventListAdapter adapter = new EventListAdapter(requireContext(), favoriteEvents);
+            favoriteEventsList.setAdapter(adapter);
+
+            favoriteEventsList.setOnItemClickListener((parent, view, position, id) -> {
+                GetEventResponse event = favoriteEvents.get(position);
+                navigateToEventDetails(event.getId());
+            });
+        }
     }
 
     private void navigateToEventDetails(long eventId) {

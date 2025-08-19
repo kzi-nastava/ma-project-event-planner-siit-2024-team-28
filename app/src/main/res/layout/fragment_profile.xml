@@ -183,6 +183,17 @@
             android:textColor="@android:color/white"
             android:gravity="center" />
 
+        <TextView
+            android:id="@+id/noFavoriteEventsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_no_favorite_events"
+            android:textSize="16sp"
+            android:textColor="@android:color/darker_gray"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone" />
+
         <ListView
             android:id="@+id/favoriteEventsList"
             android:layout_width="match_parent"
