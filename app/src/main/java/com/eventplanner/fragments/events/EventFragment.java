@@ -373,8 +373,19 @@ public class EventFragment extends Fragment {
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadDetailsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
 
-        // Favorite button is always visible but disabled if not logged in
-        binding.favoriteButton.setEnabled(AuthUtils.getUserId(getContext()) != null);
+        // Handle favorite button visibility and functionality
+        Long currentUserId = AuthUtils.getUserId(getContext());
+        boolean isLoggedIn = currentUserId != null;
+        boolean isEventCreator = isOrganizer();
+
+        if (!isLoggedIn || isEventCreator) {
+            // Hide favorite button if user is not logged in or if they are the event creator
+            binding.favoriteButton.setVisibility(View.GONE);
+        } else {
+            // Show and enable favorite button for logged in users who are not the event creator
+            binding.favoriteButton.setVisibility(View.VISIBLE);
+            binding.favoriteButton.setEnabled(true);
+        }
 
         // Disable image upload if not organizer
         if (isEditMode && !isOrganizer()) {
