@@ -169,5 +169,25 @@
             android:layout_marginTop="8dp"
             android:text="@string/profile_deactivate_button"
             android:backgroundTint="@android:color/holo_red_dark" />
+
+        <!-- Favorite Events Section -->
+        <TextView
+            android:id="@+id/favoriteEventsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_favorite_events_header"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:padding="16dp"
+            android:background="@color/cool_dark_purple"
+            android:textColor="@android:color/white"
+            android:gravity="center" />
+
+        <ListView
+            android:id="@+id/favoriteEventsList"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
     </LinearLayout>
 </ScrollView>

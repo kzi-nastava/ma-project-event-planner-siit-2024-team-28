@@ -13,18 +13,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
+import com.eventplanner.adapters.events.EventListAdapter;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.users.UpdateUserRequest;
+import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.utils.AuthUtils;
@@ -34,6 +39,8 @@ import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import retrofit2.Call;
@@ -48,6 +55,9 @@ public class ProfileFragment extends Fragment {
     private List<String> currentUserRoles;
     private Long userId;
     private TextInputLayout businessNameLayout, businessDescriptionLayout, firstNameLayout, lastNameLayout;
+    private ListView favoriteEventsList;
+    private TextView favoriteEventsHeader;
+    private List<GetEventResponse> favoriteEvents = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,6 +76,8 @@ public class ProfileFragment extends Fragment {
         businessDescriptionLayout = view.findViewById(R.id.businessDescriptionLayout);
         firstNameLayout = view.findViewById(R.id.firstNameLayout);
         lastNameLayout = view.findViewById(R.id.lastNameLayout);
+        favoriteEventsList = view.findViewById(R.id.favoriteEventsList);
+        favoriteEventsHeader = view.findViewById(R.id.favoriteEventsHeader);
 
         // Get current user info
         userId = AuthUtils.getUserId(requireContext());
@@ -94,6 +106,9 @@ public class ProfileFragment extends Fragment {
 
         // Load user data
         loadUserData();
+
+        // Load favorite events
+        loadFavoriteEvents();
 
         return view;
     }
@@ -134,6 +149,10 @@ public class ProfileFragment extends Fragment {
             firstNameLayout.setVisibility(View.GONE);
             lastNameLayout.setVisibility(View.GONE);
         }
+
+        // Favorite events section is visible for all authenticated users
+        favoriteEventsHeader.setVisibility(View.VISIBLE);
+        favoriteEventsList.setVisibility(View.VISIBLE);
     }
 
     private void loadUserData() {
@@ -475,5 +494,40 @@ public class ProfileFragment extends Fragment {
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void loadFavoriteEvents() {
+        Call<Collection<GetEventResponse>> call = HttpUtils.getEventService().getFavoriteEventsForCurrentUser();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Collection<GetEventResponse>> call, @NonNull Response<Collection<GetEventResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    favoriteEvents = new ArrayList<>(response.body());
+                    setupFavoriteEventsList();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Collection<GetEventResponse>> call, @NonNull Throwable t) {
+                // Handle error silently or show message
+            }
+        });
+    }
+
+    private void setupFavoriteEventsList() {
+        EventListAdapter adapter = new EventListAdapter(requireContext(), favoriteEvents);
+        favoriteEventsList.setAdapter(adapter);
+
+        favoriteEventsList.setOnItemClickListener((parent, view, position, id) -> {
+            GetEventResponse event = favoriteEvents.get(position);
+            navigateToEventDetails(event.getId());
+        });
+    }
+
+    private void navigateToEventDetails(long eventId) {
+        NavController navController = Navigation.findNavController(requireView());
+        Bundle args = new Bundle();
+        args.putLong("eventId", eventId);
+        navController.navigate(R.id.action_profile_to_event, args);
     }
 }
