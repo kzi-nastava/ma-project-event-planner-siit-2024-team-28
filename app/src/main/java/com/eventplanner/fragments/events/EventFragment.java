@@ -137,15 +137,22 @@ public class EventFragment extends Fragment {
         submitReviewButton = binding.getRoot().findViewById(R.id.submitReviewButton);
         deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
 
-        if (AuthUtils.getUserId(getContext()) != null) {
+        Long currentUserId = AuthUtils.getUserId(getContext());
+        boolean isLoggedIn = currentUserId != null;
+        boolean isEventCreator = isOrganizer();
+
+        if (isLoggedIn && !isEventCreator) {
+            // Show review section only for logged-in users who are NOT the event creator
             submitReviewButton.setOnClickListener(v -> submitReview());
             deleteReviewButton.setOnClickListener(v -> deleteReview());
 
             if (isEditMode) {
                 reviewSection.setVisibility(View.VISIBLE);
-                loadUserReview(AuthUtils.getUserId(getContext()), eventId);
+                loadUserReview(currentUserId, eventId);
             }
         } else {
+            // Hide review section for non-logged-in users or event creators
+            reviewSection.setVisibility(View.GONE);
             submitReviewButton.setVisibility(View.GONE);
             deleteReviewButton.setVisibility(View.GONE);
         }
