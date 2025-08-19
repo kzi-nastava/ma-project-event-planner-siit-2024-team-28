@@ -12,8 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.eventplanner.R;
-import com.eventplanner.model.requests.auth.UpdatePasswordRequest;
-import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.model.requests.users.UpdatePasswordRequest;
 import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
 
@@ -23,7 +22,6 @@ import retrofit2.Response;
 
 public class ChangePasswordFragment extends Fragment {
     private EditText oldPassword, newPassword, confirmNewPassword;
-    private Long userId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,8 +30,6 @@ public class ChangePasswordFragment extends Fragment {
         oldPassword = view.findViewById(R.id.oldPassword);
         newPassword = view.findViewById(R.id.newPassword);
         confirmNewPassword = view.findViewById(R.id.confirmNewPassword);
-
-        userId = AuthUtils.getUserId(requireContext());
 
         Button submitButton = view.findViewById(R.id.submitButton);
         submitButton.setOnClickListener(v -> changePassword());
@@ -75,14 +71,16 @@ public class ChangePasswordFragment extends Fragment {
     }
 
     private void changePassword() {
-        if (!validateForm() || userId == null) return;
+        if (!validateForm()) {
+            return;
+        }
 
         UpdatePasswordRequest request = new UpdatePasswordRequest(
                 oldPassword.getText().toString(),
                 newPassword.getText().toString()
         );
 
-        Call<Void> call = HttpUtils.getUserService().updateUserPassword(userId, request);
+        Call<Void> call = HttpUtils.getUserService().updateUserPassword(request);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {

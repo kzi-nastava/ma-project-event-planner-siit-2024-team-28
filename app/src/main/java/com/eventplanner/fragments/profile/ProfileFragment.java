@@ -22,8 +22,9 @@ import androidx.navigation.Navigation;
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
 import com.eventplanner.model.constants.UserRoles;
-import com.eventplanner.model.requests.auth.UpdateBusinessOwnerRequest;
-import com.eventplanner.model.requests.auth.UpdateEventOrganizerRequest;
+import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
+import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
+import com.eventplanner.model.requests.users.UpdateUserRequest;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.utils.AuthUtils;
@@ -104,12 +105,15 @@ public class ProfileFragment extends Fragment {
 
         boolean isBusinessOwner = false;
         boolean isEventOrganizer = false;
+        boolean isAdmin = false;
 
         for (String role : currentUserRoles) {
             if (role.equals(UserRoles.BusinessOwner)) {
                 isBusinessOwner = true;
             } else if (role.equals(UserRoles.EventOrganizer)) {
                 isEventOrganizer = true;
+            } else if (role.equals(UserRoles.ADMIN)) {
+                isAdmin = true;
             }
         }
 
@@ -123,6 +127,12 @@ public class ProfileFragment extends Fragment {
             businessDescriptionLayout.setVisibility(View.GONE);
             firstNameLayout.setVisibility(View.VISIBLE);
             lastNameLayout.setVisibility(View.VISIBLE);
+        } else if (isAdmin) {
+            // Admin users only have basic fields (email, phone, address, profile picture)
+            businessNameLayout.setVisibility(View.GONE);
+            businessDescriptionLayout.setVisibility(View.GONE);
+            firstNameLayout.setVisibility(View.GONE);
+            lastNameLayout.setVisibility(View.GONE);
         }
     }
 
@@ -235,12 +245,6 @@ public class ProfileFragment extends Fragment {
         }
 
         if (businessNameLayout.getVisibility() == View.VISIBLE) {
-            String businessNameStr = businessName.getText().toString().trim();
-            if (FormValidator.isEmpty(businessNameStr)) {
-                businessName.setError(getString(R.string.error_organization_name_required));
-                valid = false;
-            }
-
             String businessDescStr = businessDescription.getText().toString().trim();
             if (FormValidator.isEmpty(businessDescStr)) {
                 businessDescription.setError(getString(R.string.error_description_required));
@@ -274,6 +278,8 @@ public class ProfileFragment extends Fragment {
             updateBusinessOwner();
         } else if (isEventOrganizer()) {
             updateEventOrganizer();
+        } else {
+            updateUser();
         }
     }
 
@@ -301,12 +307,10 @@ public class ProfileFragment extends Fragment {
 
     private void updateBusinessOwner() {
         UpdateBusinessOwnerRequest request = new UpdateBusinessOwnerRequest(
-                email.getText().toString(),
                 phoneNumber.getText().toString(),
                 profilePictureBase64,
                 address.getText().toString(),
-                businessDescription.getText().toString(),
-                businessName.getText().toString()
+                businessDescription.getText().toString()
         );
 
         Call<Void> call = HttpUtils.getUserService().updateBusinessOwner(userId, request);
@@ -337,6 +341,31 @@ public class ProfileFragment extends Fragment {
         );
 
         Call<Void> call = HttpUtils.getUserService().updateEventOrganizer(userId, request);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), getString(R.string.toast_profile_updated_success), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.toast_profile_update_failed), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), getString(R.string.toast_network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateUser() {
+        UpdateUserRequest request = new UpdateUserRequest(
+                phoneNumber.getText().toString(),
+                profilePictureBase64,
+                address.getText().toString()
+        );
+
+        Call<Void> call = HttpUtils.getUserService().updateUser(userId, request);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {

@@ -1,4 +1,4 @@
-package com.eventplanner.model.requests.auth;
+package com.eventplanner.model.requests.users;
 
 public class UpdateEventOrganizerRequest {
     private String phoneNumber;

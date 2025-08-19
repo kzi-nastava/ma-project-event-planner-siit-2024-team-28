@@ -1,30 +1,18 @@
-package com.eventplanner.model.requests.auth;
+package com.eventplanner.model.requests.users;
 
 public class UpdateBusinessOwnerRequest {
-    private String email;
     private String phoneNumber;
     private String profilePictureBase64;
     private String address;
-    private String businessName;
     private String businessDescription;
 
     public UpdateBusinessOwnerRequest() {}
 
-    public UpdateBusinessOwnerRequest(String email, String phoneNumber, String profilePictureBase64, String address, String businessName, String businessDescription) {
-        this.email = email;
+    public UpdateBusinessOwnerRequest(String phoneNumber, String profilePictureBase64, String address, String businessDescription) {
         this.phoneNumber = phoneNumber;
         this.profilePictureBase64 = profilePictureBase64;
         this.address = address;
-        this.businessName = businessName;
         this.businessDescription = businessDescription;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPhoneNumber() {
@@ -49,14 +37,6 @@ public class UpdateBusinessOwnerRequest {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getBusinessName() {
-        return businessName;
-    }
-
-    public void setBusinessName(String businessName) {
-        this.businessName = businessName;
     }
 
     public String getBusinessDescription() {

@@ -1,4 +1,4 @@
-package com.eventplanner.model.requests.auth;
+package com.eventplanner.model.requests.users;
 
 public class UpdatePasswordRequest {
     private String oldPassword;
