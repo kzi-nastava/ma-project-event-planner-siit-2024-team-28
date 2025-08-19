@@ -137,18 +137,8 @@ public class EventFragment extends Fragment {
         submitReviewButton = binding.getRoot().findViewById(R.id.submitReviewButton);
         deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
 
-        if (AuthUtils.getUserId(getContext()) != null) {
-            submitReviewButton.setOnClickListener(v -> submitReview());
-            deleteReviewButton.setOnClickListener(v -> deleteReview());
-
-            if (isEditMode) {
-                reviewSection.setVisibility(View.VISIBLE);
-                loadUserReview(AuthUtils.getUserId(getContext()), eventId);
-            }
-        } else {
-            submitReviewButton.setVisibility(View.GONE);
-            deleteReviewButton.setVisibility(View.GONE);
-        }
+        // Setup review section visibility and functionality
+        setupReviewSection(reviewSection);
     }
 
     private void setupForm() {
@@ -161,6 +151,43 @@ public class EventFragment extends Fragment {
     private boolean isOrganizer() {
         Long currentUserId = AuthUtils.getUserId(getContext());
         return currentUserId != null && currentUserId.equals(eventOrganizerId);
+    }
+
+    private void setupReviewSection(LinearLayout reviewSection) {
+        Long currentUserId = AuthUtils.getUserId(getContext());
+        boolean isLoggedIn = currentUserId != null;
+        boolean isEventCreator = isOrganizer();
+
+        if (isLoggedIn && !isEventCreator) {
+            // Show review section only for logged-in users who are NOT the event creator
+            submitReviewButton.setOnClickListener(v -> submitReview());
+            deleteReviewButton.setOnClickListener(v -> deleteReview());
+
+            if (isEditMode) {
+                reviewSection.setVisibility(View.VISIBLE);
+                loadUserReview(currentUserId, eventId);
+            }
+        } else {
+            // Hide review section for non-logged-in users or event creators
+            reviewSection.setVisibility(View.GONE);
+            submitReviewButton.setVisibility(View.GONE);
+            deleteReviewButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupFavoriteButton() {
+        Long currentUserId = AuthUtils.getUserId(getContext());
+        boolean isLoggedIn = currentUserId != null;
+        boolean isEventCreator = isOrganizer();
+
+        if (!isLoggedIn || isEventCreator) {
+            // Hide favorite button if user is not logged in or if they are the event creator
+            binding.favoriteButton.setVisibility(View.GONE);
+        } else {
+            // Show and enable favorite button for logged in users who are not the event creator
+            binding.favoriteButton.setVisibility(View.VISIBLE);
+            binding.favoriteButton.setEnabled(true);
+        }
     }
 
     private void disableForm() {
@@ -373,8 +400,8 @@ public class EventFragment extends Fragment {
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadDetailsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
 
-        // Favorite button is always visible but disabled if not logged in
-        binding.favoriteButton.setEnabled(AuthUtils.getUserId(getContext()) != null);
+        // Setup favorite button visibility and functionality
+        setupFavoriteButton();
 
         // Disable image upload if not organizer
         if (isEditMode && !isOrganizer()) {

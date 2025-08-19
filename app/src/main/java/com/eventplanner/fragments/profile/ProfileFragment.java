@@ -13,17 +13,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
+import com.eventplanner.adapters.events.EventListAdapter;
 import com.eventplanner.model.constants.UserRoles;
-import com.eventplanner.model.requests.auth.UpdateBusinessOwnerRequest;
-import com.eventplanner.model.requests.auth.UpdateEventOrganizerRequest;
+import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
+import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
+import com.eventplanner.model.requests.users.UpdateUserRequest;
+import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.utils.AuthUtils;
@@ -33,6 +39,8 @@ import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import retrofit2.Call;
@@ -47,6 +55,10 @@ public class ProfileFragment extends Fragment {
     private List<String> currentUserRoles;
     private Long userId;
     private TextInputLayout businessNameLayout, businessDescriptionLayout, firstNameLayout, lastNameLayout;
+    private ListView favoriteEventsList;
+    private TextView favoriteEventsHeader;
+    private TextView noFavoriteEventsText;
+    private List<GetEventResponse> favoriteEvents = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,6 +77,9 @@ public class ProfileFragment extends Fragment {
         businessDescriptionLayout = view.findViewById(R.id.businessDescriptionLayout);
         firstNameLayout = view.findViewById(R.id.firstNameLayout);
         lastNameLayout = view.findViewById(R.id.lastNameLayout);
+        favoriteEventsList = view.findViewById(R.id.favoriteEventsList);
+        favoriteEventsHeader = view.findViewById(R.id.favoriteEventsHeader);
+        noFavoriteEventsText = view.findViewById(R.id.noFavoriteEventsText);
 
         // Get current user info
         userId = AuthUtils.getUserId(requireContext());
@@ -94,6 +109,9 @@ public class ProfileFragment extends Fragment {
         // Load user data
         loadUserData();
 
+        // Load favorite events
+        loadFavoriteEvents();
+
         return view;
     }
 
@@ -104,12 +122,15 @@ public class ProfileFragment extends Fragment {
 
         boolean isBusinessOwner = false;
         boolean isEventOrganizer = false;
+        boolean isAdmin = false;
 
         for (String role : currentUserRoles) {
             if (role.equals(UserRoles.BusinessOwner)) {
                 isBusinessOwner = true;
             } else if (role.equals(UserRoles.EventOrganizer)) {
                 isEventOrganizer = true;
+            } else if (role.equals(UserRoles.ADMIN)) {
+                isAdmin = true;
             }
         }
 
@@ -123,7 +144,18 @@ public class ProfileFragment extends Fragment {
             businessDescriptionLayout.setVisibility(View.GONE);
             firstNameLayout.setVisibility(View.VISIBLE);
             lastNameLayout.setVisibility(View.VISIBLE);
+        } else if (isAdmin) {
+            // Admin users only have basic fields (email, phone, address, profile picture)
+            businessNameLayout.setVisibility(View.GONE);
+            businessDescriptionLayout.setVisibility(View.GONE);
+            firstNameLayout.setVisibility(View.GONE);
+            lastNameLayout.setVisibility(View.GONE);
         }
+
+        // Favorite events section is visible for all authenticated users
+        favoriteEventsHeader.setVisibility(View.VISIBLE);
+        favoriteEventsList.setVisibility(View.VISIBLE);
+        // noFavoriteEventsText visibility will be handled in setupFavoriteEventsList()
     }
 
     private void loadUserData() {
@@ -226,25 +258,28 @@ public class ProfileFragment extends Fragment {
         } else if (!FormValidator.isValidPhoneNumber(phoneStr)) {
             phoneNumber.setError(getString(R.string.error_phone_invalid));
             valid = false;
+        } else {
+            phoneNumber.setError(null);
         }
 
         String addressStr = address.getText().toString().trim();
         if (FormValidator.isEmpty(addressStr)) {
             address.setError(getString(R.string.error_address_required));
             valid = false;
+        } else if (!FormValidator.isValidAddress(addressStr)) {
+            address.setError(getString(R.string.error_address_invalid));
+            valid = false;
+        } else {
+            address.setError(null);
         }
 
         if (businessNameLayout.getVisibility() == View.VISIBLE) {
-            String businessNameStr = businessName.getText().toString().trim();
-            if (FormValidator.isEmpty(businessNameStr)) {
-                businessName.setError(getString(R.string.error_organization_name_required));
-                valid = false;
-            }
-
             String businessDescStr = businessDescription.getText().toString().trim();
             if (FormValidator.isEmpty(businessDescStr)) {
                 businessDescription.setError(getString(R.string.error_description_required));
                 valid = false;
+            } else {
+                businessDescription.setError(null);
             }
         }
 
@@ -253,12 +288,16 @@ public class ProfileFragment extends Fragment {
             if (FormValidator.isEmpty(firstNameStr)) {
                 firstName.setError(getString(R.string.error_first_name_required));
                 valid = false;
+            } else {
+                firstName.setError(null);
             }
 
             String lastNameStr = lastName.getText().toString().trim();
             if (FormValidator.isEmpty(lastNameStr)) {
                 lastName.setError(getString(R.string.error_last_name_required));
                 valid = false;
+            } else {
+                lastName.setError(null);
             }
         }
 
@@ -274,6 +313,8 @@ public class ProfileFragment extends Fragment {
             updateBusinessOwner();
         } else if (isEventOrganizer()) {
             updateEventOrganizer();
+        } else {
+            updateUser();
         }
     }
 
@@ -301,12 +342,10 @@ public class ProfileFragment extends Fragment {
 
     private void updateBusinessOwner() {
         UpdateBusinessOwnerRequest request = new UpdateBusinessOwnerRequest(
-                email.getText().toString(),
                 phoneNumber.getText().toString(),
                 profilePictureBase64,
                 address.getText().toString(),
-                businessDescription.getText().toString(),
-                businessName.getText().toString()
+                businessDescription.getText().toString()
         );
 
         Call<Void> call = HttpUtils.getUserService().updateBusinessOwner(userId, request);
@@ -337,6 +376,31 @@ public class ProfileFragment extends Fragment {
         );
 
         Call<Void> call = HttpUtils.getUserService().updateEventOrganizer(userId, request);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), getString(R.string.toast_profile_updated_success), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.toast_profile_update_failed), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), getString(R.string.toast_network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateUser() {
+        UpdateUserRequest request = new UpdateUserRequest(
+                phoneNumber.getText().toString(),
+                profilePictureBase64,
+                address.getText().toString()
+        );
+
+        Call<Void> call = HttpUtils.getUserService().updateUser(userId, request);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
@@ -433,5 +497,54 @@ public class ProfileFragment extends Fragment {
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void loadFavoriteEvents() {
+        Call<Collection<GetEventResponse>> call = HttpUtils.getEventService().getFavoriteEventsForCurrentUser();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Collection<GetEventResponse>> call, @NonNull Response<Collection<GetEventResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    favoriteEvents = new ArrayList<>(response.body());
+                } else {
+                    favoriteEvents = new ArrayList<>();
+                }
+                setupFavoriteEventsList();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Collection<GetEventResponse>> call, @NonNull Throwable t) {
+                // Handle error by showing empty list
+                favoriteEvents = new ArrayList<>();
+                setupFavoriteEventsList();
+            }
+        });
+    }
+
+    private void setupFavoriteEventsList() {
+        if (favoriteEvents.isEmpty()) {
+            // Show "no favorite events" message and hide the list
+            noFavoriteEventsText.setVisibility(View.VISIBLE);
+            favoriteEventsList.setVisibility(View.GONE);
+        } else {
+            // Show the list and hide the "no favorite events" message
+            noFavoriteEventsText.setVisibility(View.GONE);
+            favoriteEventsList.setVisibility(View.VISIBLE);
+
+            EventListAdapter adapter = new EventListAdapter(requireContext(), favoriteEvents);
+            favoriteEventsList.setAdapter(adapter);
+
+            favoriteEventsList.setOnItemClickListener((parent, view, position, id) -> {
+                GetEventResponse event = favoriteEvents.get(position);
+                navigateToEventDetails(event.getId());
+            });
+        }
+    }
+
+    private void navigateToEventDetails(long eventId) {
+        NavController navController = Navigation.findNavController(requireView());
+        Bundle args = new Bundle();
+        args.putLong("eventId", eventId);
+        navController.navigate(R.id.action_profile_to_event, args);
     }
 }

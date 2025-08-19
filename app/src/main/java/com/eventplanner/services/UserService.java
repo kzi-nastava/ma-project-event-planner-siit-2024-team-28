@@ -1,8 +1,9 @@
 package com.eventplanner.services;
 
-import com.eventplanner.model.requests.auth.UpdateBusinessOwnerRequest;
-import com.eventplanner.model.requests.auth.UpdateEventOrganizerRequest;
-import com.eventplanner.model.requests.auth.UpdatePasswordRequest;
+import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
+import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
+import com.eventplanner.model.requests.users.UpdatePasswordRequest;
+import com.eventplanner.model.requests.users.UpdateUserRequest;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 
@@ -34,8 +35,11 @@ public interface UserService {
     @PUT("users/event-organizers/{id}")
     Call<Void> updateEventOrganizer(@Path("id") Long id, @Body UpdateEventOrganizerRequest request);
 
-    @PATCH("users/{id}/password")
-    Call<Void> updateUserPassword(@Path("id") Long id, @Body UpdatePasswordRequest request);
+    @PUT("users/{id}")
+    Call<Void> updateUser(@Path("id") Long id, @Body UpdateUserRequest request);
+
+    @PATCH("users/password")
+    Call<Void> updateUserPassword(@Body UpdatePasswordRequest request);
 
     @GET("users/{id}/can-be-deactivated")
     Call<Boolean> canUserBeDeactivated(@Path("id") Long userId);

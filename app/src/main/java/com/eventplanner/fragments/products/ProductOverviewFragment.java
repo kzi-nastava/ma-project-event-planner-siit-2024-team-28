@@ -102,7 +102,7 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
 
         // Only show create button for logged in business owners
         if (AuthUtils.getToken(requireContext()) == null ||
-            !AuthUtils.getUserRoles(requireContext()).contains("BUSINESS_OWNER")) {
+            !AuthUtils.getUserRoles(requireContext()).contains(UserRoles.BusinessOwner)) {
             fabCreateProduct.setVisibility(View.GONE);
         }
 
