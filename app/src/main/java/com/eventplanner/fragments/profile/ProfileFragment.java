@@ -236,12 +236,19 @@ public class ProfileFragment extends Fragment {
         } else if (!FormValidator.isValidPhoneNumber(phoneStr)) {
             phoneNumber.setError(getString(R.string.error_phone_invalid));
             valid = false;
+        } else {
+            phoneNumber.setError(null);
         }
 
         String addressStr = address.getText().toString().trim();
         if (FormValidator.isEmpty(addressStr)) {
             address.setError(getString(R.string.error_address_required));
             valid = false;
+        } else if (!FormValidator.isValidAddress(addressStr)) {
+            address.setError(getString(R.string.error_address_invalid));
+            valid = false;
+        } else {
+            address.setError(null);
         }
 
         if (businessNameLayout.getVisibility() == View.VISIBLE) {
@@ -249,6 +256,8 @@ public class ProfileFragment extends Fragment {
             if (FormValidator.isEmpty(businessDescStr)) {
                 businessDescription.setError(getString(R.string.error_description_required));
                 valid = false;
+            } else {
+                businessDescription.setError(null);
             }
         }
 
@@ -257,12 +266,16 @@ public class ProfileFragment extends Fragment {
             if (FormValidator.isEmpty(firstNameStr)) {
                 firstName.setError(getString(R.string.error_first_name_required));
                 valid = false;
+            } else {
+                firstName.setError(null);
             }
 
             String lastNameStr = lastName.getText().toString().trim();
             if (FormValidator.isEmpty(lastNameStr)) {
                 lastName.setError(getString(R.string.error_last_name_required));
                 valid = false;
+            } else {
+                lastName.setError(null);
             }
         }
 
