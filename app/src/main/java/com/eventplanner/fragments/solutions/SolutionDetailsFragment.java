@@ -26,19 +26,19 @@ import com.eventplanner.model.enums.ChatTheme;
 import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.requests.chats.CreateChatRequest;
 import com.eventplanner.model.requests.chats.FindChatRequest;
-import com.eventplanner.model.requests.comments.CreateCommentRequest;
-import com.eventplanner.model.requests.reviews.CreateReviewRequest;
+import com.eventplanner.model.requests.solutionComments.CreateSolutionCommentRequest;
+import com.eventplanner.model.requests.solutionReviews.CreateSolutionReviewRequest;
 import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.chats.FindChatResponse;
-import com.eventplanner.model.responses.comments.GetCommentResponse;
+import com.eventplanner.model.responses.solutionComments.GetSolutionCommentResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
-import com.eventplanner.model.responses.reviews.GetReviewResponse;
+import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.services.ChatService;
-import com.eventplanner.services.CommentService;
+import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.ProductService;
-import com.eventplanner.services.ReviewService;
+import com.eventplanner.services.SolutionReviewService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
@@ -65,8 +65,8 @@ public class SolutionDetailsFragment extends Fragment {
     private UserService userService;
     private EventService eventService;
     private ProductService productService;
-    private CommentService commentService;
-    private ReviewService reviewService;
+    private SolutionCommentService solutionCommentService;
+    private SolutionReviewService solutionReviewService;
     private ChatService chatService;
     private NavController navController;
     private int globalImageIndex = 0;
@@ -90,8 +90,8 @@ public class SolutionDetailsFragment extends Fragment {
         userService = HttpUtils.getUserService();
         eventService = HttpUtils.getEventService();
         productService = HttpUtils.getProductService();
-        commentService = HttpUtils.getCommentService();
-        reviewService = HttpUtils.getReviewService();
+        solutionCommentService = HttpUtils.getCommentService();
+        solutionReviewService = HttpUtils.getReviewService();
         chatService = HttpUtils.getChatService();
         navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
         super.onCreate(savedInstanceState);
@@ -333,7 +333,7 @@ public class SolutionDetailsFragment extends Fragment {
                 });
     }
 
-    private void showCommentReviewDialog(boolean canReviewComment, Consumer<CreateCommentRequest> createComment, Consumer<CreateReviewRequest> createReview) {
+    private void showCommentReviewDialog(boolean canReviewComment, Consumer<CreateSolutionCommentRequest> createComment, Consumer<CreateSolutionReviewRequest> createReview) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         if (canReviewComment) {
@@ -361,14 +361,14 @@ public class SolutionDetailsFragment extends Fragment {
                         Long userId = AuthUtils.getUserId(getContext());
                         Long solId = Long.parseLong(solutionId);
 
-                        CreateCommentRequest commentRequest = CreateCommentRequest.builder()
+                        CreateSolutionCommentRequest commentRequest = CreateSolutionCommentRequest.builder()
                                 .commenterId(userId)
                                 .solutionId(solId)
                                 .content(commentText)
                                 .build();
                         createComment.accept(commentRequest);
 
-                        CreateReviewRequest reviewRequest = CreateReviewRequest.builder()
+                        CreateSolutionReviewRequest reviewRequest = CreateSolutionReviewRequest.builder()
                                 .reviewerId(userId)
                                 .solutionId(solId)
                                 .rating((short) rating)
@@ -385,12 +385,12 @@ public class SolutionDetailsFragment extends Fragment {
         builder.show();
     }
 
-    private void createComment(CreateCommentRequest request) {
-        commentService.createComment(request).enqueue(new Callback<GetCommentResponse>() {
+    private void createComment(CreateSolutionCommentRequest request) {
+        solutionCommentService.createComment(request).enqueue(new Callback<GetSolutionCommentResponse>() {
             @Override
-            public void onResponse(Call<GetCommentResponse> call, Response<GetCommentResponse> response) {
+            public void onResponse(Call<GetSolutionCommentResponse> call, Response<GetSolutionCommentResponse> response) {
                 if (response.isSuccessful()) {
-                    GetCommentResponse comment = response.body();
+                    GetSolutionCommentResponse comment = response.body();
                     Toast.makeText(getContext(), "Comment created successfully!", Toast.LENGTH_SHORT).show();
                     Log.i("SolutionDetailsFragment", "Comment created ID: " + comment.getId());
                 } else {
@@ -408,18 +408,18 @@ public class SolutionDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<GetCommentResponse> call, Throwable t) {
+            public void onFailure(Call<GetSolutionCommentResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "Network failure: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("CommentActivity", "Network failure: " + t.getMessage(), t);
             }
         });
     }
-    private void createReview(CreateReviewRequest request) {
-            reviewService.createReview(request).enqueue(new Callback<GetReviewResponse>() {
+    private void createReview(CreateSolutionReviewRequest request) {
+            solutionReviewService.createReview(request).enqueue(new Callback<GetSolutionReviewResponse>() {
                 @Override
-                public void onResponse(Call<GetReviewResponse> call, Response<GetReviewResponse> response) {
+                public void onResponse(Call<GetSolutionReviewResponse> call, Response<GetSolutionReviewResponse> response) {
                     if (response.isSuccessful()) {
-                        GetReviewResponse review = response.body();
+                        GetSolutionReviewResponse review = response.body();
                         Toast.makeText(getContext(), "Review created successfully!", Toast.LENGTH_SHORT).show();
                         Log.i("ReviewFragment", "Review created ID: " + review.getId());
                     } else {
@@ -437,7 +437,7 @@ public class SolutionDetailsFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<GetReviewResponse> call, Throwable t) {
+                public void onFailure(Call<GetSolutionReviewResponse> call, Throwable t) {
                     Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("ReviewFragment", "Network failure: " + t.getMessage(), t);
                 }

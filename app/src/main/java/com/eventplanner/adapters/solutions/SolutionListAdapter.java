@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eventplanner.R;
-import com.eventplanner.model.events.Event;
 import com.eventplanner.model.solutions.Solution;
 
 import java.util.List;

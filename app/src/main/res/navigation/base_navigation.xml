@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_home_to_profile"
             app:destination="@id/nav_profile" />
+        <action
+            android:id="@+id/action_home_to_product_overview"
+            app:destination="@id/nav_product_overview" />
     </fragment>
 
     <fragment
@@ -230,6 +233,49 @@
         <action
             android:id="@+id/action_allProducts_to_solutionDetails"
             app:destination="@id/nav_solution_details" />
+        <action
+            android:id="@+id/action_allProducts_to_product_edit"
+            app:destination="@id/nav_product_edit">
+            <argument
+                android:name="productId"
+                app:argType="long" />
+        </action>
+        <action
+            android:id="@+id/action_allProducts_to_product_creation"
+            app:destination="@id/nav_product_creation" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_product_overview"
+        android:name="com.eventplanner.fragments.products.ProductOverviewFragment"
+        android:label="My Products"
+        tools:layout="@layout/fragment_product_overview">
+        <action
+            android:id="@+id/action_product_overview_to_product_creation"
+            app:destination="@id/nav_product_creation" />
+        <action
+            android:id="@+id/action_product_overview_to_product_edit"
+            app:destination="@id/nav_product_edit">
+            <argument
+                android:name="productId"
+                app:argType="long" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_product_creation"
+        android:name="com.eventplanner.fragments.products.ProductCreationFragment"
+        android:label="Create Product"
+        tools:layout="@layout/fragment_product_creation" />
+
+    <fragment
+        android:id="@+id/nav_product_edit"
+        android:name="com.eventplanner.fragments.products.ProductCreationFragment"
+        android:label="Edit Product"
+        tools:layout="@layout/fragment_product_creation">
+        <argument
+            android:name="productId"
+            app:argType="long" />
     </fragment>
 
     <fragment

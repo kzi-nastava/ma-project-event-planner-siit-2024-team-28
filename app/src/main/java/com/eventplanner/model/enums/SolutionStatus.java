@@ -1,5 +1,7 @@
 package com.eventplanner.model.enums;
 
 public enum SolutionStatus {
-    ACTIVE, PENDING
+    ACTIVE,
+    PENDING,
+    REJECTED
 }

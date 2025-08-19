@@ -13,4 +13,10 @@
     <color name="gray">#888888</color>
     <color name="submit_green">#48BD67</color>
     <color name="delete_red">#BD4A4A</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="light_purple">#E8E1F5</color>
+    <color name="light_red">#FFE5E5</color>
+    <color name="red">#D32F2F</color>
+    <color name="green">#388E3C</color>
+    <color name="orange">#FF9800</color>
 </resources>
