@@ -1,6 +1,7 @@
 package com.eventplanner.adapters.solutions;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,10 +16,12 @@ import android.widget.Toast;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.eventplanner.R;
 import com.eventplanner.model.responses.services.DeleteServiceResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
 import com.eventplanner.services.ServiceService;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
 
@@ -52,7 +55,14 @@ public class ServiceListAdapter extends ArrayAdapter<GetServiceResponse> {
         serviceName.setText(service.getName());
         DecimalFormat df = new DecimalFormat("0.##");
         priceText.setText("Price: " + df.format(service.getPrice()) + "$");
-        // TODO: srediti za sliku
+        if (service.getImageBase64().isEmpty()) {
+            Glide.with(getContext())
+                    .load(Base64Util.DEFAULT_IMAGE_URI)
+                    .into(image);
+        } else {
+            Bitmap bitmap = Base64Util.decodeBase64ToBitmap(service.getImageBase64().get(0));
+            image.setImageBitmap(bitmap);
+        }
 
         Button editButton = convertView.findViewById(R.id.editButton);
         editButton.setOnClickListener(v -> {

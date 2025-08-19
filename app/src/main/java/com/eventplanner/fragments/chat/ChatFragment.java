@@ -1,5 +1,6 @@
 package com.eventplanner.fragments.chat;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.eventplanner.R;
 import com.eventplanner.adapters.chatMessages.ChatMessageListAdapter;
 import com.eventplanner.databinding.FragmentChatBinding;
@@ -17,9 +19,12 @@ import com.eventplanner.model.requests.chatMessages.CreateChatMessageRequest;
 import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.chatMessages.GetChatMessageResponse;
 import com.eventplanner.model.responses.chats.GetChatResponse;
+import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
+import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
 
@@ -37,6 +42,7 @@ public class ChatFragment extends Fragment {
     private ChatMessageListAdapter messageListAdapter;
     private ChatService chatService;
     private ChatMessageService chatMessageService;
+    private UserService userService;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -58,6 +64,7 @@ public class ChatFragment extends Fragment {
         }
         chatService = HttpUtils.getChatService();
         chatMessageService = HttpUtils.getChatMessageService();
+        userService = HttpUtils.getUserService();
     }
 
     @Override
@@ -86,11 +93,14 @@ public class ChatFragment extends Fragment {
                 if (response.isSuccessful()) {
                     chat = response.body();
                     if (chat != null) {
-                        // TODO: srediti sliku
-                        if(!AuthUtils.getUserId(getContext()).equals(chat.getParticipant1Id()))
+                        if(!AuthUtils.getUserId(getContext()).equals(chat.getParticipant1Id())) {
                             binding.userName.setText(chat.getParticipant1Name());
-                        else
+                            fetchAndSetParticipantImage(chat.getParticipant1Id());
+                        }
+                        else {
                             binding.userName.setText(chat.getParticipant2Name());
+                            fetchAndSetParticipantImage(chat.getParticipant2Id());
+                        }
                         binding.themeName.setText(getString(R.string.theme_for) + " " + chat.getThemeName());
                     }
                 } else {
@@ -142,6 +152,34 @@ public class ChatFragment extends Fragment {
             }
         });
     };
+
+    private void fetchAndSetParticipantImage(Long participantId) {
+        Call<GetUserProfilePictureResponse> call = userService.getUserProfilePictureBase64(participantId);
+
+        call.enqueue(new Callback<GetUserProfilePictureResponse>() {
+            @Override
+            public void onResponse(Call<GetUserProfilePictureResponse> call, Response<GetUserProfilePictureResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String base64Image = response.body().getProfilePictureBase64();
+                    if (base64Image != null && !base64Image.isEmpty()) {
+                        Bitmap bitmap = Base64Util.decodeBase64ToBitmap(base64Image);
+                        binding.userProfilePicture.setImageBitmap(bitmap);
+                    } else {
+                        Glide.with(requireContext())
+                                .load(Base64Util.DEFAULT_IMAGE_URI)
+                                .into(binding.userProfilePicture);
+                    }
+                } else {
+                    Log.e("BusinessOwnerDetailsFragment", "Response failed: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetUserProfilePictureResponse> call, Throwable t) {
+                Log.e("BusinessOwnerDetailsFragment", "Network failure: " + t.getMessage(), t);
+            }
+        });
+    }
 
     private void setChatMessagesAdapter(List<GetChatMessageResponse> messages) {
         messageListAdapter = new ChatMessageListAdapter(getContext(), messages, AuthUtils.getUserId(getContext()));

@@ -165,6 +165,7 @@
     <string name="specifics_input">Specifics:</string>
     <string name="price_input">Price:</string>
     <string name="discount_input">Discount:</string>
+    <string name="number_of_selected_images">(You selected %1$d images)</string>
     <string name="which_events_input">For which types of events are your services available:</string>
     <string name="service_visible">Make your service visible</string>
     <string name="service_available">Make your service available</string>

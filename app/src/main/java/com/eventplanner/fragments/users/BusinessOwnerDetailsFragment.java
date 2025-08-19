@@ -1,12 +1,7 @@
 package com.eventplanner.fragments.users;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,19 +11,27 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
 import com.eventplanner.R;
 import com.eventplanner.adapters.solutionComments.SolutionCommentListAdapter;
 import com.eventplanner.adapters.solutionReviews.SolutionReviewListAdapter;
 import com.eventplanner.databinding.FragmentBusinessOwnerDetailsBinding;
 import com.eventplanner.model.requests.reports.CreateReportRequest;
-import com.eventplanner.model.responses.solutionComments.GetSolutionCommentPreviewResponse;
 import com.eventplanner.model.responses.reports.GetReportResponse;
+import com.eventplanner.model.responses.solutionComments.GetSolutionCommentPreviewResponse;
 import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewPreviewResponse;
+import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
-import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.ReportService;
+import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.SolutionReviewService;
 import com.eventplanner.services.UserService;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -122,6 +125,9 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         binding.textDescription.setText(binding.textDescription.getText() + " " + businessOwner.getBusinessDescription());
         binding.textPhoneNumber.setText(binding.textPhoneNumber.getText() + " " + businessOwner.getPhoneNumber());
 
+        // Image
+        fetchAndSetUserProfilePicture();
+
         // on click opens dialog
         binding.reportUserButton.setOnClickListener(v -> {
             Log.i("BusinessOwnerFragment", "Attempt creating report.");
@@ -130,6 +136,34 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         // on click opens bottomSheetDialog for displaying comments|reviews
         binding.seeComments.setOnClickListener(v -> showCommentsDialog());
         binding.seeReviews.setOnClickListener(v -> showReviewsDialog());
+    }
+
+    private void fetchAndSetUserProfilePicture() {
+        Call<GetUserProfilePictureResponse> call = userService.getUserProfilePictureBase64(Long.parseLong(businessOwnerId));
+
+        call.enqueue(new Callback<GetUserProfilePictureResponse>() {
+            @Override
+            public void onResponse(Call<GetUserProfilePictureResponse> call, Response<GetUserProfilePictureResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String base64Image = response.body().getProfilePictureBase64();
+                    if (base64Image != null && !base64Image.isEmpty()) {
+                        Bitmap bitmap = Base64Util.decodeBase64ToBitmap(base64Image);
+                        binding.imageUser.setImageBitmap(bitmap);
+                    } else {
+                        Glide.with(requireContext())
+                                .load(Base64Util.DEFAULT_IMAGE_URI)
+                                .into(binding.imageUser);
+                    }
+                } else {
+                    Log.e("BusinessOwnerDetailsFragment", "Response failed: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetUserProfilePictureResponse> call, Throwable t) {
+                Log.e("BusinessOwnerDetailsFragment", "Network failure: " + t.getMessage(), t);
+            }
+        });
     }
 
     // function for making dialog -> SUBMIT: call function for making request to back | CANCEL: nothing happens

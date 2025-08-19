@@ -1,7 +1,14 @@
 package com.eventplanner.fragments.services;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.ClipData;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -29,13 +36,16 @@ import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryRe
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
+import com.eventplanner.utils.RequestCodes;
 import com.google.android.material.chip.Chip;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +58,7 @@ public class ServiceEditFragment extends Fragment {
     private FragmentServiceEditBinding binding;
     private ServiceService serviceService;
     private EventTypeService eventTypeService;
+    private List<String> base64Images;
 
     public ServiceEditFragment() {
     }
@@ -57,6 +68,7 @@ public class ServiceEditFragment extends Fragment {
         super.onCreate(savedInstanceState);
         serviceService = HttpUtils.getServiceService();
         eventTypeService = HttpUtils.getEventTypeService();
+        base64Images = new ArrayList<>();
         if (getArguments() != null) {
             serviceId = getArguments().getString(ARG_SERVICE_ID);
         }
@@ -158,6 +170,16 @@ public class ServiceEditFragment extends Fragment {
             binding.radioButtonAuto.setChecked(true);
         else if (service.getReservationType() == ReservationType.MANUAL)
             binding.radioButtonManual.setChecked(true);
+
+        // Button for triggering image selection
+        binding.buttonSelectImages.setOnClickListener(v -> {
+            openImageSelection();
+        });
+
+        // Setting up number of selected images indicator
+        this.base64Images = service.getImageBase64();
+        String numberOfSelectedImages = getString(R.string.number_of_selected_images, this.base64Images.size());
+        binding.numberOfSelectedImages.setText(numberOfSelectedImages);
 
         // Edit button listener
         binding.buttonEditService.setOnClickListener(v-> {
@@ -343,6 +365,7 @@ public class ServiceEditFragment extends Fragment {
                 .description(description)
                 .price(price)
                 .discount(discount)
+                .imageBase64(this.base64Images)
                 .specifics(specifics)
                 .isVisibleForEventOrganizers(isVisible)
                 .isAvailable(isAvailable)
@@ -385,6 +408,59 @@ public class ServiceEditFragment extends Fragment {
                 Log.e("ServiceEditFragment", "Network error", t);
             }
         });
+    }
+
+    // Function for resolving image selection
+    public void openImageSelection() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(intent, "Select Pictures"), RequestCodes.REQUEST_CODE_PICK_IMAGES); //REQUEST_CODE_PICK_IMAGES -> code for intents used in image selection
+    }
+
+    // Processing Intent results
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RequestCodes.REQUEST_CODE_PICK_IMAGES && resultCode == RESULT_OK && data != null) {
+            List<Uri> imageUris = new ArrayList<>();
+
+            if (data.getClipData() != null) { // Multiple pictures selected
+                ClipData clipData = data.getClipData();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    Uri uri = clipData.getItemAt(i).getUri();
+                    imageUris.add(uri);
+                }
+            } else if (data.getData() != null) { // One picture selected
+                imageUris.add(data.getData());
+            }
+
+            proccessImages(imageUris);
+        }
+    }
+
+    private void proccessImages(List<Uri> imageUris) {
+        if(imageUris == null) {
+            return;
+        }
+
+        // List of Uri elements encodes to base64
+        List<String> base64Images = new ArrayList<>();
+        for (Uri uri : imageUris) {
+            Bitmap bitmap = Base64Util.getBitmapFromUri(requireContext(), uri);
+            if (bitmap != null) {
+                String base64 = Base64Util.encodeImageToBase64(bitmap);
+                base64Images.add(base64);
+            }
+        }
+
+        // Saving images in private field
+        this.base64Images = base64Images;
+
+        // Setting up number of selected images indicator
+        String numberOfSelectedImagesString = getString(R.string.number_of_selected_images, this.base64Images.size());
+        binding.numberOfSelectedImages.setText(numberOfSelectedImagesString);
     }
 
     public int convertHoursToSeconds(double hours) {

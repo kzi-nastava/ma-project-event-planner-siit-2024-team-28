@@ -1,5 +1,11 @@
 package com.eventplanner.fragments.services;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.ClipData;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,7 +43,9 @@ import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCategoryService;
 import com.eventplanner.utils.AuthUtils;
+import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
+import com.eventplanner.utils.RequestCodes;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -58,6 +66,7 @@ public class ServiceCreationFragment extends Fragment {
     private ServiceService serviceService;
     private SolutionCategoryService categoryService;
     private EventTypeService eventTypeService;
+    private List<String> base64Images;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +74,7 @@ public class ServiceCreationFragment extends Fragment {
         serviceService = HttpUtils.getServiceService();
         categoryService = HttpUtils.getSolutionCategoryService();
         eventTypeService = HttpUtils.getEventTypeService();
+        base64Images = new ArrayList<>();
     }
 
     @Nullable
@@ -147,6 +157,15 @@ public class ServiceCreationFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+
+        // Button for triggering image selection
+        binding.buttonSelectImages.setOnClickListener(v -> {
+            openImageSelection();
+        });
+
+        // Setting up number of selected images indicator
+        String numberOfSelectedImagesString = getString(R.string.number_of_selected_images, base64Images.size());
+        binding.numberOfSelectedImages.setText(numberOfSelectedImagesString);
 
         // Create button listener
         binding.buttonCreateService.setOnClickListener(v-> {
@@ -308,6 +327,7 @@ public class ServiceCreationFragment extends Fragment {
                 .description(description)
                 .price(price)
                 .discount(discount)
+                .imageBase64(this.base64Images)
                 .specifics(specifics)
                 .isVisibleForEventOrganizers(isVisible)
                 .isAvailable(isAvailable)
@@ -495,5 +515,58 @@ public class ServiceCreationFragment extends Fragment {
 
         int totalSeconds = (hoursPart * 60 * 60) + (int) Math.round(minutesPart) * 60;
         return totalSeconds;
+    }
+
+    // Function for resolving image selection
+    public void openImageSelection() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(intent, "Select Pictures"), RequestCodes.REQUEST_CODE_PICK_IMAGES); //REQUEST_CODE_PICK_IMAGES -> code for intents used in image selection
+    }
+
+    // Processing Intent results
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RequestCodes.REQUEST_CODE_PICK_IMAGES && resultCode == RESULT_OK && data != null) {
+            List<Uri> imageUris = new ArrayList<>();
+
+            if (data.getClipData() != null) { // Multiple pictures selected
+                ClipData clipData = data.getClipData();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    Uri uri = clipData.getItemAt(i).getUri();
+                    imageUris.add(uri);
+                }
+            } else if (data.getData() != null) { // One picture selected
+                imageUris.add(data.getData());
+            }
+
+            proccessImages(imageUris);
+        }
+    }
+
+    private void proccessImages(List<Uri> imageUris) {
+        if(imageUris == null) {
+            return;
+        }
+
+        // List of Uri elements encodes to base64
+        List<String> base64Images = new ArrayList<>();
+        for (Uri uri : imageUris) {
+            Bitmap bitmap = Base64Util.getBitmapFromUri(requireContext(), uri);
+            if (bitmap != null) {
+                String base64 = Base64Util.encodeImageToBase64(bitmap);
+                base64Images.add(base64);
+            }
+        }
+
+        // Saving images in private field
+        this.base64Images = base64Images;
+
+        // Setting up number of selected images indicator
+        String numberOfSelectedImagesString = getString(R.string.number_of_selected_images, this.base64Images.size());
+        binding.numberOfSelectedImages.setText(numberOfSelectedImagesString);
     }
 }
