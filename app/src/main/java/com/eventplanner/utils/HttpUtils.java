@@ -7,6 +7,7 @@ import com.eventplanner.BuildConfig;
 import com.eventplanner.adapters.typeAdapters.LocalDateAdapter;
 import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.services.AuthService;
+import com.eventplanner.services.CalendarService;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
 import com.eventplanner.services.EventReviewService;
@@ -123,5 +124,9 @@ public class HttpUtils {
 
     public static EventReviewService getEventReviewService() {
         return retrofit.create(EventReviewService.class);
+    }
+
+    public static CalendarService getCalendarService() {
+        return retrofit.create(CalendarService.class);
     }
 }
