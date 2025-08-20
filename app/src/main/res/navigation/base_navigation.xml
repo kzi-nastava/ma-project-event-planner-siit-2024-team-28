@@ -343,6 +343,13 @@
                 android:name="eventId"
                 app:argType="long" />
         </action>
+        <action
+            android:id="@+id/action_profile_to_solution_details"
+            app:destination="@id/nav_solution_details">
+            <argument
+                android:name="solutionId"
+                app:argType="string" />
+        </action>
     </fragment>
 
     <fragment

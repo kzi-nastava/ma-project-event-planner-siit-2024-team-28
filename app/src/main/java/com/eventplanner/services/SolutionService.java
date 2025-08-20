@@ -43,4 +43,7 @@ public interface SolutionService {
             @Path("solutionId") Long solutionId,
             @Query("userId") Long userId
     );
+
+    @GET("solutions/favorites")
+    Call<Collection<GetSolutionResponse>> getFavoriteSolutionsForCurrentUser();
 }
