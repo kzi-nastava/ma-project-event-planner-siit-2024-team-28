@@ -22,14 +22,23 @@ import com.eventplanner.model.responses.chats.GetChatResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
+import com.eventplanner.services.ChatWebSocketService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompClient;
+import io.reactivex.disposables.Disposable;
+import ua.naiksoftware.stomp.dto.LifecycleEvent;
+import ua.naiksoftware.stomp.dto.StompMessage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,6 +52,8 @@ public class ChatFragment extends Fragment {
     private ChatService chatService;
     private ChatMessageService chatMessageService;
     private UserService userService;
+    private ChatWebSocketService chatWSService;
+    private Gson gson;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -65,6 +76,29 @@ public class ChatFragment extends Fragment {
         chatService = HttpUtils.getChatService();
         chatMessageService = HttpUtils.getChatMessageService();
         userService = HttpUtils.getUserService();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
+                        (json, type, context) -> LocalDateTime.parse(json.getAsString()))
+                .create();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        chatWSService = new ChatWebSocketService();
+
+        // Subscribes to chat with callback that processes incoming messages
+        chatWSService.subscribeToChat(chatId, message -> {
+            requireActivity().runOnUiThread(() -> addNewMessage(gson.fromJson(message, GetChatMessageResponse.class)));
+        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (chatWSService != null) {
+            chatWSService.unsubscribeFromChat();
+        }
     }
 
     @Override
@@ -198,32 +232,13 @@ public class ChatFragment extends Fragment {
                 .chatId(chatId)
                 .build();
 
-        Call<GetChatMessageResponse> call = chatMessageService.createChatMessage(request);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<GetChatMessageResponse> call, Response<GetChatMessageResponse> response) {
-                if (response.isSuccessful()) {
-                    GetChatMessageResponse message = response.body();
-                    addNewMessage(message);
-                    binding.messageInput.setText("");
-                } else {
-                    try {
-                        String errorJson = response.errorBody().string();
-                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
-                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
-                        Log.e("ChatFragment", "Send failed: " + errorResponse.getError());
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), "Send failed: Unknown error" + response.code(), Toast.LENGTH_SHORT).show();
-                        Log.e("ChatFragment", "Send failed: " + response.code());
-                    }
-                }
-            }
+        String requestJsonMessage = new Gson().toJson(request);
 
-            @Override
-            public void onFailure(Call<GetChatMessageResponse> call, Throwable t) {
-                Log.e("ChatFragment", "Network failure: " + t.getMessage());
-                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+        chatWSService.sendMessage(requestJsonMessage, () -> {
+            requireActivity().runOnUiThread(() -> {
+                binding.messageInput.setText("");
+                Toast.makeText(getContext(), "Message sent", Toast.LENGTH_SHORT).show();
+            });
         });
     }
 
@@ -239,4 +254,32 @@ public class ChatFragment extends Fragment {
             binding.messagesListView.setSelection(messageListAdapter.getCount() - 1);
         });
     }
+//        Sending messages via REST endpoint
+//        Call<GetChatMessageResponse> call = chatMessageService.createChatMessage(request);
+//        call.enqueue(new Callback<>() {
+//            @Override
+//            public void onResponse(Call<GetChatMessageResponse> call, Response<GetChatMessageResponse> response) {
+//                if (response.isSuccessful()) {
+//                    GetChatMessageResponse message = response.body();
+//                    addNewMessage(message);
+//                    binding.messageInput.setText("");
+//                } else {
+//                    try {
+//                        String errorJson = response.errorBody().string();
+//                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+//                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+//                        Log.e("ChatFragment", "Send failed: " + errorResponse.getError());
+//                    } catch (Exception e) {
+//                        Toast.makeText(getContext(), "Send failed: Unknown error" + response.code(), Toast.LENGTH_SHORT).show();
+//                        Log.e("ChatFragment", "Send failed: " + response.code());
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<GetChatMessageResponse> call, Throwable t) {
+//                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+//                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 }
