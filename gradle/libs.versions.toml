@@ -35,8 +35,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 glide = { module = "com.github.bumptech.glide:glide", version = "4.16.0" }
 glideCompiler = { module = "com.github.bumptech.glide:compiler", version = "4.16.0" }
 stomp = { module = "com.github.NaikSoftware:StompProtocolAndroid", version.ref = "stomp" }
-rxjava = { module = "io.reactivex.rxjava3:rxjava", version = "3.1.6" }
-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version = "3.0.2" }
+rxjava2 = { module = "io.reactivex.rxjava2:rxjava", version = "2.2.21" }
+rxandroid2 = { module = "io.reactivex.rxjava2:rxandroid", version = "2.1.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

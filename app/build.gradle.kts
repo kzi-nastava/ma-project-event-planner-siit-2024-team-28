@@ -67,6 +67,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.stomp)
-    implementation(libs.rxjava)
-    implementation(libs.rxandroid)
+    implementation(libs.rxjava2)
+    implementation(libs.rxandroid2)
 }

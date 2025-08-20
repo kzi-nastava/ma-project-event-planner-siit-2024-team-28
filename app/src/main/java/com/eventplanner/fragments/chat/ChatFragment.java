@@ -32,7 +32,9 @@ import java.util.List;
 
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.disposables.Disposable;
+import ua.naiksoftware.stomp.dto.LifecycleEvent;
+import ua.naiksoftware.stomp.dto.StompMessage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -71,6 +73,71 @@ public class ChatFragment extends Fragment {
         chatService = HttpUtils.getChatService();
         chatMessageService = HttpUtils.getChatMessageService();
         userService = HttpUtils.getUserService();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initStompConnection();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disconnectStomp();
+    }
+
+
+    private void initStompConnection() {
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/ws");
+
+        // Poveži se
+        stompClient.connect();
+
+        // Pretplati se na lifecycle evente
+        stompConnection = stompClient.lifecycle()
+                .subscribe(lifecycleEvent -> {
+                    LifecycleEvent.Type type = lifecycleEvent.getType();
+
+                    switch (type) {
+                        case OPENED:
+                            Log.d("ChatFragment", "STOMP connection opened");
+                            subscribeToChat();
+                            break;
+                        case ERROR:
+                            Log.e("ChatFragment", "STOMP connection error", lifecycleEvent.getException());
+                            break;
+                        case CLOSED:
+                            Log.d("ChatFragment", "STOMP connection closed");
+                            break;
+                    }
+                }, throwable -> Log.e("ChatFragment", "STOMP lifecycle error", throwable));
+    }
+
+
+    private void subscribeToChat() {
+        if (stompClient != null) {
+            chatSubscription = stompClient.topic("/topic/chat/" + chatId)
+                    .subscribe(topicMessage -> {
+                        String payload = topicMessage.getPayload();
+                        GetChatMessageResponse message = new Gson().fromJson(payload, GetChatMessageResponse.class);
+
+                        requireActivity().runOnUiThread(() -> addNewMessage(message));
+                    }, throwable -> Log.e("ChatFragment", "STOMP topic subscription error", throwable));
+        }
+    }
+
+
+    private void disconnectStomp() {
+        if (chatSubscription != null && !chatSubscription.isDisposed()) {
+            chatSubscription.dispose();
+        }
+        if (stompConnection != null && !stompConnection.isDisposed()) {
+            stompConnection.dispose();
+        }
+        if (stompClient != null) {
+            stompClient.disconnect();
+        }
     }
 
     @Override
