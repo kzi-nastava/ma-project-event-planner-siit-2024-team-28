@@ -236,6 +236,7 @@
     <string name="send">Send</string>
     <string name="no_chats">You have no conversations currently</string>
     <string name="theme_for">For:</string>
+    <string name="new_messages">(New messages)</string>
 
     <string name="my_services">My services</string>
     <string name="my_products">My products</string>

@@ -18,6 +18,7 @@ public class ChatWebSocketService {
      *  i.e. we don't need multiple chat subscriptions active at the same time (we don't need List<Disposable> chatSubscription)
      */
     private Disposable chatSubscription;
+    private Disposable chatListSubscription;
 
     public ChatWebSocketService() {
         // Directly takes singleton stomp-client
@@ -29,6 +30,14 @@ public class ChatWebSocketService {
             chatSubscription = stompClient.topic("/topic/chat/" + chatId)
                     .subscribe(topicMessage -> onMessage.accept(topicMessage.getPayload()),
                             throwable -> Log.e("ChatWebSocketService", "STOMP topic subscription error", throwable));
+        }
+    }
+
+    public void subscribeToChatListUpdate(Long userId, Consumer<String> onMessage) {
+        if (stompClient != null && stompClient.isConnected()) {
+            chatListSubscription = stompClient.topic("/topic/chat-list/" + userId)
+                    .subscribe(topicMessage -> onMessage.accept(topicMessage.getPayload()),
+                            throwable -> Log.e("ChatWebSocketService", "Failed subscribing to chat list", throwable));
         }
     }
 
@@ -44,6 +53,12 @@ public class ChatWebSocketService {
     public void unsubscribeFromChat() {
         if (chatSubscription != null && !chatSubscription.isDisposed()) {
             chatSubscription.dispose();
+        }
+    }
+
+    public void unsubscribeFromChatListUpdate() {
+        if (chatListSubscription != null && !chatListSubscription.isDisposed()) {
+            chatListSubscription.dispose();
         }
     }
 }
