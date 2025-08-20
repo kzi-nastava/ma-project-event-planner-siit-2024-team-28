@@ -26,7 +26,9 @@ import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
 import com.eventplanner.adapters.events.EventListAdapter;
 import com.eventplanner.adapters.solutions.FavoriteSolutionListAdapter;
+import com.eventplanner.components.CalendarComponent;
 import com.eventplanner.model.constants.UserRoles;
+import com.eventplanner.model.responses.calendar.CalendarEventDTO;
 import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.users.UpdateUserRequest;
@@ -67,6 +69,8 @@ public class ProfileFragment extends Fragment {
     private TextView noFavoriteSolutionsText;
     private List<GetSolutionResponse> favoriteSolutions = new ArrayList<>();
 
+    private CalendarComponent calendarComponent;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -91,6 +95,10 @@ public class ProfileFragment extends Fragment {
         favoriteSolutionsList = view.findViewById(R.id.favoriteSolutionsList);
         favoriteSolutionsHeader = view.findViewById(R.id.favoriteSolutionsHeader);
         noFavoriteSolutionsText = view.findViewById(R.id.noFavoriteSolutionsText);
+
+        // Initialize calendar component
+        calendarComponent = view.findViewById(R.id.calendarComponent);
+        setupCalendarComponent();
 
         // Get current user info
         userId = AuthUtils.getUserId(requireContext());
@@ -614,5 +622,105 @@ public class ProfileFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString("solutionId", String.valueOf(solutionId));
         navController.navigate(R.id.action_profile_to_solution_details, args);
+    }
+
+    private void setupCalendarComponent() {
+        if (calendarComponent != null) {
+            calendarComponent.setOnEventClickListener(this::onCalendarEventClick);
+        }
+    }
+
+    private void onCalendarEventClick(CalendarEventDTO event) {
+        // Navigate based on event type
+        switch (event.getType()) {
+            case EVENT:
+            case CREATED_EVENT:
+                // Navigate to event details
+                if (event.getRelatedEntityId() != null) {
+                    navigateToEventDetails(event.getRelatedEntityId());
+                } else {
+                    showEventDetailsDialog(event);
+                }
+                break;
+            case SERVICE_RESERVATION:
+                // Navigate to service details
+                if (event.getRelatedEntityId() != null) {
+                    navigateToServiceDetails(event.getRelatedEntityId());
+                } else {
+                    showEventDetailsDialog(event);
+                }
+                break;
+            default:
+                showEventDetailsDialog(event);
+                break;
+        }
+    }
+
+    private void navigateToEventDetails(Long eventId) {
+        NavController navController = Navigation.findNavController(requireView());
+        Bundle args = new Bundle();
+        args.putLong("eventId", eventId);
+        navController.navigate(R.id.action_profile_to_event, args);
+    }
+
+    private void navigateToServiceDetails(Long serviceId) {
+        NavController navController = Navigation.findNavController(requireView());
+        Bundle args = new Bundle();
+        args.putString("solutionId", String.valueOf(serviceId));
+        navController.navigate(R.id.action_profile_to_solution_details, args);
+    }
+
+    private void showEventDetailsDialog(CalendarEventDTO event) {
+        // Create a dialog to show event details with navigation option
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(event.getTitle());
+
+        StringBuilder message = new StringBuilder();
+        if (event.getDescription() != null && !event.getDescription().isEmpty()) {
+            message.append("Description: ").append(event.getDescription()).append("\n\n");
+        }
+
+        message.append("Date: ").append(event.getStartDate());
+        if (event.getEndDate() != null && !event.getEndDate().equals(event.getStartDate())) {
+            message.append(" - ").append(event.getEndDate());
+        }
+        message.append("\n");
+
+        if (event.getStartTime() != null) {
+            message.append("Time: ").append(event.getStartTime());
+            if (event.getEndTime() != null) {
+                message.append(" - ").append(event.getEndTime());
+            }
+            message.append("\n");
+        }
+
+        if (event.getLocation() != null && !event.getLocation().isEmpty()) {
+            message.append("Location: ").append(event.getLocation()).append("\n");
+        }
+
+        if (event.getStatus() != null && !event.getStatus().isEmpty()) {
+            message.append("Status: ").append(event.getStatus()).append("\n");
+        }
+
+        message.append("Type: ").append(event.getType().toString());
+
+        builder.setMessage(message.toString());
+
+        // Add navigation buttons if we have a related entity ID
+        if (event.getRelatedEntityId() != null) {
+            if (event.getType() == com.eventplanner.model.enums.CalendarEventType.EVENT ||
+                event.getType() == com.eventplanner.model.enums.CalendarEventType.CREATED_EVENT) {
+                builder.setPositiveButton("View Event", (dialog, which) ->
+                    navigateToEventDetails(event.getRelatedEntityId()));
+            } else if (event.getType() == com.eventplanner.model.enums.CalendarEventType.SERVICE_RESERVATION) {
+                builder.setPositiveButton("View Service", (dialog, which) ->
+                    navigateToServiceDetails(event.getRelatedEntityId()));
+            }
+            builder.setNegativeButton("Close", null);
+        } else {
+            builder.setPositiveButton("OK", null);
+        }
+
+        builder.show();
     }
 }
