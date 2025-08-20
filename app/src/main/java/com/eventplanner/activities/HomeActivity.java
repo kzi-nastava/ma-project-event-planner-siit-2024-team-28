@@ -3,6 +3,7 @@ package com.eventplanner.activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -25,6 +26,7 @@ import com.eventplanner.R;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
+import com.eventplanner.utils.WebSocketService;
 import com.google.android.material.navigation.NavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -42,6 +44,12 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             initializeApp();
         }
+
+        // Lazily gets the singleton instance and establishes the WebSocket/STOMP connection
+        // Logs once the connection is successfully opened
+        WebSocketService.getInstance().connect(() -> {
+            Log.d("App", "WebSocket connected!");
+        });
     }
 
     private void initializeApp() {

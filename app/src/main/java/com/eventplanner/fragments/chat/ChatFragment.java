@@ -22,6 +22,7 @@ import com.eventplanner.model.responses.chats.GetChatResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
+import com.eventplanner.services.ChatWebSocketService;
 import com.eventplanner.services.UserService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.Base64Util;
@@ -51,9 +52,7 @@ public class ChatFragment extends Fragment {
     private ChatService chatService;
     private ChatMessageService chatMessageService;
     private UserService userService;
-    private StompClient stompClient;
-    private Disposable stompConnection;
-    private Disposable chatSubscription;
+    private ChatWebSocketService chatWSService;
     private Gson gson;
 
     public ChatFragment() {
@@ -86,63 +85,19 @@ public class ChatFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        initStompConnection();
+        chatWSService = new ChatWebSocketService();
+
+        // Subscribes to chat with callback that processes incoming messages
+        chatWSService.subscribeToChat(chatId, message -> {
+            requireActivity().runOnUiThread(() -> addNewMessage(gson.fromJson(message, GetChatMessageResponse.class)));
+        });
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        disconnectStomp();
-    }
-
-
-    private void initStompConnection() {
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/ws-native");
-
-        stompClient.connect();
-
-        stompConnection = stompClient.lifecycle()
-                .subscribe(lifecycleEvent -> {
-                    LifecycleEvent.Type type = lifecycleEvent.getType();
-
-                    switch (type) {
-                        case OPENED:
-                            Log.d("ChatFragment", "STOMP connection opened");
-                            subscribeToChat();
-                            break;
-                        case ERROR:
-                            Log.e("ChatFragment", "STOMP connection error", lifecycleEvent.getException());
-                            break;
-                        case CLOSED:
-                            Log.d("ChatFragment", "STOMP connection closed");
-                            break;
-                    }
-                }, throwable -> Log.e("ChatFragment", "STOMP lifecycle error", throwable));
-    }
-
-
-    private void subscribeToChat() {
-        if (stompClient != null) {
-            chatSubscription = stompClient.topic("/topic/chat/" + chatId)
-                    .subscribe(topicMessage -> {
-                        String payload = topicMessage.getPayload();
-                        GetChatMessageResponse message = gson.fromJson(payload, GetChatMessageResponse.class);
-
-                        requireActivity().runOnUiThread(() -> addNewMessage(message));
-                    }, throwable -> Log.e("ChatFragment", "STOMP topic subscription error", throwable));
-        }
-    }
-
-
-    private void disconnectStomp() {
-        if (chatSubscription != null && !chatSubscription.isDisposed()) {
-            chatSubscription.dispose();
-        }
-        if (stompConnection != null && !stompConnection.isDisposed()) {
-            stompConnection.dispose();
-        }
-        if (stompClient != null) {
-            stompClient.disconnect();
+        if (chatWSService != null) {
+            chatWSService.unsubscribeFromChat();
         }
     }
 
@@ -277,24 +232,29 @@ public class ChatFragment extends Fragment {
                 .chatId(chatId)
                 .build();
 
-        String jsonMessage = new Gson().toJson(request);
+        String requestJsonMessage = new Gson().toJson(request);
 
-        stompClient.send("/app/send/message", jsonMessage)
-                .subscribe(
-                        () -> {
-                            requireActivity().runOnUiThread(() -> {
-                                binding.messageInput.setText("");
-                                Toast.makeText(getContext(), "Message sent", Toast.LENGTH_SHORT).show();
-                            });
-                        },
-                        throwable -> {
-                            requireActivity().runOnUiThread(() ->
-                                    Toast.makeText(getContext(), "Unsuccessful sending message via STOMP", Toast.LENGTH_SHORT).show()
-                            );
-                            Log.e("ChatFragment", "Unsuccessful sending message via STOMP", throwable);
-                        }
-                );
+        chatWSService.sendMessage(requestJsonMessage, () -> {
+            requireActivity().runOnUiThread(() -> {
+                binding.messageInput.setText("");
+                Toast.makeText(getContext(), "Message sent", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
 
+    public void addNewMessage(GetChatMessageResponse message) {
+        if (messageListAdapter != null) {
+            messageListAdapter.addNewMessage(message);
+            scrollToTop();
+        }
+    }
+
+    private void scrollToTop() {
+        binding.messagesListView.post(() -> {
+            binding.messagesListView.setSelection(messageListAdapter.getCount() - 1);
+        });
+    }
+//        Sending messages via REST endpoint
 //        Call<GetChatMessageResponse> call = chatMessageService.createChatMessage(request);
 //        call.enqueue(new Callback<>() {
 //            @Override
@@ -322,18 +282,4 @@ public class ChatFragment extends Fragment {
 //                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
 //            }
 //        });
-    }
-
-    public void addNewMessage(GetChatMessageResponse message) {
-        if (messageListAdapter != null) {
-            messageListAdapter.addNewMessage(message);
-            scrollToTop();
-        }
-    }
-
-    private void scrollToTop() {
-        binding.messagesListView.post(() -> {
-            binding.messagesListView.setSelection(messageListAdapter.getCount() - 1);
-        });
-    }
 }
