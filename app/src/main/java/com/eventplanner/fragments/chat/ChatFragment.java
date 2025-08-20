@@ -30,6 +30,9 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompClient;
+import io.reactivex.rxjava3.disposables.Disposable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,6 +46,9 @@ public class ChatFragment extends Fragment {
     private ChatService chatService;
     private ChatMessageService chatMessageService;
     private UserService userService;
+    private StompClient stompClient;
+    private Disposable stompConnection;
+    private Disposable chatSubscription;
 
     public ChatFragment() {
         // Required empty public constructor
