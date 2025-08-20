@@ -27,7 +27,10 @@ import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import ua.naiksoftware.stomp.Stomp;
@@ -51,6 +54,7 @@ public class ChatFragment extends Fragment {
     private StompClient stompClient;
     private Disposable stompConnection;
     private Disposable chatSubscription;
+    private Gson gson;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -73,6 +77,10 @@ public class ChatFragment extends Fragment {
         chatService = HttpUtils.getChatService();
         chatMessageService = HttpUtils.getChatMessageService();
         userService = HttpUtils.getUserService();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
+                        (json, type, context) -> LocalDateTime.parse(json.getAsString()))
+                .create();
     }
 
     @Override
@@ -89,12 +97,10 @@ public class ChatFragment extends Fragment {
 
 
     private void initStompConnection() {
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/ws");
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/ws-native");
 
-        // Poveži se
         stompClient.connect();
 
-        // Pretplati se na lifecycle evente
         stompConnection = stompClient.lifecycle()
                 .subscribe(lifecycleEvent -> {
                     LifecycleEvent.Type type = lifecycleEvent.getType();
@@ -120,7 +126,7 @@ public class ChatFragment extends Fragment {
             chatSubscription = stompClient.topic("/topic/chat/" + chatId)
                     .subscribe(topicMessage -> {
                         String payload = topicMessage.getPayload();
-                        GetChatMessageResponse message = new Gson().fromJson(payload, GetChatMessageResponse.class);
+                        GetChatMessageResponse message = gson.fromJson(payload, GetChatMessageResponse.class);
 
                         requireActivity().runOnUiThread(() -> addNewMessage(message));
                     }, throwable -> Log.e("ChatFragment", "STOMP topic subscription error", throwable));
@@ -271,33 +277,51 @@ public class ChatFragment extends Fragment {
                 .chatId(chatId)
                 .build();
 
-        Call<GetChatMessageResponse> call = chatMessageService.createChatMessage(request);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<GetChatMessageResponse> call, Response<GetChatMessageResponse> response) {
-                if (response.isSuccessful()) {
-                    GetChatMessageResponse message = response.body();
-                    addNewMessage(message);
-                    binding.messageInput.setText("");
-                } else {
-                    try {
-                        String errorJson = response.errorBody().string();
-                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
-                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
-                        Log.e("ChatFragment", "Send failed: " + errorResponse.getError());
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), "Send failed: Unknown error" + response.code(), Toast.LENGTH_SHORT).show();
-                        Log.e("ChatFragment", "Send failed: " + response.code());
-                    }
-                }
-            }
+        String jsonMessage = new Gson().toJson(request);
 
-            @Override
-            public void onFailure(Call<GetChatMessageResponse> call, Throwable t) {
-                Log.e("ChatFragment", "Network failure: " + t.getMessage());
-                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        stompClient.send("/app/send/message", jsonMessage)
+                .subscribe(
+                        () -> {
+                            requireActivity().runOnUiThread(() -> {
+                                binding.messageInput.setText("");
+                                Toast.makeText(getContext(), "Message sent", Toast.LENGTH_SHORT).show();
+                            });
+                        },
+                        throwable -> {
+                            requireActivity().runOnUiThread(() ->
+                                    Toast.makeText(getContext(), "Unsuccessful sending message via STOMP", Toast.LENGTH_SHORT).show()
+                            );
+                            Log.e("ChatFragment", "Unsuccessful sending message via STOMP", throwable);
+                        }
+                );
+
+//        Call<GetChatMessageResponse> call = chatMessageService.createChatMessage(request);
+//        call.enqueue(new Callback<>() {
+//            @Override
+//            public void onResponse(Call<GetChatMessageResponse> call, Response<GetChatMessageResponse> response) {
+//                if (response.isSuccessful()) {
+//                    GetChatMessageResponse message = response.body();
+//                    addNewMessage(message);
+//                    binding.messageInput.setText("");
+//                } else {
+//                    try {
+//                        String errorJson = response.errorBody().string();
+//                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+//                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+//                        Log.e("ChatFragment", "Send failed: " + errorResponse.getError());
+//                    } catch (Exception e) {
+//                        Toast.makeText(getContext(), "Send failed: Unknown error" + response.code(), Toast.LENGTH_SHORT).show();
+//                        Log.e("ChatFragment", "Send failed: " + response.code());
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<GetChatMessageResponse> call, Throwable t) {
+//                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+//                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     public void addNewMessage(GetChatMessageResponse message) {
