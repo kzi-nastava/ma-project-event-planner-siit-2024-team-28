@@ -114,6 +114,8 @@
     <string name="toast_deactivation_failed">Failed to deactivate account</string>
     <string name="profile_favorite_events_header">Favorite Events</string>
     <string name="profile_no_favorite_events">No favorite events yet</string>
+    <string name="profile_favorite_solutions_header">Favorite Solutions</string>
+    <string name="profile_no_favorite_solutions">No favorite solutions yet</string>
 
     <!-- fragment_change_password -->
     <string name="change_password_title">Change Password</string>

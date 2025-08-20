@@ -25,11 +25,13 @@ import androidx.navigation.Navigation;
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
 import com.eventplanner.adapters.events.EventListAdapter;
+import com.eventplanner.adapters.solutions.FavoriteSolutionListAdapter;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.users.UpdateUserRequest;
 import com.eventplanner.model.responses.events.GetEventResponse;
+import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 import com.eventplanner.utils.AuthUtils;
@@ -60,6 +62,11 @@ public class ProfileFragment extends Fragment {
     private TextView noFavoriteEventsText;
     private List<GetEventResponse> favoriteEvents = new ArrayList<>();
 
+    private ListView favoriteSolutionsList;
+    private TextView favoriteSolutionsHeader;
+    private TextView noFavoriteSolutionsText;
+    private List<GetSolutionResponse> favoriteSolutions = new ArrayList<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -80,6 +87,10 @@ public class ProfileFragment extends Fragment {
         favoriteEventsList = view.findViewById(R.id.favoriteEventsList);
         favoriteEventsHeader = view.findViewById(R.id.favoriteEventsHeader);
         noFavoriteEventsText = view.findViewById(R.id.noFavoriteEventsText);
+
+        favoriteSolutionsList = view.findViewById(R.id.favoriteSolutionsList);
+        favoriteSolutionsHeader = view.findViewById(R.id.favoriteSolutionsHeader);
+        noFavoriteSolutionsText = view.findViewById(R.id.noFavoriteSolutionsText);
 
         // Get current user info
         userId = AuthUtils.getUserId(requireContext());
@@ -111,6 +122,9 @@ public class ProfileFragment extends Fragment {
 
         // Load favorite events
         loadFavoriteEvents();
+
+        // Load favorite solutions
+        loadFavoriteSolutions();
 
         return view;
     }
@@ -156,6 +170,11 @@ public class ProfileFragment extends Fragment {
         favoriteEventsHeader.setVisibility(View.VISIBLE);
         favoriteEventsList.setVisibility(View.VISIBLE);
         // noFavoriteEventsText visibility will be handled in setupFavoriteEventsList()
+
+        // Favorite solutions section is visible for all authenticated users
+        favoriteSolutionsHeader.setVisibility(View.VISIBLE);
+        favoriteSolutionsList.setVisibility(View.VISIBLE);
+        // noFavoriteSolutionsText visibility will be handled in setupFavoriteSolutionsList()
     }
 
     private void loadUserData() {
@@ -546,5 +565,54 @@ public class ProfileFragment extends Fragment {
         Bundle args = new Bundle();
         args.putLong("eventId", eventId);
         navController.navigate(R.id.action_profile_to_event, args);
+    }
+
+    private void loadFavoriteSolutions() {
+        Call<Collection<GetSolutionResponse>> call = HttpUtils.getSolutionService().getFavoriteSolutionsForCurrentUser();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Collection<GetSolutionResponse>> call, @NonNull Response<Collection<GetSolutionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    favoriteSolutions = new ArrayList<>(response.body());
+                } else {
+                    favoriteSolutions = new ArrayList<>();
+                }
+                setupFavoriteSolutionsList();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Collection<GetSolutionResponse>> call, @NonNull Throwable t) {
+                // Handle error by showing empty list
+                favoriteSolutions = new ArrayList<>();
+                setupFavoriteSolutionsList();
+            }
+        });
+    }
+
+    private void setupFavoriteSolutionsList() {
+        if (favoriteSolutions.isEmpty()) {
+            // Show "no favorite solutions" message and hide the list
+            noFavoriteSolutionsText.setVisibility(View.VISIBLE);
+            favoriteSolutionsList.setVisibility(View.GONE);
+        } else {
+            // Show the list and hide the "no favorite solutions" message
+            noFavoriteSolutionsText.setVisibility(View.GONE);
+            favoriteSolutionsList.setVisibility(View.VISIBLE);
+
+            FavoriteSolutionListAdapter adapter = new FavoriteSolutionListAdapter(requireContext(), favoriteSolutions);
+            favoriteSolutionsList.setAdapter(adapter);
+
+            favoriteSolutionsList.setOnItemClickListener((parent, view, position, id) -> {
+                GetSolutionResponse solution = favoriteSolutions.get(position);
+                navigateToSolutionDetails(solution.getId());
+            });
+        }
+    }
+
+    private void navigateToSolutionDetails(long solutionId) {
+        NavController navController = Navigation.findNavController(requireView());
+        Bundle args = new Bundle();
+        args.putString("solutionId", String.valueOf(solutionId));
+        navController.navigate(R.id.action_profile_to_solution_details, args);
     }
 }
