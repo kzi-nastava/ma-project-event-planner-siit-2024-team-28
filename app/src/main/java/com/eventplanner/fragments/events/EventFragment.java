@@ -803,6 +803,9 @@ public class EventFragment extends Fragment {
     private void updateActivitiesSummary() {
         if (!activities.isEmpty()) {
             binding.activitiesList.removeAllViews();
+            // Formatter to display date and time without seconds
+            DateTimeFormatter previewFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
             for (int i = 0; i < activities.size(); i++) {
                 CreateActivityRequest activity = activities.get(i);
                 final int index = i;
@@ -821,10 +824,10 @@ public class EventFragment extends Fragment {
                 descView.setText(activity.getDescription());
                 locView.setText(activity.getLocation());
 
-                // Set times if available
+                // Set times if available, formatted as yyyy-MM-dd HH:mm (no seconds)
                 try {
                     if (activity.getStartTime() != null) {
-                        startView.setText(activity.getStartTime().toString());
+                        startView.setText(activity.getStartTime().format(previewFormatter));
                     } else {
                         startView.setText("");
                     }
@@ -833,7 +836,7 @@ public class EventFragment extends Fragment {
                 }
                 try {
                     if (activity.getEndTime() != null) {
-                        endView.setText(activity.getEndTime().toString());
+                        endView.setText(activity.getEndTime().format(previewFormatter));
                     } else {
                         endView.setText("");
                     }
