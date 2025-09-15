@@ -1,9 +1,6 @@
 package com.eventplanner.model.responses.solutionCateogries;
 
-import com.eventplanner.model.enums.RequestStatus;
-
 public class GetSolutionCategoryResponse {
-
     private Long id;
     private String name;
     private String description;
@@ -19,5 +16,4 @@ public class GetSolutionCategoryResponse {
     public String getDescription() {
         return description;
     }
-
 }

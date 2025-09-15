@@ -114,6 +114,14 @@
                 android:inputType="textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <ListView
+            android:id="@+id/ownerCategoriesListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp"
+            android:padding="8dp" />
+
         <!-- Event Organizer Fields (initially hidden) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/firstNameLayout"

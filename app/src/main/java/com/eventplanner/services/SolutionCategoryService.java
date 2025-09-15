@@ -50,4 +50,7 @@ public interface SolutionCategoryService {
             @Query("categoryId") Long categoryId,
             @Query("solutionId") Long solutionId
     );
+
+    @GET("categories/current-business-owner")
+    Call<Collection<GetSolutionCategoryResponse>> getCurrentBusinessOwnerCategories();
 }

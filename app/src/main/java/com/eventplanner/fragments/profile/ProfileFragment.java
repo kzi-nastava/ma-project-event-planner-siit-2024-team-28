@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.users.UpdateUserRequest;
 import com.eventplanner.model.responses.events.GetEventResponse;
+import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
@@ -63,8 +65,8 @@ public class ProfileFragment extends Fragment {
     private TextView favoriteEventsHeader;
     private TextView noFavoriteEventsText;
     private List<GetEventResponse> favoriteEvents = new ArrayList<>();
-
     private ListView favoriteSolutionsList;
+    private ListView ownerCategoriesListView;
     private TextView favoriteSolutionsHeader;
     private TextView noFavoriteSolutionsText;
     private List<GetSolutionResponse> favoriteSolutions = new ArrayList<>();
@@ -93,6 +95,7 @@ public class ProfileFragment extends Fragment {
         noFavoriteEventsText = view.findViewById(R.id.noFavoriteEventsText);
 
         favoriteSolutionsList = view.findViewById(R.id.favoriteSolutionsList);
+        ownerCategoriesListView = view.findViewById(R.id.ownerCategoriesListView);
         favoriteSolutionsHeader = view.findViewById(R.id.favoriteSolutionsHeader);
         noFavoriteSolutionsText = view.findViewById(R.id.noFavoriteSolutionsText);
 
@@ -105,8 +108,7 @@ public class ProfileFragment extends Fragment {
         currentUserRoles = AuthUtils.getUserRoles(requireContext());
         checkDeactivationStatus();
 
-        // Setup role-based visibility
-        setupRoleBasedViews(view);
+        setupRoleBasedViews();
 
         // Set click listeners
         Button uploadProfilePictureButton = view.findViewById(R.id.uploadProfilePictureButton);
@@ -125,19 +127,15 @@ public class ProfileFragment extends Fragment {
         deactivateButton.setText(getString(R.string.profile_deactivate_button));
         deactivateButton.setOnClickListener(v -> deactivateAccount());
 
-        // Load user data
         loadUserData();
-
-        // Load favorite events
+        loadOwnerCategories();
         loadFavoriteEvents();
-
-        // Load favorite solutions
         loadFavoriteSolutions();
 
         return view;
     }
 
-    private void setupRoleBasedViews(View view) {
+    private void setupRoleBasedViews() {
         if (currentUserRoles == null) {
             return;
         }
@@ -147,12 +145,16 @@ public class ProfileFragment extends Fragment {
         boolean isAdmin = false;
 
         for (String role : currentUserRoles) {
-            if (role.equals(UserRoles.BusinessOwner)) {
-                isBusinessOwner = true;
-            } else if (role.equals(UserRoles.EventOrganizer)) {
-                isEventOrganizer = true;
-            } else if (role.equals(UserRoles.ADMIN)) {
-                isAdmin = true;
+            switch (role) {
+                case UserRoles.BusinessOwner:
+                    isBusinessOwner = true;
+                    break;
+                case UserRoles.EventOrganizer:
+                    isEventOrganizer = true;
+                    break;
+                case UserRoles.ADMIN:
+                    isAdmin = true;
+                    break;
             }
         }
 
@@ -212,7 +214,7 @@ public class ProfileFragment extends Fragment {
             public void onResponse(@NonNull Call<GetUserProfilePictureResponse> call, @NonNull Response<GetUserProfilePictureResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String base64Image = response.body().getProfilePictureBase64();
-                    if (!base64Image.isEmpty()) {
+                    if (base64Image != null && !base64Image.isEmpty()) {
                         profilePictureBase64 = base64Image;
                         Bitmap bitmap = Base64Util.decodeBase64ToBitmap(base64Image);
                         if (bitmap != null) {
@@ -722,5 +724,40 @@ public class ProfileFragment extends Fragment {
         }
 
         builder.show();
+    }
+
+    private void loadOwnerCategories() {
+        Call<Collection<GetSolutionCategoryResponse>> call = HttpUtils.getSolutionCategoryService().getCurrentBusinessOwnerCategories();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Collection<GetSolutionCategoryResponse>> call,
+                                   @NonNull Response<Collection<GetSolutionCategoryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Collection<GetSolutionCategoryResponse> categories = response.body();
+
+                    List<String> items = new ArrayList<>();
+                    if (categories.isEmpty()) {
+                        items.add("You haven't created any solution categories yet.");
+                    } else {
+                        for (GetSolutionCategoryResponse c : categories) {
+                            items.add(c.getName() + "\n" + c.getDescription());
+                        }
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_list_item_1,
+                            items
+                    );
+                    ownerCategoriesListView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Collection<GetSolutionCategoryResponse>> call,
+                                  @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Failed to load current user's solution categories", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
