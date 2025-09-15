@@ -14,6 +14,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.graphics.Bitmap;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.eventplanner.utils.Base64Util;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +74,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -111,6 +116,9 @@ public class EventFragment extends Fragment {
         // Get event ID from arguments if editing
         if (getArguments() != null) {
             eventId = getArguments().getLong("eventId");
+        }
+
+        if (eventId != null && eventId != -1) {
             isEditMode = true;
             loadEventDetails();
         } else {
@@ -138,17 +146,25 @@ public class EventFragment extends Fragment {
         deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
 
         // Setup review section visibility and functionality
-        setupReviewSection(reviewSection);
+        if (isEditMode) {
+            setupReviewSection(reviewSection);
+        } else {
+            // Creating new event: hide review UI and favorite toggle
+            reviewSection.setVisibility(View.GONE);
+            submitReviewButton.setVisibility(View.GONE);
+            deleteReviewButton.setVisibility(View.GONE);
+            binding.favoriteButton.setVisibility(View.GONE);
+        }
     }
 
     private void setupForm() {
         // Disable form if user is not organizer (for edit mode)
-        if (isEditMode && !isOrganizer()) {
+        if (isEditMode && !isEventOrganizerAndCreator()) {
             disableForm();
         }
     }
 
-    private boolean isOrganizer() {
+    private boolean isEventOrganizerAndCreator() {
         Long currentUserId = AuthUtils.getUserId(getContext());
         return currentUserId != null && currentUserId.equals(eventOrganizerId);
     }
@@ -156,7 +172,7 @@ public class EventFragment extends Fragment {
     private void setupReviewSection(LinearLayout reviewSection) {
         Long currentUserId = AuthUtils.getUserId(getContext());
         boolean isLoggedIn = currentUserId != null;
-        boolean isEventCreator = isOrganizer();
+        boolean isEventCreator = isEventOrganizerAndCreator();
 
         if (isLoggedIn && !isEventCreator) {
             // Show review section only for logged-in users who are NOT the event creator
@@ -178,7 +194,7 @@ public class EventFragment extends Fragment {
     private void setupFavoriteButton() {
         Long currentUserId = AuthUtils.getUserId(getContext());
         boolean isLoggedIn = currentUserId != null;
-        boolean isEventCreator = isOrganizer();
+        boolean isEventCreator = isEventOrganizerAndCreator();
 
         if (!isLoggedIn || isEventCreator) {
             // Hide favorite button if user is not logged in or if they are the event creator
@@ -220,10 +236,7 @@ public class EventFragment extends Fragment {
         binding.endDate.setFocusable(false);
         binding.endDate.setClickable(false);
 
-        // Disable buttons
         binding.imageUploadButton.setEnabled(false);
-        binding.locationButton.setEnabled(false);
-        binding.activitiesButton.setEnabled(false);
         binding.submitButton.setEnabled(false);
         binding.deleteButton.setEnabled(false);
 
@@ -244,12 +257,15 @@ public class EventFragment extends Fragment {
                     eventOrganizerId = event.getEventOrganizerId();
 
                     // Check if current user is organizer
-                    if (!isOrganizer()) {
+                    if (!isEventOrganizerAndCreator()) {
                         disableForm();
                     }
 
                     populateForm(event);
                     setupButtons();
+                    // Now that organizer info is known, set up review section visibility
+                    LinearLayout reviewSection = binding.getRoot().findViewById(R.id.reviewSection);
+                    setupReviewSection(reviewSection);
                 } else {
                     Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
                 }
@@ -294,9 +310,7 @@ public class EventFragment extends Fragment {
                 }
             });
         } else {
-            binding.getRoot().post(() -> {
-                binding.eventType.setText("All", false);
-            });
+            binding.getRoot().post(() -> binding.eventType.setText("All", false));
         }
 
         // Set location
@@ -317,6 +331,7 @@ public class EventFragment extends Fragment {
                 activities.add(new CreateActivityRequest(
                         activity.getName(),
                         activity.getDescription(),
+                        activity.getLocation(),
                         activity.getStartTime(),
                         activity.getEndTime()
                 ));
@@ -340,7 +355,7 @@ public class EventFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Collection<GetEventTypeResponse>> call, @NonNull Response<Collection<GetEventTypeResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    eventTypes = response.body().stream().collect(Collectors.toList());
+                    eventTypes = new ArrayList<>(response.body());
                     setupEventTypeSpinner();
                 }
             }
@@ -391,10 +406,10 @@ public class EventFragment extends Fragment {
         binding.endDate.setFocusable(false);
         binding.endDate.setClickable(true);
 
-        // Only show action buttons if in edit mode and user is organizer
-        boolean showActionButtons = isEditMode && isOrganizer();
-        binding.submitButton.setVisibility(showActionButtons ? View.VISIBLE : View.GONE);
-        binding.deleteButton.setVisibility(showActionButtons ? View.VISIBLE : View.GONE);
+        boolean showSubmit = !isEditMode || isEventOrganizerAndCreator();
+        boolean showDelete = isEditMode && isEventOrganizerAndCreator();
+        binding.submitButton.setVisibility(showSubmit ? View.VISIBLE : View.GONE);
+        binding.deleteButton.setVisibility(showDelete ? View.VISIBLE : View.GONE);
 
         // Show download buttons if in edit mode (regardless of organizer status)
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
@@ -404,17 +419,17 @@ public class EventFragment extends Fragment {
         setupFavoriteButton();
 
         // Disable image upload if not organizer
-        if (isEditMode && !isOrganizer()) {
+        if (isEditMode && !isEventOrganizerAndCreator()) {
             binding.imageUploadButton.setEnabled(false);
         }
     }
 
     private void openImagePicker() {
-        // Implement image picker intent
+        imagePickerLauncher.launch("image/*");
     }
 
     private void openLocationDialog() {
-        boolean isReadOnly = !isOrganizer();
+        boolean isReadOnly = isEditMode && !isEventOrganizerAndCreator();
         LocationDialogFragment dialog = LocationDialogFragment.newInstance(location, isReadOnly);
         dialog.show(getChildFragmentManager(), "LocationDialogFragment");
 
@@ -427,7 +442,7 @@ public class EventFragment extends Fragment {
     }
 
     private void openActivitiesDialog() {
-        boolean isReadOnly = !isOrganizer();
+        boolean isReadOnly = isEditMode && !isEventOrganizerAndCreator();
         ActivitiesDialogFragment dialog = ActivitiesDialogFragment.newInstance(activities, isReadOnly);
         dialog.show(getChildFragmentManager(), "ActivitiesDialogFragment");
 
@@ -783,9 +798,11 @@ public class EventFragment extends Fragment {
 
                 TextView nameView = activityView.findViewById(R.id.activity_name);
                 TextView descView = activityView.findViewById(R.id.activity_description);
+                TextView locView = activityView.findViewById(R.id.activity_location);
 
                 nameView.setText(activity.getName());
                 descView.setText(activity.getDescription());
+                locView.setText(activity.getLocation());
 
                 binding.activitiesList.addView(activityView);
             }
@@ -861,7 +878,6 @@ public class EventFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<GetEventReviewResponse> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), R.string.failed_to_load_review, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -933,4 +949,17 @@ public class EventFragment extends Fragment {
             }
         });
     }
+
+    private final ActivityResultLauncher<String> imagePickerLauncher =
+        registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+            if (uri != null) {
+                Bitmap bitmap = Base64Util.getBitmapFromUri(requireContext(), uri);
+                if (bitmap != null) {
+                    imageBase64 = Base64Util.encodeImageToBase64(bitmap);
+                    binding.eventImage.setImageBitmap(bitmap);
+                } else {
+                    Toast.makeText(requireContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 }

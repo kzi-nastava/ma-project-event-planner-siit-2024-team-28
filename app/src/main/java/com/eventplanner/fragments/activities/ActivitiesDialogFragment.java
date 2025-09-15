@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.eventplanner.R;
 import com.eventplanner.adapters.activities.ActivitiesAdapter;
 import com.eventplanner.databinding.FragmentActivitiesDialogBinding;
 import com.eventplanner.model.requests.activities.CreateActivityRequest;
@@ -62,7 +63,7 @@ public class ActivitiesDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Set title
-        binding.dialogTitle.setText("Manage Activities");
+        binding.dialogTitle.setText(R.string.manage_activities);
 
         // Setup RecyclerView
         adapter = new ActivitiesAdapter(activities, isReadOnly);
@@ -82,7 +83,7 @@ public class ActivitiesDialogFragment extends DialogFragment {
     }
 
     private void addActivity() {
-        activities.add(new CreateActivityRequest("", "", LocalDateTime.now(), LocalDateTime.now()));
+        activities.add(new CreateActivityRequest("", "", "", LocalDateTime.now(), LocalDateTime.now()));
         adapter.notifyItemInserted(activities.size() - 1);
     }
 
@@ -112,6 +113,14 @@ public class ActivitiesDialogFragment extends DialogFragment {
             }
         }
         return true;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }
     }
 
     @Override

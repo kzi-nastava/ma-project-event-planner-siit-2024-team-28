@@ -570,13 +570,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void navigateToEventDetails(long eventId) {
-        NavController navController = Navigation.findNavController(requireView());
-        Bundle args = new Bundle();
-        args.putLong("eventId", eventId);
-        navController.navigate(R.id.action_profile_to_event, args);
-    }
-
     private void loadFavoriteSolutions() {
         Call<Collection<GetSolutionResponse>> call = HttpUtils.getSolutionService().getFavoriteSolutionsForCurrentUser();
         call.enqueue(new Callback<>() {

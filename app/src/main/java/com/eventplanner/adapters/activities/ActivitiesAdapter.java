@@ -63,6 +63,7 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Ac
         public void bind(CreateActivityRequest activity, int position) {
             binding.name.setText(activity.getName());
             binding.description.setText(activity.getDescription());
+            binding.location.setText(activity.getLocation());
 
             // Handle null dates more robustly
             String startTimeText = "";
@@ -89,6 +90,7 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Ac
             if (isReadOnly) {
                 binding.name.setEnabled(false);
                 binding.description.setEnabled(false);
+                binding.location.setEnabled(false);
                 binding.startTime.setEnabled(false);
                 binding.endTime.setEnabled(false);
                 binding.removeButton.setVisibility(View.GONE);
@@ -106,6 +108,13 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Ac
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     activity.setDescription(s.toString());
+                }
+            });
+
+            binding.location.addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    activity.setLocation(s.toString());
                 }
             });
 

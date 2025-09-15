@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Base64;
 
 import com.eventplanner.model.auth.JwtPayload;
+import com.eventplanner.model.constants.UserRoles;
 import com.google.gson.Gson;
 
 import java.nio.charset.StandardCharsets;
@@ -39,6 +40,10 @@ public class AuthUtils {
             }
         }
         return Collections.emptyList();
+    }
+
+    public static boolean currentUserIsRole(Context context, String userRole) {
+        return AuthUtils.getUserRoles(context).contains(userRole);
     }
 
     public static Long getUserId(Context context) {
