@@ -60,6 +60,7 @@ import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
@@ -448,7 +449,9 @@ public class EventFragment extends Fragment {
 
         getChildFragmentManager().setFragmentResultListener("activities_request", this, (requestKey, result) -> {
             String activitiesJson = result.getString("activities");
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(java.time.LocalDateTime.class, new com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter())
+                    .create();
             Type type = new TypeToken<List<CreateActivityRequest>>() {
             }.getType();
             activities = gson.fromJson(activitiesJson, type);
@@ -485,6 +488,14 @@ public class EventFragment extends Fragment {
         } catch (DateTimeParseException e) {
             Toast.makeText(requireContext(), "Invalid date format. Use YYYY-MM-DD", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        // Validate activity times to prevent null LocalDateTime values in request
+        for (CreateActivityRequest a : activities) {
+            if (a.getStartTime() == null || a.getEndTime() == null) {
+                Toast.makeText(requireContext(), "Each activity must have both start and end time", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         if (isEditMode) {
@@ -792,17 +803,57 @@ public class EventFragment extends Fragment {
     private void updateActivitiesSummary() {
         if (!activities.isEmpty()) {
             binding.activitiesList.removeAllViews();
-            for (CreateActivityRequest activity : activities) {
+            for (int i = 0; i < activities.size(); i++) {
+                CreateActivityRequest activity = activities.get(i);
+                final int index = i;
+
                 View activityView = LayoutInflater.from(requireContext())
                         .inflate(R.layout.item_activity_preview, binding.activitiesList, false);
 
                 TextView nameView = activityView.findViewById(R.id.activity_name);
                 TextView descView = activityView.findViewById(R.id.activity_description);
                 TextView locView = activityView.findViewById(R.id.activity_location);
+                TextView startView = activityView.findViewById(R.id.activity_start_time);
+                TextView endView = activityView.findViewById(R.id.activity_end_time);
+                Button removeButton = activityView.findViewById(R.id.remove_activity_button);
 
                 nameView.setText(activity.getName());
                 descView.setText(activity.getDescription());
                 locView.setText(activity.getLocation());
+
+                // Set times if available
+                try {
+                    if (activity.getStartTime() != null) {
+                        startView.setText(activity.getStartTime().toString());
+                    } else {
+                        startView.setText("");
+                    }
+                } catch (Exception e) {
+                    startView.setText("");
+                }
+                try {
+                    if (activity.getEndTime() != null) {
+                        endView.setText(activity.getEndTime().toString());
+                    } else {
+                        endView.setText("");
+                    }
+                } catch (Exception e) {
+                    endView.setText("");
+                }
+
+                // Configure remove button based on permissions
+                boolean canEdit = !isEditMode || isEventOrganizerAndCreator();
+                if (canEdit) {
+                    removeButton.setVisibility(View.VISIBLE);
+                    removeButton.setOnClickListener(v -> {
+                        if (index >= 0 && index < activities.size()) {
+                            activities.remove(index);
+                            updateActivitiesSummary();
+                        }
+                    });
+                } else {
+                    removeButton.setVisibility(View.GONE);
+                }
 
                 binding.activitiesList.addView(activityView);
             }

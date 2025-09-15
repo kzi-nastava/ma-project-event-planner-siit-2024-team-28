@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.activities.ActivitiesAdapter;
+import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.databinding.FragmentActivitiesDialogBinding;
 import com.eventplanner.model.requests.activities.CreateActivityRequest;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -32,7 +34,9 @@ public class ActivitiesDialogFragment extends DialogFragment {
     public static ActivitiesDialogFragment newInstance(List<CreateActivityRequest> activities, boolean isReadOnly) {
         ActivitiesDialogFragment fragment = new ActivitiesDialogFragment();
         Bundle args = new Bundle();
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
         args.putString("activities", gson.toJson(activities));
         args.putBoolean("isReadOnly", isReadOnly);
         fragment.setArguments(args);
@@ -43,7 +47,9 @@ public class ActivitiesDialogFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .create();
             String activitiesJson = getArguments().getString("activities");
             Type type = new TypeToken<List<CreateActivityRequest>>(){}.getType();
             activities = gson.fromJson(activitiesJson, type);
@@ -90,7 +96,9 @@ public class ActivitiesDialogFragment extends DialogFragment {
     private void saveActivities() {
         if (validateActivities()) {
             Bundle result = new Bundle();
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .create();
             result.putString("activities", gson.toJson(activities));
             getParentFragmentManager().setFragmentResult("activities_request", result);
             dismiss();

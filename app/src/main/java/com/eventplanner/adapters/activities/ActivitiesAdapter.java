@@ -120,11 +120,11 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Ac
 
             binding.startTime.setFocusable(false);
             binding.startTime.setClickable(true);
-            binding.startTime.setOnClickListener(v -> showDateTimePicker(v.getContext(), binding.startTime, formatter));
+            binding.startTime.setOnClickListener(v -> showDateTimePicker(v.getContext(), binding.startTime, formatter, activity::setStartTime));
 
             binding.endTime.setFocusable(false);
             binding.endTime.setClickable(true);
-            binding.endTime.setOnClickListener(v -> showDateTimePicker(v.getContext(), binding.endTime, formatter));
+            binding.endTime.setOnClickListener(v -> showDateTimePicker(v.getContext(), binding.endTime, formatter, activity::setEndTime));
 
 
             binding.removeButton.setOnClickListener(v -> {
@@ -137,7 +137,7 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Ac
         }
     }
 
-    private void showDateTimePicker(Context context, TextInputEditText editText, DateTimeFormatter formatter) {
+    private void showDateTimePicker(Context context, TextInputEditText editText, DateTimeFormatter formatter, java.util.function.Consumer<LocalDateTime> onPicked) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         if (!editText.getText().toString().isEmpty()) {
             try {
@@ -157,6 +157,7 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Ac
                                         year, month + 1, dayOfMonth, hourOfDay, minute
                                 );
                                 editText.setText(selectedDateTime.format(formatter));
+                                if (onPicked != null) onPicked.accept(selectedDateTime);
                             },
                             finalCurrentDateTime.getHour(),
                             finalCurrentDateTime.getMinute(),
