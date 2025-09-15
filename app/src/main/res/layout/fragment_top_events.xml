@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        tools:listitem="@layout/event_card"/>
+        tools:listitem="@layout/top_event_card"/>
 
     <Button
         android:id="@+id/browse_events_button"

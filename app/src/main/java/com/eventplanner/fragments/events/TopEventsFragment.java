@@ -13,7 +13,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.events.EventListAdapter;
+import com.eventplanner.adapters.events.TopEventListAdapter;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.services.EventService;
@@ -64,7 +64,7 @@ public class TopEventsFragment extends Fragment {
 
     private void setupEventList(View rootView, List<GetEventResponse> events) {
         ListView listView = rootView.findViewById(android.R.id.list);
-        EventListAdapter adapter = new EventListAdapter(requireContext(), events);
+        TopEventListAdapter adapter = new TopEventListAdapter(requireContext(), events);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((parent, view, position, id) -> {

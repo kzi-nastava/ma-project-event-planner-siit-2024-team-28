@@ -5,6 +5,7 @@ import com.eventplanner.model.requests.events.UpdateEventRequest;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import okhttp3.ResponseBody;
@@ -64,4 +65,15 @@ public interface EventService {
 
     @GET("events/{eventId}/reviews")
     Call<ResponseBody> getEventReviewsReport(@Path("eventId") Long eventId);
+
+    @GET("events/filter")
+    Call<PagedResponse<GetEventResponse>> filterEvents(@Query("page") int page,
+                                                       @Query("size") int size,
+                                                       @Query("name") String name,
+                                                       @Query("eventTypeId") Long eventTypeId,
+                                                       @Query("minParticipants") Integer minParticipants,
+                                                       @Query("maxParticipants") Integer maxParticipants,
+                                                       @Query("startDate") LocalDate startDate,
+                                                       @Query("endDate") LocalDate endDate,
+                                                       @Query("sort") String sort);
 }

@@ -17,8 +17,8 @@ import com.eventplanner.utils.Base64Util;
 
 import java.util.List;
 
-public class EventListAdapter extends ArrayAdapter<GetEventResponse> {
-    public EventListAdapter(Context context, List<GetEventResponse> events) {
+public class TopEventListAdapter extends ArrayAdapter<GetEventResponse> {
+    public TopEventListAdapter(Context context, List<GetEventResponse> events) {
         super(context, 0, events);
     }
 
@@ -26,13 +26,13 @@ public class EventListAdapter extends ArrayAdapter<GetEventResponse> {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.event_card, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.top_event_card, parent, false);
         }
 
         GetEventResponse event = getItem(position);
 
-        TextView titleTextView = convertView.findViewById(R.id.event_name);
-        TextView descriptionTextView = convertView.findViewById(R.id.event_description);
+        TextView titleTextView = convertView.findViewById(R.id.top_event_name);
+        TextView descriptionTextView = convertView.findViewById(R.id.top_event_description);
         ImageView imageImageView = convertView.findViewById(R.id.event_image);
 
         titleTextView.setText(event.getName());
