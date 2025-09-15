@@ -349,4 +349,13 @@
 
     <!-- item_activity_preview (additional) -->
     <string name="dash">-</string>
+    <string name="event_details">Event details</string>
+    <string name="event_media">Event media</string>
+    <string name="event_schedule">Event schedule</string>
+    <string name="location_and_activities">Location and activities</string>
+    <string name="activity_description_is_required">Activity description is required</string>
+    <string name="activity_location_is_required">Activity location is required</string>
+    <string name="start_and_end_time_required">Activity start and end time are required</string>
+    <string name="end_time_must_be_after_start_time">Activity end time must be after start time</string>
+    <string name="activity_dates_must_be_within_event_dates">Activity dates must be within event dates.</string>
 </resources>

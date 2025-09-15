@@ -70,6 +70,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -97,6 +98,7 @@ public class EventFragment extends Fragment {
     private GetEventReviewResponse currentUserReview;
     private RatingBar ratingBar;
     private Button submitReviewButton, deleteReviewButton;
+    private DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -443,8 +445,23 @@ public class EventFragment extends Fragment {
     }
 
     private void openActivitiesDialog() {
+        LocalDate startDate, endDate;
+        try {
+            startDate = LocalDate.parse(binding.startDate.getText().toString(), formatter);
+            endDate = LocalDate.parse(binding.endDate.getText().toString(), formatter);
+        } catch (DateTimeParseException e) {
+            Toast.makeText(requireContext(), getString(R.string.invalid_date_format_use_yyyy_mm_dd), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         boolean isReadOnly = isEditMode && !isEventOrganizerAndCreator();
         ActivitiesDialogFragment dialog = ActivitiesDialogFragment.newInstance(activities, isReadOnly);
+
+        Bundle args = dialog.getArguments();
+        if (args != null) {
+            args.putSerializable("eventStartDate", startDate.atStartOfDay());
+            args.putSerializable("eventEndDate", endDate.atTime(LocalTime.MAX));
+        }
         dialog.show(getChildFragmentManager(), "ActivitiesDialogFragment");
 
         getChildFragmentManager().setFragmentResultListener("activities_request", this, (requestKey, result) -> {
@@ -479,9 +496,7 @@ public class EventFragment extends Fragment {
             return;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         LocalDate startDate, endDate;
-
         try {
             startDate = LocalDate.parse(binding.startDate.getText().toString(), formatter);
             endDate = LocalDate.parse(binding.endDate.getText().toString(), formatter);

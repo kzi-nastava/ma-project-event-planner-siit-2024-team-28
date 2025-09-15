@@ -94,7 +94,11 @@ public class ActivitiesDialogFragment extends DialogFragment {
     }
 
     private void saveActivities() {
-        if (validateActivities()) {
+        // Retrieve event start/end dates from arguments
+        LocalDateTime eventStartDate = (LocalDateTime) getArguments().getSerializable("eventStartDate");
+        LocalDateTime eventEndDate = (LocalDateTime) getArguments().getSerializable("eventEndDate");
+
+        if (validateActivities(eventStartDate, eventEndDate)) {
             Bundle result = new Bundle();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -105,18 +109,39 @@ public class ActivitiesDialogFragment extends DialogFragment {
         }
     }
 
-    private boolean validateActivities() {
+
+    private boolean validateActivities(LocalDateTime eventStartDate, LocalDateTime eventEndDate) {
         for (CreateActivityRequest activity : activities) {
             if (activity.getName().isEmpty()) {
                 Toast.makeText(requireContext(), getString(R.string.activity_name_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
+            if (activity.getDescription().isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.activity_description_is_required), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (activity.getLocation().isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.activity_location_is_required), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
             if (activity.getStartTime() == null) {
                 Toast.makeText(requireContext(), getString(R.string.start_time_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
+
             if (activity.getEndTime() == null) {
                 Toast.makeText(requireContext(), getString(R.string.end_time_is_required), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            if (activity.getEndTime().isBefore(activity.getStartTime())) {
+                Toast.makeText(requireContext(), getString(R.string.end_time_must_be_after_start_time), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            if (activity.getStartTime().isBefore(eventStartDate) || activity.getEndTime().isAfter(eventEndDate)) {
+                Toast.makeText(requireContext(), getString(R.string.activity_dates_must_be_within_event_dates), Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
