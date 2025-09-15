@@ -117,6 +117,18 @@
     <string name="profile_no_favorite_events">No favorite events yet</string>
     <string name="profile_favorite_solutions_header">Favorite Solutions</string>
     <string name="profile_no_favorite_solutions">No favorite solutions yet</string>
+    <string name="profile_view_event">View Event</string>
+    <string name="profile_view_service">View Service</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="profile_description_label">Description: </string>
+    <string name="profile_date_label">Date: </string>
+    <string name="profile_time_label">Time: </string>
+    <string name="profile_location_label">Location: </string>
+    <string name="profile_status_label">Status: </string>
+    <string name="profile_type_label">Type: </string>
+    <string name="profile_no_categories_yet">You haven\'t created any solution categories yet.</string>
+    <string name="profile_failed_to_load_categories">Failed to load current user\'s solution categories</string>
 
     <!-- fragment_change_password -->
     <string name="change_password_title">Change Password</string>
@@ -288,4 +300,53 @@
     <string name="end_time">End time</string>
     <string name="download_event_reviews">Download event reviews</string>
     <string name="manage_activities">Manage Activities</string>
+    
+    <!-- Added for fragment_event hardcoded text replacements -->
+    <!-- fragment_event (additional) -->
+    <string name="all">All</string>
+    <string name="event_created_successfully">Event created successfully</string>
+    <string name="failed_to_create_event">Failed to create event</string>
+    <string name="error_with_message">Error: %1$s</string>
+    <string name="event_updated_successfully">Event updated successfully</string>
+    <string name="failed_to_update_event">Failed to update event</string>
+    <string name="delete_event_title">Delete Event</string>
+    <string name="delete_event_message">Are you sure you want to delete this event?</string>
+    <string name="event_deleted_successfully">Event deleted successfully</string>
+    <string name="failed_to_delete_event">Failed to delete event</string>
+    <string name="failed_to_load_event">Failed to load event</string>
+    <string name="failed_to_load_event_types">Failed to load event types</string>
+    <string name="failed_to_download_guest_list">Failed to download guest list</string>
+    <string name="failed_to_download_event_details">Failed to download event details</string>
+    <string name="failed_to_download_event_reviews">Failed to download event reviews</string>
+    <string name="failed_to_create_file">Failed to create file</string>
+    <string name="failed_to_open_file">Failed to open file</string>
+    <string name="pdf_saved_to_downloads">PDF saved to Downloads</string>
+    <string name="error_saving_file_with_message">Error saving file: %1$s</string>
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="failed_to_update_favorite_status">Failed to update favorite status</string>
+    <string name="favorite">Favorite</string>
+    <string name="unfavorite">Unfavorite</string>
+    <string name="invalid_date_format_use_yyyy_mm_dd">Invalid date format. Use YYYY-MM-DD</string>
+    <string name="each_activity_must_have_both_start_and_end_time">Each activity must have both start and end time</string>
+    <string name="name_is_required">Name is required</string>
+    <string name="description_is_required">Description is required</string>
+    <string name="max_participants_is_required">Max participants is required</string>
+    <string name="end_date_must_be_after_start_date">End date must be after start date</string>
+    <string name="invalid_date_format">Invalid date format</string>
+    <string name="failed_to_load_image">Failed to load image</string>
+
+    <!-- fragment_activities_dialog (additional) -->
+    <string name="add_activity">Add Activity</string>
+    <string name="activity_name_is_required">Activity name is required</string>
+    <string name="start_time_is_required">Start time is required</string>
+    <string name="end_time_is_required">End time is required</string>
+
+    <!-- fragment_location_dialog (additional) -->
+    <string name="address_is_required">Address is required</string>
+    <string name="latitude_is_required">Latitude is required</string>
+    <string name="longitude_is_required">Longitude is required</string>
+
+    <!-- item_activity_preview (additional) -->
+    <string name="dash">-</string>
 </resources>

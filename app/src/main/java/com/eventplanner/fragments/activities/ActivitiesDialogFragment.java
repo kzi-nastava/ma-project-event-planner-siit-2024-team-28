@@ -108,15 +108,15 @@ public class ActivitiesDialogFragment extends DialogFragment {
     private boolean validateActivities() {
         for (CreateActivityRequest activity : activities) {
             if (activity.getName().isEmpty()) {
-                Toast.makeText(requireContext(), "Activity name is required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.activity_name_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
             if (activity.getStartTime() == null) {
-                Toast.makeText(requireContext(), "Start time is required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.start_time_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
             if (activity.getEndTime() == null) {
-                Toast.makeText(requireContext(), "End time is required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.end_time_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
