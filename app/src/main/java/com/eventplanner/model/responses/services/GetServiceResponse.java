@@ -13,7 +13,7 @@ public class GetServiceResponse {
     private String description;
     private Double price;
     private Double discount;
-    private List<String> imageBase64;
+    private List<String> imagesBase64;
     private Boolean isDeleted;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
@@ -26,6 +26,7 @@ public class GetServiceResponse {
     private Integer cancellationDeadlineDays;
     private ReservationType reservationType;
     private Long categoryId;
+    private String categoryName;
     private Long businessOwnerId;
     private SolutionStatus status;
     private Collection<Long> eventTypeIds;
@@ -50,8 +51,8 @@ public class GetServiceResponse {
         return discount;
     }
 
-    public List<String> getImageBase64() {
-        return imageBase64;
+    public List<String> getImagesBase64() {
+        return imagesBase64;
     }
 
     public Boolean getIsDeleted() {
@@ -111,4 +112,7 @@ public class GetServiceResponse {
     public Collection<Long> getEventTypeIds() {
         return eventTypeIds;
     }
+
+    public String getCategoryName() { return categoryName; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 }

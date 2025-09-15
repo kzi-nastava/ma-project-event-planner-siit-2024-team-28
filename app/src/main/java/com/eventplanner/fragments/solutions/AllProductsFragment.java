@@ -5,13 +5,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -56,6 +61,10 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
     // Filter parameters
     private int currentPage = 0;
     private int pageSize = 10;
+    private int totalPages = 0;
+    private TextView textCurrentPage;
+    private EditText editPageNumber;
+    private Spinner spinnerPageSize;
     private String searchQuery;
     private Long selectedCategoryId;
     private Long selectedEventTypeId;
@@ -74,6 +83,7 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
         eventTypeService = HttpUtils.getEventTypeService();
         categoryService = HttpUtils.getSolutionCategoryService();
 
+        setupPagination(rootView);
         setupRecyclerView(rootView);
         setupSearchView(rootView);
         setupCreateProductFab(rootView);
@@ -177,8 +187,8 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
     private void loadProducts() {
         Call<PagedResponse<GetProductResponse>> call;
 
-        if (hasFilters()) {
-            call = productService.filterProducts(
+
+        call = productService.filterProducts(
                 searchQuery,
                 selectedCategoryId,
                 selectedEventTypeId,
@@ -189,21 +199,22 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
                 true, // isVisible - only show visible products
                 currentPage,
                 pageSize
-            );
-        } else {
-            call = productService.getAllProducts(currentPage, pageSize);
-        }
+        );
+
 
         call.enqueue(new Callback<PagedResponse<GetProductResponse>>() {
             @Override
             public void onResponse(Call<PagedResponse<GetProductResponse>> call, Response<PagedResponse<GetProductResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     PagedResponse<GetProductResponse> pageResponse = response.body();
-                    if (currentPage == 0) {
-                        products.clear();
-                    }
+
+                    products.clear();
+
                     products.addAll(pageResponse.getContent());
                     adapter.updateProducts(products);
+
+                    totalPages = pageResponse.getTotalPages();
+                    textCurrentPage.setText("Page " + (currentPage + 1) + " of " + totalPages);
                     Log.d("AllProductsFragment", "Loaded " + products.size() + " products");
                 } else {
                     Log.e("AllProductsFragment", "Failed to load products: " + response.code());
@@ -217,48 +228,69 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
         });
     }
 
-    private boolean hasFilters() {
-        return searchQuery != null || selectedCategoryId != null || selectedEventTypeId != null ||
-               minPrice != null || maxPrice != null || isAvailable != null;
-    }
-
     private void showFilterDialog() {
-        Log.i("AllProductsFragment", "Filter button clicked");
+        Log.i("AllServicesFragment", "Filter button clicked");
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
-        View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_products, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_solutions, null);
 
         // Filling filter dialog with categories
         RadioGroup radioGroupCategories = dialogView.findViewById(R.id.radio_group_categories);
         if (radioGroupCategories != null) {
-            // Add "All Categories" option
-            RadioButton allCategoriesButton = new RadioButton(getActivity());
-            allCategoriesButton.setText("All Categories");
-            allCategoriesButton.setTag(-1L);
-            allCategoriesButton.setChecked(selectedCategoryId == null);
-            radioGroupCategories.addView(allCategoriesButton);
+            RadioButton allCategories = new RadioButton(getActivity());
+            allCategories.setText("All Categories");
+            allCategories.setTag(null);
+            allCategories.setChecked(selectedCategoryId == null);
+            radioGroupCategories.addView(allCategories);
 
             for (GetSolutionCategoryResponse category : categories) {
-                RadioButton radioButton = new RadioButton(getActivity());
-                radioButton.setText(category.getName());
-                radioButton.setTag(category.getId());
-                radioButton.setChecked(category.getId().equals(selectedCategoryId));
-                radioButton.setButtonTintList(getResources().getColorStateList(R.color.cool_purple));
-                radioGroupCategories.addView(radioButton);
+                RadioButton rb = new RadioButton(getActivity());
+                rb.setText(category.getName());
+                rb.setTag(category.getId());
+                rb.setChecked(selectedCategoryId != null && selectedCategoryId.equals(category.getId()));
+                radioGroupCategories.addView(rb);
             }
         }
 
-        // Filling filter dialog with event types checkboxes
-        LinearLayout eventTypesCheckboxes = dialogView.findViewById(R.id.event_types_checkboxes);
-        if (eventTypesCheckboxes != null) {
+        RadioGroup radioGroupEventTypes = dialogView.findViewById(R.id.radio_group_event_types);
+        if (radioGroupEventTypes != null) {
+            RadioButton allTypes = new RadioButton(getActivity());
+            allTypes.setText("All Types");
+            allTypes.setTag(null);
+            allTypes.setChecked(selectedEventTypeId == null);
+            radioGroupEventTypes.addView(allTypes);
+
             for (GetEventTypeResponse eventType : eventTypes) {
-                CheckBox checkBox = new CheckBox(getActivity());
-                checkBox.setText(eventType.getName());
-                checkBox.setTag(eventType.getId());
-                checkBox.setChecked(eventType.getId().equals(selectedEventTypeId));
-                checkBox.setButtonTintList(getResources().getColorStateList(R.color.cool_purple));
-                eventTypesCheckboxes.addView(checkBox);
+                RadioButton rb = new RadioButton(getActivity());
+                rb.setText(eventType.getName());
+                rb.setTag(eventType.getId());
+                rb.setChecked(selectedEventTypeId != null && selectedEventTypeId.equals(eventType.getId()));
+                radioGroupEventTypes.addView(rb);
             }
         }
+        // Availability
+        RadioGroup availabilityGroup = dialogView.findViewById(R.id.radio_group_availabilityFilter);
+        if (availabilityGroup != null) {
+            if (isAvailable == null) {
+                availabilityGroup.clearCheck(); // "All" case
+            } else if (isAvailable) {
+                availabilityGroup.check(R.id.radio_button_available);
+            } else {
+                availabilityGroup.check(R.id.radio_button_unavailable);
+            }
+        }
+
+// Min price
+        EditText minPriceInput = dialogView.findViewById(R.id.editText_min_price);
+        if (minPrice != null) {
+            minPriceInput.setText(String.valueOf(minPrice));
+        }
+
+// Max price
+        EditText maxPriceInput = dialogView.findViewById(R.id.editText_max_price);
+        if (maxPrice != null) {
+            maxPriceInput.setText(String.valueOf(maxPrice));
+        }
+
 
         // Add Apply and Cancel buttons
         Button applyButton = dialogView.findViewById(R.id.button_apply_filters);
@@ -280,36 +312,55 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
     }
 
     private void applyFilters(View dialogView) {
-        // Get selected category
-        RadioGroup radioGroupCategories = dialogView.findViewById(R.id.radio_group_categories);
-        if (radioGroupCategories != null) {
-            int selectedId = radioGroupCategories.getCheckedRadioButtonId();
+        // Category
+        RadioGroup categoryGroup = dialogView.findViewById(R.id.radio_group_categories);
+        if (categoryGroup != null) {
+            int selectedId = categoryGroup.getCheckedRadioButtonId();
             if (selectedId != -1) {
                 RadioButton selectedRadio = dialogView.findViewById(selectedId);
-                if (selectedRadio != null) {
-                    Long categoryId = (Long) selectedRadio.getTag();
-                    selectedCategoryId = categoryId.equals(-1L) ? null : categoryId;
-                }
+                selectedCategoryId = (Long) selectedRadio.getTag();
             }
         }
 
-        // Get selected event types
-        LinearLayout eventTypesCheckboxes = dialogView.findViewById(R.id.event_types_checkboxes);
-        selectedEventTypeId = null; // Reset
-        if (eventTypesCheckboxes != null) {
-            for (int i = 0; i < eventTypesCheckboxes.getChildCount(); i++) {
-                View child = eventTypesCheckboxes.getChildAt(i);
-                if (child instanceof CheckBox) {
-                    CheckBox checkBox = (CheckBox) child;
-                    if (checkBox.isChecked()) {
-                        selectedEventTypeId = (Long) checkBox.getTag();
-                        break; // For now, just take the first selected event type
-                    }
-                }
+// Event type
+        RadioGroup typeGroup = dialogView.findViewById(R.id.radio_group_event_types);
+        if (typeGroup != null) {
+            int selectedId = typeGroup.getCheckedRadioButtonId();
+            if (selectedId != -1) {
+                RadioButton selectedRadio = dialogView.findViewById(selectedId);
+                selectedEventTypeId = (Long) selectedRadio.getTag();
             }
         }
 
-        // Reset page and reload products with filters
+// Availability
+        RadioGroup availabilityGroup = dialogView.findViewById(R.id.radio_group_availabilityFilter);
+        if (availabilityGroup != null) {
+            int selectedId = availabilityGroup.getCheckedRadioButtonId();
+            if (selectedId == R.id.radio_button_available) {
+                isAvailable = true;
+            } else if (selectedId == R.id.radio_button_unavailable) {
+                isAvailable = false;
+            } else {
+                isAvailable = null;
+            }
+        }
+
+// Price
+        EditText minInput = dialogView.findViewById(R.id.editText_min_price);
+        EditText maxInput = dialogView.findViewById(R.id.editText_max_price);
+
+        try {
+            String minText = minInput.getText().toString().trim();
+            minPrice = minText.isEmpty() ? null : Double.parseDouble(minText);
+
+            String maxText = maxInput.getText().toString().trim();
+            maxPrice = maxText.isEmpty() ? null : Double.parseDouble(maxText);
+        } catch (NumberFormatException e) {
+            minPrice = null;
+            maxPrice = null;
+        }
+
+        // Reset page and reload services with filters
         currentPage = 0;
         loadProducts();
     }
@@ -377,5 +428,77 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
                 Toast.makeText(getContext(), "Error deleting product", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setupPagination(View rootView)
+    {
+        textCurrentPage = rootView.findViewById(R.id.text_current_page);
+        editPageNumber = rootView.findViewById(R.id.edit_page_number);
+        spinnerPageSize = rootView.findViewById(R.id.spinner_page_size);
+
+// Page size spinner setup
+        ArrayAdapter<CharSequence> adapterSpinner = ArrayAdapter.createFromResource(
+                getContext(),
+                R.array.page_size_options,
+                android.R.layout.simple_spinner_item);
+        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPageSize.setAdapter(adapterSpinner);
+        spinnerPageSize.setSelection(1); // default = 10
+
+        spinnerPageSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int newSize = Integer.parseInt(parent.getItemAtPosition(position).toString());
+                if (pageSize != newSize) {
+                    pageSize = newSize;
+                    currentPage = 0;
+                    loadProducts();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+// Button listeners
+        rootView.findViewById(R.id.button_first_page).setOnClickListener(v -> {
+            currentPage = 0;
+            loadProducts();
+        });
+
+        rootView.findViewById(R.id.button_prev_page).setOnClickListener(v -> {
+            if (currentPage > 0) {
+                currentPage--;
+                loadProducts();
+            }
+        });
+
+        rootView.findViewById(R.id.button_next_page).setOnClickListener(v -> {
+            if (currentPage + 1 < totalPages) {
+                currentPage++;
+                loadProducts();
+            }
+        });
+
+        rootView.findViewById(R.id.button_last_page).setOnClickListener(v -> {
+            if (totalPages > 0) {
+                currentPage = totalPages - 1;
+                loadProducts();
+            }
+        });
+
+        rootView.findViewById(R.id.button_go_page).setOnClickListener(v -> {
+            String input = editPageNumber.getText().toString();
+            if (!input.isEmpty()) {
+                int page = Integer.parseInt(input) - 1;
+                if (page >= 0 && page < totalPages) {
+                    currentPage = page;
+                    loadProducts();
+                } else {
+                    Toast.makeText(getContext(), "Invalid page number", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 }

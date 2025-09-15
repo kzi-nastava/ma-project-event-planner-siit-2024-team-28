@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,12 +25,10 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.adapters.solutions.ServiceListAdapter;
-import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
-import com.eventplanner.model.solutions.Service;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCategoryService;
@@ -43,7 +39,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -238,7 +233,7 @@ public class ServicesOverviewFragment extends Fragment {
 
     // separated code for fetching event types and creating radio buttons in bottom sheet filter
     private void populateEventTypesFilter(View dialogView) {
-        Spinner spinner = dialogView.findViewById(R.id.spinner_eventTypes);
+        Spinner spinner = dialogView.findViewById(R.id.event_type_spinner);
 
         Call<Collection<GetEventTypeResponse>> call = eventTypeService.getActiveEventTypes();
         call.enqueue(new Callback<Collection<GetEventTypeResponse>>() {
@@ -372,13 +367,14 @@ public class ServicesOverviewFragment extends Fragment {
     // FIXME: poziva se negde filter(); na otvaranje filterSheet-a
     private void setupFilterBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-        View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_services, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.bottom_sheet_filter_solutions, null);
 
         // populating filter with available categories
         populateCategoriesFilter(dialogView);
         // populating filter with available eventTypes
         populateEventTypesFilter(dialogView);
 
+        /*
         // setting AVAILABLE UNAVAILABLE switch listeners and connecting them to filter params
         Switch switchAvailable = dialogView.findViewById(R.id.switch_show_available);
         Switch switchUnavailable = dialogView.findViewById(R.id.switch_show_unavailable);
@@ -451,6 +447,8 @@ public class ServicesOverviewFragment extends Fragment {
 
         bottomSheetDialog.setContentView(dialogView);
         bottomSheetDialog.show();
+
+         */
     }
 
 }

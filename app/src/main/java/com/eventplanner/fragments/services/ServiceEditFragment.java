@@ -14,8 +14,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,18 +22,14 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.eventplanner.R;
-import com.eventplanner.databinding.FragmentServiceCreationBinding;
 import com.eventplanner.databinding.FragmentServiceEditBinding;
 import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
-import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.services.UpdateServiceRequest;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.services.GetServiceResponse;
-import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ServiceService;
-import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.eventplanner.utils.RequestCodes;
@@ -177,7 +171,7 @@ public class ServiceEditFragment extends Fragment {
         });
 
         // Setting up number of selected images indicator
-        this.base64Images = service.getImageBase64();
+        this.base64Images = service.getImagesBase64();
         String numberOfSelectedImages = getString(R.string.number_of_selected_images, this.base64Images.size());
         binding.numberOfSelectedImages.setText(numberOfSelectedImages);
 

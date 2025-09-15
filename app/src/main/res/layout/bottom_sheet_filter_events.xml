@@ -1,135 +1,100 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:padding="16dp">
 
-    <ScrollView
+    <!-- Event Type -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Type" />
+
+    <RadioGroup
+        android:id="@+id/radio_group_event_types"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <!-- Min participants -->
+    <EditText
+        android:id="@+id/editText_min_participants"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Min Participants"
+        android:inputType="number" />
+
+    <!-- Max participants -->
+    <EditText
+        android:id="@+id/editText_max_participants"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Max Participants"
+        android:inputType="number" />
+
+    <!-- Start Date -->
+    <EditText
+        android:id="@+id/editText_start_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"
+        android:focusable="false"
+        android:hint="Start Date" />
+
+    <!-- End Date -->
+    <EditText
+        android:id="@+id/editText_end_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="End Date"
+        android:focusable="false"
+        android:clickable="true"
+        android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"/>
+
+    <!-- Sorting -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort By" />
+
+    <RadioGroup
+        android:id="@+id/radio_group_sort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_button_normal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="2dp">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dp">
+            android:text="Normal" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/filters"
-                    android:textAlignment="viewStart"
-                    android:textSize="24sp"
-                    android:textColor="@android:color/black"/>
-            </RelativeLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/black"
-                android:layout_margin="2dp"
-                />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_margin="2dp">
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="@color/black"
-                    android:layout_marginTop="10dp"
-                    />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/event_type"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"/>
-                <LinearLayout
-                    android:id="@+id/event_types_checkboxes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="2dp">
-                </LinearLayout>
-                <!--
-                <CheckBox
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/samsung"/>
-                <CheckBox
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/xiaomi"/>
-                <CheckBox
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/huawei"/>
-                <CheckBox
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/nokia"/>-->
+        <RadioButton
+            android:id="@+id/radio_button_closest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Closest" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="@color/black"
-                    android:layout_marginTop="10dp"
-                    />
+        <RadioButton
+            android:id="@+id/radio_button_furthest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Furthest" />
+    </RadioGroup>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+    <!-- Buttons -->
+    <Button
+        android:id="@+id/button_apply_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply" />
 
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="@color/black"
-                    android:layout_marginTop="10dp"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="5dp"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/availability"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp" />
-                <RadioGroup
-                    android:id="@+id/radio_group_availabilityFilter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <RadioButton
-                        android:id="@+id/radio_button_available"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/available"
-                        android:buttonTint="@color/cool_purple"
-                        android:layout_marginEnd="16dp"/>
-                    <RadioButton
-                        android:id="@+id/radio_button_unavailable"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/unavailable"
-                        android:buttonTint="@color/cool_purple"
-                        android:layout_marginEnd="16dp"/>
-                </RadioGroup>
-
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+    <Button
+        android:id="@+id/button_cancel_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cancel" />
 
 </LinearLayout>
