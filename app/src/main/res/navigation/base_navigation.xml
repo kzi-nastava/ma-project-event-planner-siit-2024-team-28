@@ -264,15 +264,15 @@
 
     <fragment
         android:id="@+id/nav_product_creation"
-        android:name="com.eventplanner.fragments.products.ProductCreationFragment"
+        android:name="com.eventplanner.fragments.products.ProductFragment"
         android:label="Create Product"
-        tools:layout="@layout/fragment_product_creation" />
+        tools:layout="@layout/fragment_product" />
 
     <fragment
         android:id="@+id/nav_product_edit"
-        android:name="com.eventplanner.fragments.products.ProductCreationFragment"
+        android:name="com.eventplanner.fragments.products.ProductFragment"
         android:label="Edit Product"
-        tools:layout="@layout/fragment_product_creation">
+        tools:layout="@layout/fragment_product">
         <argument
             android:name="productId"
             app:argType="long" />

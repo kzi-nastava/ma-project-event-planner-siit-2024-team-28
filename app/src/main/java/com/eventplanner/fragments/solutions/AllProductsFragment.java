@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.RadioButton;
@@ -27,7 +26,7 @@ import androidx.appcompat.widget.SearchView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.products.AllProductsAdapter;
+import com.eventplanner.adapters.products.ProductsAdapter;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
@@ -48,12 +47,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AllProductsFragment extends Fragment implements AllProductsAdapter.OnProductClickListener {
+public class AllProductsFragment extends Fragment implements ProductsAdapter.OnProductClickListener {
 
     private ProductService productService;
     private EventTypeService eventTypeService;
     private SolutionCategoryService categoryService;
-    private AllProductsAdapter adapter;
+    private ProductsAdapter adapter;
     private List<GetProductResponse> products = new ArrayList<>();
     private List<GetEventTypeResponse> eventTypes = new ArrayList<>();
     private List<GetSolutionCategoryResponse> categories = new ArrayList<>();
@@ -104,7 +103,7 @@ public class AllProductsFragment extends Fragment implements AllProductsAdapter.
     private void setupRecyclerView(View rootView) {
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view_products);
 
-        adapter = new AllProductsAdapter(getContext(), products);
+        adapter = new ProductsAdapter(getContext(), products);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 

@@ -14,6 +14,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.graphics.Bitmap;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.eventplanner.utils.Base64Util;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +60,7 @@ import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
@@ -63,12 +70,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -91,6 +98,7 @@ public class EventFragment extends Fragment {
     private GetEventReviewResponse currentUserReview;
     private RatingBar ratingBar;
     private Button submitReviewButton, deleteReviewButton;
+    private DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,6 +119,9 @@ public class EventFragment extends Fragment {
         // Get event ID from arguments if editing
         if (getArguments() != null) {
             eventId = getArguments().getLong("eventId");
+        }
+
+        if (eventId != null && eventId != -1) {
             isEditMode = true;
             loadEventDetails();
         } else {
@@ -138,17 +149,25 @@ public class EventFragment extends Fragment {
         deleteReviewButton = binding.getRoot().findViewById(R.id.deleteReviewButton);
 
         // Setup review section visibility and functionality
-        setupReviewSection(reviewSection);
+        if (isEditMode) {
+            setupReviewSection(reviewSection);
+        } else {
+            // Creating new event: hide review UI and favorite toggle
+            reviewSection.setVisibility(View.GONE);
+            submitReviewButton.setVisibility(View.GONE);
+            deleteReviewButton.setVisibility(View.GONE);
+            binding.favoriteButton.setVisibility(View.GONE);
+        }
     }
 
     private void setupForm() {
         // Disable form if user is not organizer (for edit mode)
-        if (isEditMode && !isOrganizer()) {
+        if (isEditMode && !isEventOrganizerAndCreator()) {
             disableForm();
         }
     }
 
-    private boolean isOrganizer() {
+    private boolean isEventOrganizerAndCreator() {
         Long currentUserId = AuthUtils.getUserId(getContext());
         return currentUserId != null && currentUserId.equals(eventOrganizerId);
     }
@@ -156,7 +175,7 @@ public class EventFragment extends Fragment {
     private void setupReviewSection(LinearLayout reviewSection) {
         Long currentUserId = AuthUtils.getUserId(getContext());
         boolean isLoggedIn = currentUserId != null;
-        boolean isEventCreator = isOrganizer();
+        boolean isEventCreator = isEventOrganizerAndCreator();
 
         if (isLoggedIn && !isEventCreator) {
             // Show review section only for logged-in users who are NOT the event creator
@@ -178,7 +197,7 @@ public class EventFragment extends Fragment {
     private void setupFavoriteButton() {
         Long currentUserId = AuthUtils.getUserId(getContext());
         boolean isLoggedIn = currentUserId != null;
-        boolean isEventCreator = isOrganizer();
+        boolean isEventCreator = isEventOrganizerAndCreator();
 
         if (!isLoggedIn || isEventCreator) {
             // Hide favorite button if user is not logged in or if they are the event creator
@@ -220,10 +239,7 @@ public class EventFragment extends Fragment {
         binding.endDate.setFocusable(false);
         binding.endDate.setClickable(false);
 
-        // Disable buttons
         binding.imageUploadButton.setEnabled(false);
-        binding.locationButton.setEnabled(false);
-        binding.activitiesButton.setEnabled(false);
         binding.submitButton.setEnabled(false);
         binding.deleteButton.setEnabled(false);
 
@@ -244,20 +260,23 @@ public class EventFragment extends Fragment {
                     eventOrganizerId = event.getEventOrganizerId();
 
                     // Check if current user is organizer
-                    if (!isOrganizer()) {
+                    if (!isEventOrganizerAndCreator()) {
                         disableForm();
                     }
 
                     populateForm(event);
                     setupButtons();
+                    // Now that organizer info is known, set up review section visibility
+                    LinearLayout reviewSection = binding.getRoot().findViewById(R.id.reviewSection);
+                    setupReviewSection(reviewSection);
                 } else {
-                    Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_load_event), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<GetEventResponse> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -294,9 +313,7 @@ public class EventFragment extends Fragment {
                 }
             });
         } else {
-            binding.getRoot().post(() -> {
-                binding.eventType.setText("All", false);
-            });
+            binding.getRoot().post(() -> binding.eventType.setText(getString(R.string.all), false));
         }
 
         // Set location
@@ -317,6 +334,7 @@ public class EventFragment extends Fragment {
                 activities.add(new CreateActivityRequest(
                         activity.getName(),
                         activity.getDescription(),
+                        activity.getLocation(),
                         activity.getStartTime(),
                         activity.getEndTime()
                 ));
@@ -340,21 +358,21 @@ public class EventFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Collection<GetEventTypeResponse>> call, @NonNull Response<Collection<GetEventTypeResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    eventTypes = response.body().stream().collect(Collectors.toList());
+                    eventTypes = new ArrayList<>(response.body());
                     setupEventTypeSpinner();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Collection<GetEventTypeResponse>> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Failed to load event types", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.failed_to_load_event_types), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setupEventTypeSpinner() {
         List<String> typeNames = new ArrayList<>();
-        typeNames.add("All"); // First option is always "All"
+        typeNames.add(requireContext().getString(R.string.all)); // First option is always "All"
         for (GetEventTypeResponse type : eventTypes) {
             typeNames.add(type.getName());
         }
@@ -369,7 +387,7 @@ public class EventFragment extends Fragment {
 
         // Set default selection to "All" if not in edit mode
         if (!isEditMode) {
-            binding.eventType.setText("All", false);
+            binding.eventType.setText(getString(R.string.all), false);
         }
     }
 
@@ -391,10 +409,10 @@ public class EventFragment extends Fragment {
         binding.endDate.setFocusable(false);
         binding.endDate.setClickable(true);
 
-        // Only show action buttons if in edit mode and user is organizer
-        boolean showActionButtons = isEditMode && isOrganizer();
-        binding.submitButton.setVisibility(showActionButtons ? View.VISIBLE : View.GONE);
-        binding.deleteButton.setVisibility(showActionButtons ? View.VISIBLE : View.GONE);
+        boolean showSubmit = !isEditMode || isEventOrganizerAndCreator();
+        boolean showDelete = isEditMode && isEventOrganizerAndCreator();
+        binding.submitButton.setVisibility(showSubmit ? View.VISIBLE : View.GONE);
+        binding.deleteButton.setVisibility(showDelete ? View.VISIBLE : View.GONE);
 
         // Show download buttons if in edit mode (regardless of organizer status)
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
@@ -404,17 +422,17 @@ public class EventFragment extends Fragment {
         setupFavoriteButton();
 
         // Disable image upload if not organizer
-        if (isEditMode && !isOrganizer()) {
+        if (isEditMode && !isEventOrganizerAndCreator()) {
             binding.imageUploadButton.setEnabled(false);
         }
     }
 
     private void openImagePicker() {
-        // Implement image picker intent
+        imagePickerLauncher.launch("image/*");
     }
 
     private void openLocationDialog() {
-        boolean isReadOnly = !isOrganizer();
+        boolean isReadOnly = isEditMode && !isEventOrganizerAndCreator();
         LocationDialogFragment dialog = LocationDialogFragment.newInstance(location, isReadOnly);
         dialog.show(getChildFragmentManager(), "LocationDialogFragment");
 
@@ -427,13 +445,30 @@ public class EventFragment extends Fragment {
     }
 
     private void openActivitiesDialog() {
-        boolean isReadOnly = !isOrganizer();
+        LocalDate startDate, endDate;
+        try {
+            startDate = LocalDate.parse(binding.startDate.getText().toString(), formatter);
+            endDate = LocalDate.parse(binding.endDate.getText().toString(), formatter);
+        } catch (DateTimeParseException e) {
+            Toast.makeText(requireContext(), getString(R.string.invalid_date_format_use_yyyy_mm_dd), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean isReadOnly = isEditMode && !isEventOrganizerAndCreator();
         ActivitiesDialogFragment dialog = ActivitiesDialogFragment.newInstance(activities, isReadOnly);
+
+        Bundle args = dialog.getArguments();
+        if (args != null) {
+            args.putSerializable("eventStartDate", startDate.atStartOfDay());
+            args.putSerializable("eventEndDate", endDate.atTime(LocalTime.MAX));
+        }
         dialog.show(getChildFragmentManager(), "ActivitiesDialogFragment");
 
         getChildFragmentManager().setFragmentResultListener("activities_request", this, (requestKey, result) -> {
             String activitiesJson = result.getString("activities");
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(java.time.LocalDateTime.class, new com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter())
+                    .create();
             Type type = new TypeToken<List<CreateActivityRequest>>() {
             }.getType();
             activities = gson.fromJson(activitiesJson, type);
@@ -461,15 +496,21 @@ public class EventFragment extends Fragment {
             return;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         LocalDate startDate, endDate;
-
         try {
             startDate = LocalDate.parse(binding.startDate.getText().toString(), formatter);
             endDate = LocalDate.parse(binding.endDate.getText().toString(), formatter);
         } catch (DateTimeParseException e) {
-            Toast.makeText(requireContext(), "Invalid date format. Use YYYY-MM-DD", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.invalid_date_format_use_yyyy_mm_dd), Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        // Validate activity times to prevent null LocalDateTime values in request
+        for (CreateActivityRequest a : activities) {
+            if (a.getStartTime() == null || a.getEndTime() == null) {
+                Toast.makeText(requireContext(), getString(R.string.each_activity_must_have_both_start_and_end_time), Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         if (isEditMode) {
@@ -507,15 +548,15 @@ public class EventFragment extends Fragment {
 
     private boolean validateForm() {
         if (binding.name.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Name is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.name_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (binding.description.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Description is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.description_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (binding.maxParticipants.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Max participants is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.max_participants_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -524,11 +565,11 @@ public class EventFragment extends Fragment {
             LocalDate endDate = LocalDate.parse(binding.endDate.getText().toString());
 
             if (endDate.isBefore(startDate)) {
-                Toast.makeText(requireContext(), "End date must be after start date", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.end_date_must_be_after_start_date), Toast.LENGTH_SHORT).show();
                 return false;
             }
         } catch (DateTimeParseException e) {
-            Toast.makeText(requireContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.invalid_date_format), Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -537,7 +578,7 @@ public class EventFragment extends Fragment {
 
     private Long getSelectedEventTypeId() {
         String selectedName = binding.eventType.getText().toString();
-        if (selectedName.equals("All")) {
+        if (selectedName.equals(getString(R.string.all))) {
             return null;
         }
         for (GetEventTypeResponse type : eventTypes) {
@@ -553,16 +594,16 @@ public class EventFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(requireContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.event_created_successfully), Toast.LENGTH_SHORT).show();
                     navigateBack();
                 } else {
-                    Toast.makeText(requireContext(), "Failed to create event", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_create_event), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -572,26 +613,26 @@ public class EventFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(requireContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.event_updated_successfully), Toast.LENGTH_SHORT).show();
                     navigateBack();
                 } else {
-                    Toast.makeText(requireContext(), "Failed to update event", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_update_event), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void confirmDelete() {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Delete Event")
-                .setMessage("Are you sure you want to delete this event?")
-                .setPositiveButton("Delete", (dialog, which) -> deleteEvent())
-                .setNegativeButton("Cancel", null)
+                .setTitle(getString(R.string.delete_event_title))
+                .setMessage(getString(R.string.delete_event_message))
+                .setPositiveButton(R.string.delete, (dialog, which) -> deleteEvent())
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -600,16 +641,16 @@ public class EventFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(requireContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.event_deleted_successfully), Toast.LENGTH_SHORT).show();
                     navigateBack();
                 } else {
-                    Toast.makeText(requireContext(), "Failed to delete event", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_delete_event), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -622,13 +663,13 @@ public class EventFragment extends Fragment {
                     // Save PDF file
                     savePdfFile(response.body(), "event_" + eventId + "_guests.pdf");
                 } else {
-                    Toast.makeText(requireContext(), "Failed to download guest list", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_download_guest_list), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -641,13 +682,13 @@ public class EventFragment extends Fragment {
                     // Save PDF file
                     savePdfFile(response.body(), "event_" + eventId + "_details.pdf");
                 } else {
-                    Toast.makeText(requireContext(), "Failed to download event details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_download_event_details), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -660,13 +701,13 @@ public class EventFragment extends Fragment {
                     // Save PDF file
                     savePdfFile(response.body(), "event_" + eventId + "_reviews.pdf");
                 } else {
-                    Toast.makeText(requireContext(), "Failed to download event reviews", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_download_event_reviews), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -685,13 +726,13 @@ public class EventFragment extends Fragment {
                 Uri collection = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
                 Uri fileUri = resolver.insert(collection, contentValues);
                 if (fileUri == null) {
-                    Toast.makeText(requireContext(), "Failed to create file", Toast.LENGTH_LONG).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_create_file), Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 outputStream = resolver.openOutputStream(fileUri);
                 if (outputStream == null) {
-                    Toast.makeText(requireContext(), "Failed to open file", Toast.LENGTH_LONG).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_open_file), Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -714,10 +755,10 @@ public class EventFragment extends Fragment {
                 MediaScannerConnection.scanFile(requireContext(), new String[]{file.getAbsolutePath()}, null, null);
             }
 
-            Toast.makeText(requireContext(), "PDF saved to Downloads", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), getString(R.string.pdf_saved_to_downloads), Toast.LENGTH_LONG).show();
 
         } catch (IOException e) {
-            Toast.makeText(requireContext(), "Error saving file: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), getString(R.string.error_saving_file_with_message, e.getMessage()), Toast.LENGTH_LONG).show();
         } finally {
             try {
                 if (outputStream != null) outputStream.close();
@@ -746,10 +787,10 @@ public class EventFragment extends Fragment {
                 if (response.isSuccessful()) {
                     isFavorite = !isFavorite;
                     updateFavoriteButton();
-                    String message = isFavorite ? "Added to favorites" : "Removed from favorites";
+                    String message = isFavorite ? getString(R.string.added_to_favorites) : getString(R.string.removed_from_favorites);
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(requireContext(), "Failed to update favorite status", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_update_favorite_status), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -761,7 +802,7 @@ public class EventFragment extends Fragment {
     }
 
     private void updateFavoriteButton() {
-        binding.favoriteButton.setText(isFavorite ? "Unfavorite" : "Favorite");
+        binding.favoriteButton.setText(isFavorite ? getString(R.string.unfavorite) : getString(R.string.favorite));
     }
 
     private void updateLocationSummary() {
@@ -777,15 +818,60 @@ public class EventFragment extends Fragment {
     private void updateActivitiesSummary() {
         if (!activities.isEmpty()) {
             binding.activitiesList.removeAllViews();
-            for (CreateActivityRequest activity : activities) {
+            // Formatter to display date and time without seconds
+            DateTimeFormatter previewFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+            for (int i = 0; i < activities.size(); i++) {
+                CreateActivityRequest activity = activities.get(i);
+                final int index = i;
+
                 View activityView = LayoutInflater.from(requireContext())
                         .inflate(R.layout.item_activity_preview, binding.activitiesList, false);
 
                 TextView nameView = activityView.findViewById(R.id.activity_name);
                 TextView descView = activityView.findViewById(R.id.activity_description);
+                TextView locView = activityView.findViewById(R.id.activity_location);
+                TextView startView = activityView.findViewById(R.id.activity_start_time);
+                TextView endView = activityView.findViewById(R.id.activity_end_time);
+                Button removeButton = activityView.findViewById(R.id.remove_activity_button);
 
                 nameView.setText(activity.getName());
                 descView.setText(activity.getDescription());
+                locView.setText(activity.getLocation());
+
+                // Set times if available, formatted as yyyy-MM-dd HH:mm (no seconds)
+                try {
+                    if (activity.getStartTime() != null) {
+                        startView.setText(activity.getStartTime().format(previewFormatter));
+                    } else {
+                        startView.setText("");
+                    }
+                } catch (Exception e) {
+                    startView.setText("");
+                }
+                try {
+                    if (activity.getEndTime() != null) {
+                        endView.setText(activity.getEndTime().format(previewFormatter));
+                    } else {
+                        endView.setText("");
+                    }
+                } catch (Exception e) {
+                    endView.setText("");
+                }
+
+                // Configure remove button based on permissions
+                boolean canEdit = !isEditMode || isEventOrganizerAndCreator();
+                if (canEdit) {
+                    removeButton.setVisibility(View.VISIBLE);
+                    removeButton.setOnClickListener(v -> {
+                        if (index >= 0 && index < activities.size()) {
+                            activities.remove(index);
+                            updateActivitiesSummary();
+                        }
+                    });
+                } else {
+                    removeButton.setVisibility(View.GONE);
+                }
 
                 binding.activitiesList.addView(activityView);
             }
@@ -861,7 +947,6 @@ public class EventFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<GetEventReviewResponse> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), R.string.failed_to_load_review, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -933,4 +1018,17 @@ public class EventFragment extends Fragment {
             }
         });
     }
+
+    private final ActivityResultLauncher<String> imagePickerLauncher =
+        registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+            if (uri != null) {
+                Bitmap bitmap = Base64Util.getBitmapFromUri(requireContext(), uri);
+                if (bitmap != null) {
+                    imageBase64 = Base64Util.encodeImageToBase64(bitmap);
+                    binding.eventImage.setImageBitmap(bitmap);
+                } else {
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_load_image), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 }

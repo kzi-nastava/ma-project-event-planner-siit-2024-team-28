@@ -7,6 +7,7 @@ public class GetActivityResponse {
     private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private String location;
 
     public String getName() {
         return name;
@@ -38,5 +39,9 @@ public class GetActivityResponse {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public String getLocation() {
+        return location;
     }
 }

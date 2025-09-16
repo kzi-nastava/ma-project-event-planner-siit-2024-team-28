@@ -11,10 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.eventplanner.R;
 import com.eventplanner.adapters.activities.ActivitiesAdapter;
+import com.eventplanner.adapters.typeAdapters.LocalDateTimeAdapter;
 import com.eventplanner.databinding.FragmentActivitiesDialogBinding;
 import com.eventplanner.model.requests.activities.CreateActivityRequest;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -31,7 +34,9 @@ public class ActivitiesDialogFragment extends DialogFragment {
     public static ActivitiesDialogFragment newInstance(List<CreateActivityRequest> activities, boolean isReadOnly) {
         ActivitiesDialogFragment fragment = new ActivitiesDialogFragment();
         Bundle args = new Bundle();
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
         args.putString("activities", gson.toJson(activities));
         args.putBoolean("isReadOnly", isReadOnly);
         fragment.setArguments(args);
@@ -42,7 +47,9 @@ public class ActivitiesDialogFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .create();
             String activitiesJson = getArguments().getString("activities");
             Type type = new TypeToken<List<CreateActivityRequest>>(){}.getType();
             activities = gson.fromJson(activitiesJson, type);
@@ -62,7 +69,7 @@ public class ActivitiesDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Set title
-        binding.dialogTitle.setText("Manage Activities");
+        binding.dialogTitle.setText(R.string.manage_activities);
 
         // Setup RecyclerView
         adapter = new ActivitiesAdapter(activities, isReadOnly);
@@ -82,36 +89,71 @@ public class ActivitiesDialogFragment extends DialogFragment {
     }
 
     private void addActivity() {
-        activities.add(new CreateActivityRequest("", "", LocalDateTime.now(), LocalDateTime.now()));
+        activities.add(new CreateActivityRequest("", "", "", LocalDateTime.now(), LocalDateTime.now()));
         adapter.notifyItemInserted(activities.size() - 1);
     }
 
     private void saveActivities() {
-        if (validateActivities()) {
+        // Retrieve event start/end dates from arguments
+        LocalDateTime eventStartDate = (LocalDateTime) getArguments().getSerializable("eventStartDate");
+        LocalDateTime eventEndDate = (LocalDateTime) getArguments().getSerializable("eventEndDate");
+
+        if (validateActivities(eventStartDate, eventEndDate)) {
             Bundle result = new Bundle();
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .create();
             result.putString("activities", gson.toJson(activities));
             getParentFragmentManager().setFragmentResult("activities_request", result);
             dismiss();
         }
     }
 
-    private boolean validateActivities() {
+
+    private boolean validateActivities(LocalDateTime eventStartDate, LocalDateTime eventEndDate) {
         for (CreateActivityRequest activity : activities) {
             if (activity.getName().isEmpty()) {
-                Toast.makeText(requireContext(), "Activity name is required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.activity_name_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
+            if (activity.getDescription().isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.activity_description_is_required), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (activity.getLocation().isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.activity_location_is_required), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
             if (activity.getStartTime() == null) {
-                Toast.makeText(requireContext(), "Start time is required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.start_time_is_required), Toast.LENGTH_SHORT).show();
                 return false;
             }
+
             if (activity.getEndTime() == null) {
-                Toast.makeText(requireContext(), "End time is required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.end_time_is_required), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            if (activity.getEndTime().isBefore(activity.getStartTime())) {
+                Toast.makeText(requireContext(), getString(R.string.end_time_must_be_after_start_time), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            if (activity.getStartTime().isBefore(eventStartDate) || activity.getEndTime().isAfter(eventEndDate)) {
+                Toast.makeText(requireContext(), getString(R.string.activity_dates_must_be_within_event_dates), Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }
     }
 
     @Override

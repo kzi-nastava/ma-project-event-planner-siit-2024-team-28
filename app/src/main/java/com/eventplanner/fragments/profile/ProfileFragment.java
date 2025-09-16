@@ -570,13 +570,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void navigateToEventDetails(long eventId) {
-        NavController navController = Navigation.findNavController(requireView());
-        Bundle args = new Bundle();
-        args.putLong("eventId", eventId);
-        navController.navigate(R.id.action_profile_to_event, args);
-    }
-
     private void loadFavoriteSolutions() {
         Call<Collection<GetSolutionResponse>> call = HttpUtils.getSolutionService().getFavoriteSolutionsForCurrentUser();
         call.enqueue(new Callback<>() {
@@ -679,32 +672,32 @@ public class ProfileFragment extends Fragment {
 
         StringBuilder message = new StringBuilder();
         if (event.getDescription() != null && !event.getDescription().isEmpty()) {
-            message.append("Description: ").append(event.getDescription()).append("\n\n");
+            message.append(getString(R.string.profile_description_label)).append(event.getDescription()).append("\n\n");
         }
 
-        message.append("Date: ").append(event.getStartDate());
+        message.append(getString(R.string.profile_date_label)).append(event.getStartDate());
         if (event.getEndDate() != null && !event.getEndDate().equals(event.getStartDate())) {
-            message.append(" - ").append(event.getEndDate());
+            message.append(" ").append(getString(R.string.dash)).append(" ").append(event.getEndDate());
         }
         message.append("\n");
 
         if (event.getStartTime() != null) {
-            message.append("Time: ").append(event.getStartTime());
+            message.append(getString(R.string.profile_time_label)).append(event.getStartTime());
             if (event.getEndTime() != null) {
-                message.append(" - ").append(event.getEndTime());
+                message.append(" ").append(getString(R.string.dash)).append(" ").append(event.getEndTime());
             }
             message.append("\n");
         }
 
         if (event.getLocation() != null && !event.getLocation().isEmpty()) {
-            message.append("Location: ").append(event.getLocation()).append("\n");
+            message.append(getString(R.string.profile_location_label)).append(event.getLocation()).append("\n");
         }
 
         if (event.getStatus() != null && !event.getStatus().isEmpty()) {
-            message.append("Status: ").append(event.getStatus()).append("\n");
+            message.append(getString(R.string.profile_status_label)).append(event.getStatus()).append("\n");
         }
 
-        message.append("Type: ").append(event.getType().toString());
+        message.append(getString(R.string.profile_type_label)).append(event.getType().toString());
 
         builder.setMessage(message.toString());
 
@@ -712,15 +705,15 @@ public class ProfileFragment extends Fragment {
         if (event.getRelatedEntityId() != null) {
             if (event.getType() == com.eventplanner.model.enums.CalendarEventType.EVENT ||
                 event.getType() == com.eventplanner.model.enums.CalendarEventType.CREATED_EVENT) {
-                builder.setPositiveButton("View Event", (dialog, which) ->
+                builder.setPositiveButton(getString(R.string.profile_view_event), (dialog, which) ->
                     navigateToEventDetails(event.getRelatedEntityId()));
             } else if (event.getType() == com.eventplanner.model.enums.CalendarEventType.SERVICE_RESERVATION) {
-                builder.setPositiveButton("View Service", (dialog, which) ->
+                builder.setPositiveButton(getString(R.string.profile_view_service), (dialog, which) ->
                     navigateToServiceDetails(event.getRelatedEntityId()));
             }
-            builder.setNegativeButton("Close", null);
+            builder.setNegativeButton(getString(R.string.close), null);
         } else {
-            builder.setPositiveButton("OK", null);
+            builder.setPositiveButton(getString(R.string.ok), null);
         }
 
         builder.show();
@@ -737,7 +730,7 @@ public class ProfileFragment extends Fragment {
 
                     List<String> items = new ArrayList<>();
                     if (categories.isEmpty()) {
-                        items.add("You haven't created any solution categories yet.");
+                        items.add(getString(R.string.profile_no_categories_yet));
                     } else {
                         for (GetSolutionCategoryResponse c : categories) {
                             items.add(c.getName() + "\n" + c.getDescription());
@@ -756,7 +749,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<Collection<GetSolutionCategoryResponse>> call,
                                   @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Failed to load current user's solution categories", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.profile_failed_to_load_categories), Toast.LENGTH_SHORT).show();
             }
         });
     }

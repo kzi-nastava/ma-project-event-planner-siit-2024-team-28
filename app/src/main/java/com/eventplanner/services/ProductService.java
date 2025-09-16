@@ -1,6 +1,7 @@
 package com.eventplanner.services;
 
 import com.eventplanner.model.requests.products.CreateProductRequest;
+import com.eventplanner.model.requests.products.CreateProductWithPendingCategoryRequest;
 import com.eventplanner.model.requests.products.UpdateProductRequest;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.products.GetProductHistoryResponse;
@@ -20,6 +21,9 @@ import retrofit2.http.Query;
 public interface ProductService {
     @POST("products")
     Call<Long> createProduct(@Body CreateProductRequest request);
+
+    @POST("products/with-pending-category")
+    Call<Long> createProductWithPendingCategory(@Body CreateProductWithPendingCategoryRequest request);
 
     @GET("products/{id}")
     Call<GetProductResponse> getProductById(@Path("id") Long id);

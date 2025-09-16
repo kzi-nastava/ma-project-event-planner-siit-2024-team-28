@@ -54,7 +54,7 @@ public class LocationDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Set title
-        binding.dialogTitle.setText("Location");
+        binding.dialogTitle.setText(getString(com.eventplanner.R.string.event_location));
 
         // Populate form if location exists
         if (location != null) {
@@ -99,22 +99,30 @@ public class LocationDialogFragment extends DialogFragment {
 
     private boolean validateForm() {
         if (binding.name.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Name is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(com.eventplanner.R.string.name_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (binding.address.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Address is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(com.eventplanner.R.string.address_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (binding.latitude.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Latitude is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(com.eventplanner.R.string.latitude_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (binding.longitude.getText().toString().isEmpty()) {
-            Toast.makeText(requireContext(), "Longitude is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(com.eventplanner.R.string.longitude_is_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }
     }
 
     @Override

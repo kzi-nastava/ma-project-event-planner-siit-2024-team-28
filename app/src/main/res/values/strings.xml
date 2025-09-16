@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">EventPlanner</string>
+    <string name="location">Location</string>
     <string name="events_button">Events</string>
     <string name="solutions_button">Solutions</string>
     <string name="event_name">Event</string>
@@ -116,6 +117,18 @@
     <string name="profile_no_favorite_events">No favorite events yet</string>
     <string name="profile_favorite_solutions_header">Favorite Solutions</string>
     <string name="profile_no_favorite_solutions">No favorite solutions yet</string>
+    <string name="profile_view_event">View Event</string>
+    <string name="profile_view_service">View Service</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="profile_description_label">Description: </string>
+    <string name="profile_date_label">Date: </string>
+    <string name="profile_time_label">Time: </string>
+    <string name="profile_location_label">Location: </string>
+    <string name="profile_status_label">Status: </string>
+    <string name="profile_type_label">Type: </string>
+    <string name="profile_no_categories_yet">You haven\'t created any solution categories yet.</string>
+    <string name="profile_failed_to_load_categories">Failed to load current user\'s solution categories</string>
 
     <!-- fragment_change_password -->
     <string name="change_password_title">Change Password</string>
@@ -297,4 +310,119 @@
     <string name="start_time">Start time</string>
     <string name="end_time">End time</string>
     <string name="download_event_reviews">Download event reviews</string>
+    <string name="manage_activities">Manage Activities</string>
+    
+    <!-- Added for fragment_event hardcoded text replacements -->
+    <!-- fragment_event (additional) -->
+    <string name="all">All</string>
+    <string name="event_created_successfully">Event created successfully</string>
+    <string name="failed_to_create_event">Failed to create event</string>
+    <string name="error_with_message">Error: %1$s</string>
+    <string name="event_updated_successfully">Event updated successfully</string>
+    <string name="failed_to_update_event">Failed to update event</string>
+    <string name="delete_event_title">Delete Event</string>
+    <string name="delete_event_message">Are you sure you want to delete this event?</string>
+    <string name="event_deleted_successfully">Event deleted successfully</string>
+    <string name="failed_to_delete_event">Failed to delete event</string>
+    <string name="failed_to_load_event">Failed to load event</string>
+    <string name="failed_to_load_event_types">Failed to load event types</string>
+    <string name="failed_to_download_guest_list">Failed to download guest list</string>
+    <string name="failed_to_download_event_details">Failed to download event details</string>
+    <string name="failed_to_download_event_reviews">Failed to download event reviews</string>
+    <string name="failed_to_create_file">Failed to create file</string>
+    <string name="failed_to_open_file">Failed to open file</string>
+    <string name="pdf_saved_to_downloads">PDF saved to Downloads</string>
+    <string name="error_saving_file_with_message">Error saving file: %1$s</string>
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="failed_to_update_favorite_status">Failed to update favorite status</string>
+    <string name="favorite">Favorite</string>
+    <string name="unfavorite">Unfavorite</string>
+    <string name="invalid_date_format_use_yyyy_mm_dd">Invalid date format. Use YYYY-MM-DD</string>
+    <string name="each_activity_must_have_both_start_and_end_time">Each activity must have both start and end time</string>
+    <string name="name_is_required">Name is required</string>
+    <string name="description_is_required">Description is required</string>
+    <string name="max_participants_is_required">Max participants is required</string>
+    <string name="end_date_must_be_after_start_date">End date must be after start date</string>
+    <string name="invalid_date_format">Invalid date format</string>
+    <string name="failed_to_load_image">Failed to load image</string>
+
+    <!-- fragment_activities_dialog (additional) -->
+    <string name="add_activity">Add Activity</string>
+    <string name="activity_name_is_required">Activity name is required</string>
+    <string name="start_time_is_required">Start time is required</string>
+    <string name="end_time_is_required">End time is required</string>
+
+    <!-- fragment_location_dialog (additional) -->
+    <string name="address_is_required">Address is required</string>
+    <string name="latitude_is_required">Latitude is required</string>
+    <string name="longitude_is_required">Longitude is required</string>
+
+    <!-- item_activity_preview (additional) -->
+    <string name="dash">-</string>
+    <string name="event_details">Event details</string>
+    <string name="event_media">Event media</string>
+    <string name="event_schedule">Event schedule</string>
+    <string name="location_and_activities">Location and activities</string>
+    <string name="activity_description_is_required">Activity description is required</string>
+    <string name="activity_location_is_required">Activity location is required</string>
+    <string name="start_and_end_time_required">Activity start and end time are required</string>
+    <string name="end_time_must_be_after_start_time">Activity end time must be after start time</string>
+    <string name="activity_dates_must_be_within_event_dates">Activity dates must be within event dates.</string>
+    <string name="update_product">Update Product</string>
+    <string name="create_product">Create Product</string>
+    <string name="please_enter_a_custom_category_name">Please enter a custom category name</string>
+    <string name="please_select_at_least_one_event_type">Please select at least one event type</string>
+    <string name="error_updating_product">"Error updating product: "</string>
+    <string name="update_request_failed">Update request failed</string>
+    <string name="product_updated_successfully">Product updated successfully</string>
+    <string name="are_you_sure_you_want_to_update_this_product">Are you sure you want to update this product?\n\nNote: Changes will only apply to future purchases. Existing purchases will retain the previous product details.</string>
+    <string name="update">Update</string>
+    <string name="please_log_in_to_create_products">Please log in to create products</string>
+    <string name="only_business_owners_can_create_edit_products">Only business owners can create/edit products</string>
+    <string name="no_images_selected">No images selected</string>
+    <string name="d_image_s_selected">%d image(s) selected</string>
+    <string name="product_created_successfully">Product created successfully</string>
+    <string name="error_creating_product">Error creating product</string>
+    <string name="error_creating_category_suggestion">Error creating category suggestion</string>
+    <string name="product_created_with_pending_status_admin_will_review_the_new_category_suggestion">Product created with pending status. Admin will review the new category suggestion.</string>
+    <string name="product_deleted_successfully">Product deleted successfully</string>
+    <string name="failed_to_delete_product">Failed to delete product</string>
+    <string name="delete_product">Delete Product</string>
+    <string name="are_you_sure_you_want_to_delete_this_product">Are you sure you want to delete this product?\n\n</string>
+    <string name="error_loading_product">Error loading product</string>
+    <string name="you_can_only_edit_your_own_products">You can only edit your own products</string>
+    <string name="invalid_discount_format">Invalid discount format</string>
+    <string name="discount_cannot_exceed_99">Discount cannot exceed 99%</string>
+    <string name="discount_cannot_be_negative">Discount cannot be negative</string>
+    <string name="invalid_price_format">Invalid price format</string>
+    <string name="price_must_be_at_least_0_01">Price must be at least 0.01</string>
+    <string name="price_is_required">Price is required</string>
+    <string name="description_must_be_at_least_10_characters">Description must be at least 10 characters</string>
+    <string name="name_must_be_at_least_3_characters">Name must be at least 3 characters</string>
+    <string name="all_event_types">All Event Types</string>
+    <string name="all_categories">All Categories</string>
+    <string name="error_loading_products">Error loading products</string>
+    <string name="failed_to_load_products">Failed to load products</string>
+    <string name="create_your_product">Create Your Product</string>
+    <string name="suggest_new_category">Suggest new category</string>
+    <string name="enter_new_category_name">Enter new category name</string>
+    <string name="product_name">Product Name</string>
+    <string name="enter_product_name">Enter product name</string>
+    <string name="enter_product_description">Enter product description</string>
+    <string name="enter_price">Enter price</string>
+    <string name="discount">Discount (%)</string>
+    <string name="enter_discount_percentage">Enter discount percentage</string>
+    <string name="select_product_images">+ Select Product Images</string>
+    <string name="select_images">Select images</string>
+    <string name="error_loading_image">Error loading image</string>
+    <string name="please_select_or_enter_category">Please select or enter category</string>
+    <string name="category_or_custom_required">Existing or custom solution category is required</string>
+    <string name="failed_to_load_categories">Failed to load categories</string>
+    <string name="visible">Visible</string>
+    <string name="search_products">Search products...</string>
+    <string name="no_products_found">No products found</string>
+    <string name="failed_to_load_service_reservations">Failed to load service reservations</string>
+    <string name="failed_to_load_created_events">Failed to load created events</string>
+    <string name="failed_to_load_accepted_events">Failed to load accepted events</string>
 </resources>

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.products.ProductListAdapter;
+import com.eventplanner.adapters.products.ProductsAdapter;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
@@ -46,9 +45,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductOverviewFragment extends Fragment implements ProductListAdapter.OnProductActionListener {
+public class ProductOverviewFragment extends Fragment implements ProductsAdapter.OnProductClickListener {
     private RecyclerView recyclerView;
-    private ProductListAdapter adapter;
+    private ProductsAdapter adapter;
     private ProductService productService;
     private SolutionCategoryService categoryService;
     private EventTypeService eventTypeService;
@@ -113,9 +112,12 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
     }
 
     private void setupRecyclerView() {
-        adapter = new ProductListAdapter(products, this);
+        adapter = new ProductsAdapter(getContext(), products);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        // Set the click listener using this fragment since it implements the interface
+        adapter.setOnProductClickListener(this);
     }
 
     private void setupSearchAndFilter() {
@@ -144,32 +146,30 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
 
     private void loadReferenceData() {
         // Load categories
-        categoryService.getAcceptedCategories().enqueue(new Callback<Collection<GetSolutionCategoryResponse>>() {
+        categoryService.getAcceptedCategories().enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<Collection<GetSolutionCategoryResponse>> call, Response<Collection<GetSolutionCategoryResponse>> response) {
+            public void onResponse(@NonNull Call<Collection<GetSolutionCategoryResponse>> call, @NonNull Response<Collection<GetSolutionCategoryResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     categories = new ArrayList<>(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<Collection<GetSolutionCategoryResponse>> call, Throwable t) {
-                Log.e("ProductOverview", "Failed to load categories", t);
+            public void onFailure(@NonNull Call<Collection<GetSolutionCategoryResponse>> call, @NonNull Throwable t) {
             }
         });
 
         // Load event types
-        eventTypeService.getAllEventTypes().enqueue(new Callback<Collection<GetEventTypeResponse>>() {
+        eventTypeService.getAllEventTypes().enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<Collection<GetEventTypeResponse>> call, Response<Collection<GetEventTypeResponse>> response) {
+            public void onResponse(@NonNull Call<Collection<GetEventTypeResponse>> call, @NonNull Response<Collection<GetEventTypeResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     eventTypes = new ArrayList<>(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<Collection<GetEventTypeResponse>> call, Throwable t) {
-                Log.e("ProductOverview", "Failed to load event types", t);
+            public void onFailure(@NonNull Call<Collection<GetEventTypeResponse>> call, @NonNull Throwable t) {
             }
         });
     }
@@ -192,9 +192,9 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
                 pageSize
         );
 
-        call.enqueue(new Callback<PagedResponse<GetProductResponse>>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<PagedResponse<GetProductResponse>> call, Response<PagedResponse<GetProductResponse>> response) {
+            public void onResponse(@NonNull Call<PagedResponse<GetProductResponse>> call, @NonNull Response<PagedResponse<GetProductResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     PagedResponse<GetProductResponse> pageResponse = response.body();
                     if (pageNumber == 0) {
@@ -203,14 +203,13 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
                     products.addAll(pageResponse.getContent());
                     adapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(getContext(), "Failed to load products", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.failed_to_load_products, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<PagedResponse<GetProductResponse>> call, Throwable t) {
-                Log.e("ProductOverview", "Failed to load products", t);
-                Toast.makeText(getContext(), "Error loading products", Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<PagedResponse<GetProductResponse>> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), getString(R.string.error_loading_products), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -260,7 +259,7 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
 
     private void setupCategorySpinner(Spinner categorySpinner) {
         List<String> categoryNames = new ArrayList<>();
-        categoryNames.add("All Categories");
+        categoryNames.add(getString(R.string.all_categories));
         for (GetSolutionCategoryResponse category : categories) {
             categoryNames.add(category.getName());
         }
@@ -271,7 +270,7 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
 
     private void setupEventTypeSpinner(Spinner eventTypeSpinner) {
         List<String> eventTypeNames = new ArrayList<>();
-        eventTypeNames.add("All Event Types");
+        eventTypeNames.add(getString(R.string.all_event_types));
         for (GetEventTypeResponse eventType : eventTypes) {
             eventTypeNames.add(eventType.getName());
         }
@@ -342,6 +341,14 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
     }
 
     @Override
+    public void onProductClick(GetProductResponse product) {
+        Bundle bundle = new Bundle();
+        bundle.putString("solutionId", String.valueOf(product.getId()));
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_allProducts_to_solutionDetails, bundle);
+    }
+
+    @Override
     public void onEditProduct(GetProductResponse product) {
         Bundle bundle = new Bundle();
         bundle.putLong("productId", product.getId());
@@ -352,37 +359,29 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
     @Override
     public void onDeleteProduct(GetProductResponse product) {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Delete Product")
-                .setMessage("Are you sure you want to delete '" + product.getName() + "'?\n\n" +
-                        "This will:\n" +
-                        "• Hide the product from all customers\n" +
-                        "• Preserve existing purchases and history\n" +
-                        "• Allow you to restore it later if needed\n\n" +
-                        "This action can be undone by contacting support.")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteProduct(product.getId());
-                })
-                .setNegativeButton("Cancel", null)
+                .setTitle(R.string.delete_product)
+                .setMessage(getString(R.string.are_you_sure_you_want_to_update_this_product))
+                .setPositiveButton(R.string.delete, (dialog, which) -> deleteProduct(product.getId()))
+                .setNegativeButton(R.string.cancel, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
     private void deleteProduct(Long productId) {
-        productService.logicalDeleteProduct(productId).enqueue(new Callback<Void>() {
+        productService.logicalDeleteProduct(productId).enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Product deleted successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.product_deleted_successfully), Toast.LENGTH_SHORT).show();
                     loadProducts(); // Refresh the list
                 } else {
-                    Toast.makeText(getContext(), "Failed to delete product", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.failed_to_delete_product), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.e("ProductOverview", "Failed to delete product", t);
-                Toast.makeText(getContext(), "Error deleting product", Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), getString(R.string.failed_to_delete_product), Toast.LENGTH_SHORT).show();
             }
         });
     }
