@@ -25,7 +25,7 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
-import com.eventplanner.adapters.events.EventListAdapter;
+import com.eventplanner.adapters.events.TopEventListAdapter;
 import com.eventplanner.adapters.solutions.FavoriteSolutionListAdapter;
 import com.eventplanner.components.CalendarComponent;
 import com.eventplanner.model.constants.UserRoles;
@@ -560,7 +560,7 @@ public class ProfileFragment extends Fragment {
             noFavoriteEventsText.setVisibility(View.GONE);
             favoriteEventsList.setVisibility(View.VISIBLE);
 
-            EventListAdapter adapter = new EventListAdapter(requireContext(), favoriteEvents);
+            TopEventListAdapter adapter = new TopEventListAdapter(requireContext(), favoriteEvents);
             favoriteEventsList.setAdapter(adapter);
 
             favoriteEventsList.setOnItemClickListener((parent, view, position, id) -> {

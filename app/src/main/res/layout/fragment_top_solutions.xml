@@ -15,23 +15,24 @@
         android:gravity="center"
         android:textSize="40sp" />
 
-    <Button
-        android:id="@+id/browse_services_button"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/browse_services_button" />
-
-    <Button
-        android:id="@+id/browse_products_button"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/browse_products_button" />
-
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         tools:listitem="@layout/solution_card" />
+
+    <Button
+        android:id="@+id/browse_services_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/browse_services_button"
+        android:layout_margin="16dp" />
+
+    <Button
+        android:id="@+id/browse_products_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/browse_products_button"
+        android:layout_margin="16dp"/>
 </LinearLayout>

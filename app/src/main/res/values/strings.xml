@@ -285,6 +285,17 @@
     <!-- item_activity -->
     <string name="remove_activity">Remove activity</string>
 
+    <!-- pagination -->
+    <string name="pagination_first">First</string>
+    <string name="pagination_last">Last</string>
+    <string name="pagination_next">Next</string>
+    <string name="pagination_previous">Prev</string>
+    <string name="pagination_go_to_page">Go to page:</string>
+    <string name="pagination_go_to_page_button">Go</string>
+    <string name="pagination_page_size">Page size:</string>
+
+
+
     <!-- fragment_location_dialog -->
     <string name="location_name">Location name</string>
     <string name="address">Address</string>
