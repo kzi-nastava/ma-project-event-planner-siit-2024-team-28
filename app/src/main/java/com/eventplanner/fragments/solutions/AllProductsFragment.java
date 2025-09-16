@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.RadioButton;
@@ -48,12 +49,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AllProductsFragment extends Fragment implements ProductsAdapter.OnProductClickListener {
-
     private ProductService productService;
     private EventTypeService eventTypeService;
     private SolutionCategoryService categoryService;
     private ProductsAdapter adapter;
-    private List<GetProductResponse> products = new ArrayList<>();
+    private final List<GetProductResponse> products = new ArrayList<>();
     private List<GetEventTypeResponse> eventTypes = new ArrayList<>();
     private List<GetSolutionCategoryResponse> categories = new ArrayList<>();
 
@@ -63,7 +63,6 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
     private int totalPages = 0;
     private TextView textCurrentPage;
     private EditText editPageNumber;
-    private Spinner spinnerPageSize;
     private String searchQuery;
     private Long selectedCategoryId;
     private Long selectedEventTypeId;
@@ -186,7 +185,6 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
     private void loadProducts() {
         Call<PagedResponse<GetProductResponse>> call;
 
-
         call = productService.filterProducts(
                 searchQuery,
                 selectedCategoryId,
@@ -200,10 +198,9 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
                 pageSize
         );
 
-
-        call.enqueue(new Callback<PagedResponse<GetProductResponse>>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<PagedResponse<GetProductResponse>> call, Response<PagedResponse<GetProductResponse>> response) {
+            public void onResponse(@NonNull Call<PagedResponse<GetProductResponse>> call, @NonNull Response<PagedResponse<GetProductResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     PagedResponse<GetProductResponse> pageResponse = response.body();
 
@@ -221,7 +218,7 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
             }
 
             @Override
-            public void onFailure(Call<PagedResponse<GetProductResponse>> call, Throwable t) {
+            public void onFailure(@NonNull Call<PagedResponse<GetProductResponse>> call, @NonNull Throwable t) {
                 Log.e("AllProductsFragment", "Failed to load products", t);
             }
         });
@@ -266,6 +263,7 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
                 radioGroupEventTypes.addView(rb);
             }
         }
+
         // Availability
         RadioGroup availabilityGroup = dialogView.findViewById(R.id.radio_group_availabilityFilter);
         if (availabilityGroup != null) {
@@ -278,13 +276,13 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
             }
         }
 
-// Min price
+        // Min price
         EditText minPriceInput = dialogView.findViewById(R.id.editText_min_price);
         if (minPrice != null) {
             minPriceInput.setText(String.valueOf(minPrice));
         }
 
-// Max price
+        // Max price
         EditText maxPriceInput = dialogView.findViewById(R.id.editText_max_price);
         if (maxPrice != null) {
             maxPriceInput.setText(String.valueOf(maxPrice));
@@ -321,7 +319,7 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
             }
         }
 
-// Event type
+        // Event type
         RadioGroup typeGroup = dialogView.findViewById(R.id.radio_group_event_types);
         if (typeGroup != null) {
             int selectedId = typeGroup.getCheckedRadioButtonId();
@@ -331,7 +329,7 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
             }
         }
 
-// Availability
+        // Availability
         RadioGroup availabilityGroup = dialogView.findViewById(R.id.radio_group_availabilityFilter);
         if (availabilityGroup != null) {
             int selectedId = availabilityGroup.getCheckedRadioButtonId();
@@ -344,7 +342,7 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
             }
         }
 
-// Price
+        // Price
         EditText minInput = dialogView.findViewById(R.id.editText_min_price);
         EditText maxInput = dialogView.findViewById(R.id.editText_max_price);
 
@@ -433,9 +431,9 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
     {
         textCurrentPage = rootView.findViewById(R.id.text_current_page);
         editPageNumber = rootView.findViewById(R.id.edit_page_number);
-        spinnerPageSize = rootView.findViewById(R.id.spinner_page_size);
+        Spinner spinnerPageSize = rootView.findViewById(R.id.spinner_page_size);
 
-// Page size spinner setup
+        // Page size spinner setup
         ArrayAdapter<CharSequence> adapterSpinner = ArrayAdapter.createFromResource(
                 getContext(),
                 R.array.page_size_options,
@@ -459,7 +457,7 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-// Button listeners
+        // Button listeners
         rootView.findViewById(R.id.button_first_page).setOnClickListener(v -> {
             currentPage = 0;
             loadProducts();
@@ -498,6 +496,5 @@ public class AllProductsFragment extends Fragment implements ProductsAdapter.OnP
                 }
             }
         });
-
     }
 }

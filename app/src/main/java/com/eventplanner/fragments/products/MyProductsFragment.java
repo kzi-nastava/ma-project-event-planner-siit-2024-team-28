@@ -45,7 +45,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductOverviewFragment extends Fragment implements ProductsAdapter.OnProductClickListener {
+public class MyProductsFragment extends Fragment implements ProductsAdapter.OnProductClickListener {
     private RecyclerView recyclerView;
     private ProductsAdapter adapter;
     private ProductService productService;
@@ -82,7 +82,7 @@ public class ProductOverviewFragment extends Fragment implements ProductsAdapter
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_product_overview, container, false);
+        View view = inflater.inflate(R.layout.fragment_my_products, container, false);
 
         initializeViews(view);
         setupRecyclerView();
@@ -107,7 +107,7 @@ public class ProductOverviewFragment extends Fragment implements ProductsAdapter
 
         fabCreateProduct.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_product_overview_to_product_creation);
+            navController.navigate(R.id.action_my_product_to_product_creation);
         });
     }
 
@@ -345,7 +345,7 @@ public class ProductOverviewFragment extends Fragment implements ProductsAdapter
         Bundle bundle = new Bundle();
         bundle.putString("solutionId", String.valueOf(product.getId()));
         NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_allProducts_to_solutionDetails, bundle);
+        navController.navigate(R.id.action_my_product_to_solutionDetails, bundle);
     }
 
     @Override
@@ -353,7 +353,7 @@ public class ProductOverviewFragment extends Fragment implements ProductsAdapter
         Bundle bundle = new Bundle();
         bundle.putLong("productId", product.getId());
         NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_product_overview_to_product_edit, bundle);
+        navController.navigate(R.id.action_my_products_to_product_edit, bundle);
     }
 
     @Override

@@ -133,7 +133,7 @@ public class HomeActivity extends AppCompatActivity {
         // Business owner-only items
         boolean isBusinessOwner = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.BusinessOwner);
         menu.findItem(R.id.nav_service_overview).setVisible(isBusinessOwner);
-        menu.findItem(R.id.nav_product_overview).setVisible(isBusinessOwner);
+        menu.findItem(R.id.nav_my_products).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_price_list).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_categories_overview).setVisible(isBusinessOwner);
 
