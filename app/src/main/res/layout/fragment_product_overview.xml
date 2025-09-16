@@ -24,7 +24,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Search products..."
+                android:hint="@string/search_products"
                 android:inputType="text"
                 android:padding="12dp"
                 android:background="@drawable/rounded_edittext_background"
@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Filter"
+                android:text="@string/filter"
                 android:backgroundTint="@color/cool_purple"
                 android:textColor="@android:color/white" />
 
@@ -49,14 +49,14 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scrollbars="vertical"
-            tools:listitem="@layout/item_product_list" />
+            tools:listitem="@layout/item_product" />
 
         <!-- Empty State -->
         <TextView
             android:id="@+id/empty_state_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No products found"
+            android:text="@string/no_products_found"
             android:textAlignment="center"
             android:textSize="16sp"
             android:textColor="@color/gray"
@@ -73,7 +73,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
-        android:contentDescription="Create Product"
+        android:contentDescription="@string/create_product"
         app:backgroundTint="@color/cool_purple"
         app:tint="@android:color/white" />
 

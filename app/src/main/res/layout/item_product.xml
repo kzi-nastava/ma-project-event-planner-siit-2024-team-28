@@ -118,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_visible"
                 android:padding="6dp"
-                android:text="Visible"
+                android:text="@string/visible"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp"
@@ -130,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_available"
                 android:padding="6dp"
-                android:text="Available"
+                android:text="@string/available"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp"
@@ -142,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_unavailable"
                 android:padding="6dp"
-                android:text="Unavailable"
+                android:text="@string/unavailable"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
                 android:visibility="gone" />
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="Edit"
+                android:text="@string/edit"
                 app:backgroundTint="@color/cool_purple"
                 android:background="@drawable/button_rounded" />
 
@@ -182,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="Delete"
+                android:text="@string/delete"
                 app:backgroundTint="@android:color/holo_red_dark"
                 android:background="@drawable/button_rounded" />
 

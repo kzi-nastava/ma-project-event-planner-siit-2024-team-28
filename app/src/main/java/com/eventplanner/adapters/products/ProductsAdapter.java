@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.products.ProductImageAdapter;
 import com.eventplanner.model.responses.products.GetProductResponse;
 import com.eventplanner.utils.AuthUtils;
 import androidx.viewpager2.widget.ViewPager2;
@@ -20,19 +19,18 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllProductsAdapter extends RecyclerView.Adapter<AllProductsAdapter.ProductViewHolder> {
-    
+public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ProductViewHolder> {
     public interface OnProductClickListener {
         void onProductClick(GetProductResponse product);
         void onEditProduct(GetProductResponse product);
         void onDeleteProduct(GetProductResponse product);
     }
 
-    private Context context;
+    private final Context context;
     private List<GetProductResponse> products;
     private OnProductClickListener listener;
 
-    public AllProductsAdapter(Context context, List<GetProductResponse> products) {
+    public ProductsAdapter(Context context, List<GetProductResponse> products) {
         this.context = context;
         this.products = products;
     }

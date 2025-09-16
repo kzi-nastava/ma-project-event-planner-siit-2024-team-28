@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.products.ProductListAdapter;
+import com.eventplanner.adapters.products.ProductsAdapter;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.model.responses.PagedResponse;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
@@ -45,9 +45,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductOverviewFragment extends Fragment implements ProductListAdapter.OnProductActionListener {
+public class ProductOverviewFragment extends Fragment implements ProductsAdapter.OnProductClickListener {
     private RecyclerView recyclerView;
-    private ProductListAdapter adapter;
+    private ProductsAdapter adapter;
     private ProductService productService;
     private SolutionCategoryService categoryService;
     private EventTypeService eventTypeService;
@@ -112,9 +112,12 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
     }
 
     private void setupRecyclerView() {
-        adapter = new ProductListAdapter(products, this);
+        adapter = new ProductsAdapter(getContext(), products);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        // Set the click listener using this fragment since it implements the interface
+        adapter.setOnProductClickListener(this);
     }
 
     private void setupSearchAndFilter() {
@@ -335,6 +338,14 @@ public class ProductOverviewFragment extends Fragment implements ProductListAdap
         isVisible = null;
         pageNumber = 0;
         loadProducts();
+    }
+
+    @Override
+    public void onProductClick(GetProductResponse product) {
+        Bundle bundle = new Bundle();
+        bundle.putString("solutionId", String.valueOf(product.getId()));
+        NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_allProducts_to_solutionDetails, bundle);
     }
 
     @Override

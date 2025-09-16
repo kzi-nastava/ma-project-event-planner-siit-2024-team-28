@@ -3,7 +3,6 @@ package com.eventplanner.components;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,8 +22,6 @@ import com.eventplanner.services.CalendarService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -156,7 +153,7 @@ public class CalendarComponent extends LinearLayout {
     
     private void loadAcceptedEvents(CalendarService calendarService) {
         Call<CalendarResponseDTO> call = calendarService.getCurrentUserAcceptedEvents();
-        call.enqueue(new Callback<CalendarResponseDTO>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<CalendarResponseDTO> call, @NonNull Response<CalendarResponseDTO> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -170,14 +167,14 @@ public class CalendarComponent extends LinearLayout {
             
             @Override
             public void onFailure(@NonNull Call<CalendarResponseDTO> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Failed to load accepted events", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.failed_to_load_accepted_events, Toast.LENGTH_SHORT).show();
             }
         });
     }
     
     private void loadCreatedEvents(CalendarService calendarService) {
         Call<CalendarResponseDTO> call = calendarService.getCurrentEventOrganizerCreatedEvents();
-        call.enqueue(new Callback<CalendarResponseDTO>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<CalendarResponseDTO> call, @NonNull Response<CalendarResponseDTO> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -191,14 +188,14 @@ public class CalendarComponent extends LinearLayout {
             
             @Override
             public void onFailure(@NonNull Call<CalendarResponseDTO> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Failed to load created events", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.failed_to_load_created_events, Toast.LENGTH_SHORT).show();
             }
         });
     }
     
     private void loadServiceReservations(CalendarService calendarService) {
         Call<CalendarResponseDTO> call = calendarService.getCurrentBusinessOwnerServiceReservations();
-        call.enqueue(new Callback<CalendarResponseDTO>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<CalendarResponseDTO> call, @NonNull Response<CalendarResponseDTO> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -212,7 +209,7 @@ public class CalendarComponent extends LinearLayout {
             
             @Override
             public void onFailure(@NonNull Call<CalendarResponseDTO> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Failed to load service reservations", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.failed_to_load_service_reservations, Toast.LENGTH_SHORT).show();
             }
         });
     }

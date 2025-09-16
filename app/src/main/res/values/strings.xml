@@ -419,4 +419,10 @@
     <string name="please_select_or_enter_category">Please select or enter category</string>
     <string name="category_or_custom_required">Existing or custom solution category is required</string>
     <string name="failed_to_load_categories">Failed to load categories</string>
+    <string name="visible">Visible</string>
+    <string name="search_products">Search products...</string>
+    <string name="no_products_found">No products found</string>
+    <string name="failed_to_load_service_reservations">Failed to load service reservations</string>
+    <string name="failed_to_load_created_events">Failed to load created events</string>
+    <string name="failed_to_load_accepted_events">Failed to load accepted events</string>
 </resources>
