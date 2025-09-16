@@ -34,11 +34,9 @@ import com.eventplanner.R;
 import com.eventplanner.adapters.products.ProductImageAdapter;
 
 import com.eventplanner.model.constants.UserRoles;
-import com.eventplanner.model.enums.SolutionStatus;
 import com.eventplanner.model.requests.products.CreateProductRequest;
 import com.eventplanner.model.requests.products.CreateProductWithPendingCategoryRequest;
 import com.eventplanner.model.requests.products.UpdateProductRequest;
-import com.eventplanner.model.requests.solutionCategories.CreatePendingCategoryRequest;
 import com.eventplanner.model.responses.eventTypes.GetEventTypeResponse;
 import com.eventplanner.model.responses.products.GetProductResponse;
 import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
@@ -55,7 +53,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductCreationFragment extends Fragment {
+public class ProductFragment extends Fragment {
     private final List<String> base64Images = new ArrayList<>();
     private EditText nameEditText, descriptionEditText, priceEditText, discountEditText, customCategoryEditText;
     private CheckBox visibilityCheckBox, availabilityCheckBox;
@@ -74,10 +72,11 @@ public class ProductCreationFragment extends Fragment {
     private boolean isReadOnly = false;
     private Long selectedCategoryId = null;
     private final List<GetSolutionCategoryResponse> solutionCategories = new ArrayList<>();
+    private TextView productSolutionCategoryText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_product_creation, container, false);
+        View view = inflater.inflate(R.layout.fragment_product, container, false);
         
         initializeViews(view);
         setupFormSubmission();
@@ -117,6 +116,7 @@ public class ProductCreationFragment extends Fragment {
         discountEditText = view.findViewById(R.id.editText_discount);
         visibilityCheckBox = view.findViewById(R.id.checkbox_visible);
         availabilityCheckBox = view.findViewById(R.id.checkbox_available);
+        productSolutionCategoryText = view.findViewById(R.id.text_product_solution_category);
 
         categorySpinner = view.findViewById(R.id.spinner_category);
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -171,6 +171,17 @@ public class ProductCreationFragment extends Fragment {
         });
 
         updateImageDisplay();
+
+        if (isEditMode) {
+            categorySpinner.setVisibility(View.GONE);
+            customCategoryCheckBox.setVisibility(View.GONE);
+            customCategoryEditText.setVisibility(View.GONE);
+            submitButton.setText(R.string.update_product);
+            deleteButton.setVisibility(View.VISIBLE);
+        } else {
+            submitButton.setText(R.string.create_product);
+            deleteButton.setVisibility(View.GONE);
+        }
     }
 
     private void setupValidation() {
@@ -301,8 +312,8 @@ public class ProductCreationFragment extends Fragment {
         HttpUtils.getSolutionCategoryService().getAcceptedCategories().enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Collection<GetSolutionCategoryResponse>> call, @NonNull Response<Collection<GetSolutionCategoryResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    solutionCategories.clear();
+                solutionCategories.clear();
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     solutionCategories.addAll(response.body());
 
                     List<String> names = new ArrayList<>();
@@ -314,20 +325,13 @@ public class ProductCreationFragment extends Fragment {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     categorySpinner.setAdapter(adapter);
 
-                    // Preselect first category if not in edit mode
-                    if (!isEditMode && !solutionCategories.isEmpty()) {
-                        selectedCategoryId = solutionCategories.get(0).getId();
-                    }
-
-                    // Preselect in edit mode
-                    if (isEditMode && productId != null) {
-                        for (int i = 0; i < solutionCategories.size(); i++) {
-                            if (solutionCategories.get(i).getId().equals(selectedCategoryId)) {
-                                categorySpinner.setSelection(i);
-                                break;
-                            }
-                        }
-                    }
+                    // Show custom category input as optional
+                    customCategoryCheckBox.setVisibility(View.VISIBLE);
+                } else {
+                    // No categories available, hide spinner and show custom input only
+                    categorySpinner.setVisibility(View.GONE);
+                    customCategoryCheckBox.setVisibility(View.GONE);
+                    customCategoryEditText.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -355,6 +359,22 @@ public class ProductCreationFragment extends Fragment {
                     }
 
                     populateForm(product);
+
+                    if (product.getCategoryId() != null) {
+                        selectedCategoryId = product.getCategoryId();
+                    }
+
+                    if (isEditMode) {
+                        categorySpinner.setVisibility(View.GONE);
+                        customCategoryCheckBox.setVisibility(View.GONE);
+                        customCategoryEditText.setVisibility(View.GONE);
+
+                        // Display selected category as text
+                        if (product.getCategoryName() != null && !product.getCategoryName().isEmpty()) {
+                            productSolutionCategoryText.setText(String.format("%s: %s", getString(R.string.category), product.getCategoryName()));
+                            productSolutionCategoryText.setVisibility(View.VISIBLE);
+                        }
+                    }
 
                     // Disable category selection in edit mode
                     categorySpinner.setEnabled(false);
@@ -464,8 +484,7 @@ public class ProductCreationFragment extends Fragment {
         }
 
         boolean hasCategorySelected = selectedCategoryId != null;
-        boolean hasCustomCategory = customCategoryCheckBox.isChecked() &&
-                !customCategoryEditText.getText().toString().trim().isEmpty();
+        boolean hasCustomCategory = !customCategoryEditText.getText().toString().trim().isEmpty();
 
         if (!hasCategorySelected && !hasCustomCategory) {
             Toast.makeText(getContext(), R.string.please_select_or_enter_category, Toast.LENGTH_SHORT).show();

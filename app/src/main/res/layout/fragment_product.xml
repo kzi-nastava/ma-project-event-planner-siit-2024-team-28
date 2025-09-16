@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    tools:context=".fragments.products.ProductCreationFragment">
+    android:background="@android:color/white"
+    tools:context=".fragments.products.ProductFragment">
 
     <ScrollView
         android:layout_width="0dp"
@@ -70,6 +70,15 @@
                     android:hint="@string/enter_new_category_name"
                     android:background="@drawable/edit_text_background"
                     android:padding="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/text_product_solution_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
                     android:layout_marginBottom="15dp"
                     android:visibility="gone" />
 
