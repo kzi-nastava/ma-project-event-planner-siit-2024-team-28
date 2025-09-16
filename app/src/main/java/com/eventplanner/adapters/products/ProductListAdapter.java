@@ -106,26 +106,18 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         boolean isOwner = currentUserId != null && currentUserId.equals(product.getBusinessOwnerId());
 
         if (holder.editButton != null && holder.deleteButton != null) {
-            if (isOwner) {
-                holder.editButton.setVisibility(View.VISIBLE);
-                holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.editButton.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+            holder.deleteButton.setVisibility(isOwner ? View.VISIBLE : View.GONE);
 
-                holder.editButton.setOnClickListener(v -> {
-                    if (listener != null) {
-                        listener.onEditProduct(product);
-                    }
-                });
-                holder.deleteButton.setOnClickListener(v -> {
-                    if (listener != null) {
-                        listener.onDeleteProduct(product);
-                    }
-                });
-            } else {
-                holder.editButton.setVisibility(View.GONE);
-                holder.deleteButton.setVisibility(View.GONE);
-            }
+            // Always attach listeners
+            holder.editButton.setOnClickListener(v -> {
+                if (listener != null) listener.onEditProduct(product);
+            });
+
+            holder.deleteButton.setOnClickListener(v -> {
+                if (listener != null) listener.onDeleteProduct(product);
+            });
         }
-
 
         // Show category name if available
         if (product.getCategoryName() != null && !product.getCategoryName().isEmpty()) {
@@ -155,8 +147,8 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             discountTextView = itemView.findViewById(R.id.product_discount);
             categoryTextView = itemView.findViewById(R.id.product_category);
             imageViewPager = itemView.findViewById(R.id.image_view_pager);
-            editButton = itemView.findViewById(R.id.button_edit);
-            deleteButton = itemView.findViewById(R.id.button_delete);
+            editButton = itemView.findViewById(R.id.edit_button);
+            deleteButton = itemView.findViewById(R.id.delete_button);
             discountedPriceTextView = itemView.findViewById(R.id.product_discounted_price);
             availabilityTextView = itemView.findViewById(R.id.product_availability);
             visibilityTextView = itemView.findViewById(R.id.product_visibility);
