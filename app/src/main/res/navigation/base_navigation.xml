@@ -53,6 +53,9 @@
         <action
             android:id="@+id/action_home_to_product_overview"
             app:destination="@id/nav_my_products" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_reports"
+            app:destination="@id/nav_reports" />
     </fragment>
 
     <fragment
@@ -427,4 +430,12 @@
             android:name="isReadOnly"
             app:argType="boolean" />
     </dialog>
+    <fragment
+        android:id="@+id/nav_reports"
+        android:name="com.eventplanner.fragments.reports.ReportsFragment"
+        android:label="ReportsFragment" >
+        <action
+            android:id="@+id/action_reportsFragment_to_business_owner_details_fragment"
+            app:destination="@id/business_owner_details_fragment" />
+    </fragment>
 </navigation>

@@ -432,4 +432,7 @@
     <string name="send_invitation_button">Send</string>
     <string name="invalid_email">Invalid email address</string>
     <string name="email_sent">Email sent successfully</string>
+    <string name="reports">Reports</string>
+    <string name="block_user">Block user</string>
+    <string name="unblock_user">Unblock user</string>
 </resources>

@@ -21,6 +21,9 @@
             android:title="@string/categories" />
         <item android:id="@+id/nav_chat_list"
             android:title="@string/chat_list" />
+        <item
+            android:id="@+id/nav_reports"
+            android:title="@string/reports" />
         <item android:id="@+id/nav_registration"
             android:title="@string/navbar_register" />
         <item android:id="@+id/nav_login"
