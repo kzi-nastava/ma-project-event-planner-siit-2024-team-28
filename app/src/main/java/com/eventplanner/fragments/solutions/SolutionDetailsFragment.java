@@ -609,8 +609,8 @@ public class SolutionDetailsFragment extends Fragment {
         binding.textAuthor.setText(solution.getBusinessOwnerName());
 
         // Image
-        if (solution.getImageBase64() != null) {
-            if (solution.getImageBase64().isEmpty()) {
+        if (solution.getImagesBase64() != null) {
+            if (solution.getImagesBase64().isEmpty()) {
                 // Glide is a library for efficient loading and displaying of images from various sources (URL, Base64, files, etc.),
                 // which automatically caches images and optimizes memory usage. It helps load images quickly and smoothly without blocking the UI.
                 Glide.with(requireContext())
@@ -618,14 +618,14 @@ public class SolutionDetailsFragment extends Fragment {
                         .into(binding.imageSolution);
             } else {
                 // Set first picture as current one
-                Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImageBase64().get(globalImageIndex));
+                Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImagesBase64().get(globalImageIndex));
                 binding.imageSolution.setImageBitmap(bitmap);
                 // Listeners for buttons that cycle through pictures
                 binding.buttonPreviousImage.setOnClickListener(this::changeImage);
                 binding.buttonNextImage.setOnClickListener(this::changeImage);
             }
             // If there is no more than one picture hide buttons for cycling
-            if (!(solution.getImageBase64().size() > 1)) {
+            if (!(solution.getImagesBase64().size() > 1)) {
                 binding.buttonPreviousImage.setVisibility(View.GONE);
                 binding.buttonNextImage.setVisibility(View.GONE);
             }
@@ -678,7 +678,7 @@ public class SolutionDetailsFragment extends Fragment {
     // Changes image in image view
     // Operates with globalImageIndex -> ++ if buttonNextImage; -- if buttonPreviousImage
     private void changeImage(View v) {
-        int lastIndex = solution.getImageBase64().size() - 1;
+        int lastIndex = solution.getImagesBase64().size() - 1;
         // If buttonPreviousImage is clicked
         if (v == binding.buttonPreviousImage) {
             // If current image is the first one and previous is clicked -> set last image as current one
@@ -695,7 +695,7 @@ public class SolutionDetailsFragment extends Fragment {
             else
                 globalImageIndex++;
         }
-        Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImageBase64().get(globalImageIndex));
+        Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImagesBase64().get(globalImageIndex));
         binding.imageSolution.setImageBitmap(bitmap);
     }
 

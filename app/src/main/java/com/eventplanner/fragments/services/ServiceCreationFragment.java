@@ -341,7 +341,6 @@ public class ServiceCreationFragment extends Fragment {
                 .categoryId(selectedCategoryId)
                 .businessOwnerId(AuthUtils.getUserId(requireContext()))
                 .eventTypeIds(selectedEventTypeIds)
-                .status((customCategoryCreation) ? SolutionStatus.PENDING : SolutionStatus.ACTIVE ) // If category is custom we are creating PENDING service
                 .build();
 
         if(!customCategoryCreation) {
@@ -384,34 +383,7 @@ public class ServiceCreationFragment extends Fragment {
     // Function for making request to backend for creating new Category and then for creating new Service
     private void createCustomCategory(CreateServiceRequest serviceRequest, String customCategoryName) {
         CreatePendingCategoryRequest request = new CreatePendingCategoryRequest(customCategoryName);
-        categoryService.createPendingCategory(request).enqueue(new Callback<Long>() {
-            @Override
-            public void onResponse(Call<Long> call, Response<Long> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Long newCategoryId = response.body();
-                    Log.i("ServiceCreationFragment", "Category created! ID: " + newCategoryId);
-                    serviceRequest.setCategoryId(newCategoryId);
-                    createService(serviceRequest);
-                } else {
-                    String message = "Unknown error.";
-                    if (response.errorBody() != null) {
-                        try {
-                            String errorString = response.errorBody().string();
-                            Log.e("ServiceCreationFragment", "Error body: " + errorString);
-                            message = new JSONObject(errorString).optString("error", message);
-                        } catch (Exception ignored) {}
-                    }
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                    Log.e("ServiceCreationFragment", "Error: " + message);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Long> call, Throwable t) {
-                Toast.makeText(getContext(), "An error has occured.", Toast.LENGTH_SHORT).show();
-                Log.i("ServiceCreationFragment", "Network failure: " + t.getMessage());
-            }
-        });
+        // TODO: implement endpoint for creating pending service
     }
 
     // populating Category spinner with possible categories

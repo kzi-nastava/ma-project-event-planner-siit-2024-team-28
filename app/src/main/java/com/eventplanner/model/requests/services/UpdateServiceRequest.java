@@ -11,7 +11,7 @@ public class UpdateServiceRequest {
     private String description;
     private Double price;
     private Double discount;
-    private List<String> imageBase64;
+    private List<String> imagesBase64;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
@@ -29,7 +29,7 @@ public class UpdateServiceRequest {
         this.description = builder.description;
         this.price = builder.price;
         this.discount = builder.discount;
-        this.imageBase64 = builder.imageBase64;
+        this.imagesBase64 = builder.imageBase64;
         this.isVisibleForEventOrganizers = builder.isVisibleForEventOrganizers;
         this.isAvailable = builder.isAvailable;
         this.specifics = builder.specifics;

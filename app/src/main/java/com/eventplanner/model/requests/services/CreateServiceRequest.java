@@ -13,7 +13,7 @@ public class CreateServiceRequest {
     private String description;
     private Double price;
     private Double discount;
-    private List<String> imageBase64;
+    private List<String> imagesBase64;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
@@ -26,7 +26,6 @@ public class CreateServiceRequest {
     private ReservationType reservationType;
     private Long categoryId;
     private Long businessOwnerId;
-    private SolutionStatus status;
     private Collection<Long> eventTypeIds;
 
     public void setCategoryId(Long categoryId) {
@@ -38,7 +37,7 @@ public class CreateServiceRequest {
         this.description = builder.description;
         this.price = builder.price;
         this.discount = builder.discount;
-        this.imageBase64 = builder.imageBase64;
+        this.imagesBase64 = builder.imageBase64;
         this.isVisibleForEventOrganizers = builder.isVisibleForEventOrganizers;
         this.isAvailable = builder.isAvailable;
         this.specifics = builder.specifics;
@@ -52,7 +51,6 @@ public class CreateServiceRequest {
         this.categoryId = builder.categoryId;
         this.businessOwnerId = builder.businessOwnerId;
         this.eventTypeIds = builder.eventTypeIds;
-        this.status = builder.status;
     }
 
     // Static Builder class
@@ -74,7 +72,6 @@ public class CreateServiceRequest {
         private ReservationType reservationType;
         private Long categoryId;
         private Long businessOwnerId;
-        private SolutionStatus status;
         private Collection<Long> eventTypeIds;
 
         public Builder name(String name) {
@@ -159,11 +156,6 @@ public class CreateServiceRequest {
 
         public Builder businessOwnerId(Long businessOwnerId) {
             this.businessOwnerId = businessOwnerId;
-            return this;
-        }
-
-        public Builder status(SolutionStatus status) {
-            this.status = status;
             return this;
         }
 

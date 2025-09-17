@@ -13,7 +13,7 @@ public class GetSolutionDetailsResponse {
     private String description;
     private Double price;
     private Double discount;
-    private List<String> imageBase64;
+    private List<String> imagesBase64;
     private Boolean isDeleted;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
@@ -56,8 +56,8 @@ public class GetSolutionDetailsResponse {
         return discount;
     }
 
-    public List<String> getImageBase64() {
-        return imageBase64;
+    public List<String> getImagesBase64() {
+        return imagesBase64;
     }
 
     public Boolean getIsDeleted() {

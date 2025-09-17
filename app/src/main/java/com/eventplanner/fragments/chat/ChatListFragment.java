@@ -16,8 +16,11 @@ import com.eventplanner.R;
 import com.eventplanner.adapters.chats.ChatListListAdapter;
 import com.eventplanner.databinding.FragmentChatListBinding;
 import com.eventplanner.model.responses.ErrorResponse;
+import com.eventplanner.model.responses.chatMessages.GetChatMessageResponse;
+import com.eventplanner.model.responses.chatMessages.GetNewChatMessageResponse;
 import com.eventplanner.model.responses.chats.GetChatListResponse;
 import com.eventplanner.services.ChatService;
+import com.eventplanner.services.ChatWebSocketService;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
@@ -34,7 +37,8 @@ public class ChatListFragment extends Fragment {
     FragmentChatListBinding binding;
     ChatService chatService;
     NavController navController;
-
+    private ChatWebSocketService chatWSService;
+    private ChatListListAdapter chatListAdapter;
 
     public ChatListFragment() {
         // Required empty public constructor
@@ -50,6 +54,32 @@ public class ChatListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         chatService = HttpUtils.getChatService();
         navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        chatWSService = new ChatWebSocketService();
+
+        // Subscribes to chat with callback that processes incoming messages
+        chatWSService.subscribeToChatListUpdate(AuthUtils.getUserId(requireContext()),message -> {
+            GetNewChatMessageResponse newMessage = new Gson().fromJson(message, GetNewChatMessageResponse.class);
+            Log.i("EEOEOEOEOEOEO", "stigla poruka");
+
+            requireActivity().runOnUiThread(() -> {
+                if(chatListAdapter != null) {
+                    chatListAdapter.setNewMessage(newMessage);
+                }
+            });
+        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (chatWSService != null) {
+            chatWSService.unsubscribeFromChatListUpdate();
+        }
     }
 
     @Override
@@ -109,9 +139,11 @@ public class ChatListFragment extends Fragment {
 
             navController
                     .navigate(R.id.action_chat_list_to_chat, bundle);
+
+            chatListAdapter.removeNewMessage(chat.chatId());
         };
 
-        ChatListListAdapter adapter = new ChatListListAdapter(getContext(), chatList, listener);
-        binding.chatListListView.setAdapter(adapter);
+        chatListAdapter = new ChatListListAdapter(getContext(), chatList, listener);
+        binding.chatListListView.setAdapter(chatListAdapter);
     }
 }
