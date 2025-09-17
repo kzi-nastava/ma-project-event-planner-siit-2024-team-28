@@ -46,4 +46,12 @@ public interface UserService {
 
     @DELETE("users/current/deactivate")
     Call<Void> deactivateCurrentUserAccount();
+
+    @GET("users/block-user")
+    Call <Boolean> isUserBlocked(@Query("userId") Long userId, @Query("blockedUserId") Long blockedUserId);
+
+    @PATCH("users/block-user")
+    Call <Void> blockUser(@Query("userId") Long userId, @Query("blockedUserId") Long blockedUserId);
+    @PATCH("users/unblock-user")
+    Call <Void> unblockUser(@Query("userId") Long userId, @Query("blockedUserId") Long blockedUserId);
 }

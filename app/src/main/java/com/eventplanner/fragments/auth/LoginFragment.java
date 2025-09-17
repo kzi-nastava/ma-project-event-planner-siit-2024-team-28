@@ -20,6 +20,8 @@ import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.FormValidator;
 import com.eventplanner.utils.HttpUtils;
 
+import org.json.JSONObject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -92,7 +94,25 @@ public class LoginFragment extends Fragment {
                             Navigation.findNavController(view).navigate(R.id.nav_home);
                         }
                     } else {
-                        Toast.makeText(getContext(), getString(R.string.toast_invalid_credentials), Toast.LENGTH_SHORT).show();
+                        // Try to extract error message from response
+                        String errorMessage = getString(R.string.toast_invalid_credentials); // fallback
+                        try {
+                            if (response.errorBody() != null) {
+                                String errorBody = response.errorBody().string();
+                                // Parse JSON: {"error":"Invalid credentials"}
+                                JSONObject json = new JSONObject(errorBody);
+                                if (json.has("error")) {
+                                    errorMessage = json.getString("error");
+                                    if(errorMessage.equals("Bad credentials"))
+                                    {
+                                        errorMessage = getString(R.string.toast_invalid_credentials);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 }
 
