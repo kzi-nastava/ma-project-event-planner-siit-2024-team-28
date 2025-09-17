@@ -137,13 +137,13 @@ public class HomeActivity extends AppCompatActivity {
         // Admin-only items
         boolean isAdmin = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.ADMIN);
         menu.findItem(R.id.nav_event_types).setVisible(isAdmin);
+        menu.findItem(R.id.nav_categories_overview).setVisible(isAdmin);
 
         // Business owner-only items
         boolean isBusinessOwner = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.BusinessOwner);
         menu.findItem(R.id.nav_service_overview).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_my_products).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_price_list).setVisible(isBusinessOwner);
-        menu.findItem(R.id.nav_categories_overview).setVisible(isBusinessOwner);
 
         // All products should be visible to everyone
         menu.findItem(R.id.nav_all_products).setVisible(true);

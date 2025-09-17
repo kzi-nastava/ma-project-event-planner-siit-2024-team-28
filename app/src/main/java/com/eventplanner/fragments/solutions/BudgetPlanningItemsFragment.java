@@ -250,7 +250,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
                         } catch (Exception e) {
                             Toast.makeText(getContext(), "Invalid budget input.", Toast.LENGTH_SHORT).show();
                         }
-                        UpdateRequiredSolutionRequest request = new UpdateRequiredSolutionRequest(budget,null,null,null);
+                        UpdateRequiredSolutionRequest request = new UpdateRequiredSolutionRequest(budget,null);
 
                         Call<Void> call = requiredSolutionService.updateRequiredSolution(requiredSolutionId, request);
                         Double finalBudget = budget;
