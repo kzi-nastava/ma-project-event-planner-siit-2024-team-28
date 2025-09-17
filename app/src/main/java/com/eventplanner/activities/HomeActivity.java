@@ -29,6 +29,10 @@ import com.eventplanner.utils.HttpUtils;
 import com.eventplanner.utils.WebSocketService;
 import com.google.android.material.navigation.NavigationView;
 
+import org.osmdroid.config.Configuration;
+
+import java.io.File;
+
 public class HomeActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration mAppBarConfiguration;
@@ -60,6 +64,10 @@ public class HomeActivity extends AppCompatActivity {
         HttpUtils.initialize(getApplicationContext());
         setupNavigation();
         setupWindowInsets();
+
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        Configuration.getInstance().setOsmdroidBasePath(new File(getCacheDir(), "osmdroid"));
+        Configuration.getInstance().setOsmdroidTileCache(new File(getCacheDir(), "osmdroid/tiles"));
     }
 
     private void setupNavigation() {
@@ -133,7 +141,7 @@ public class HomeActivity extends AppCompatActivity {
         // Business owner-only items
         boolean isBusinessOwner = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.BusinessOwner);
         menu.findItem(R.id.nav_service_overview).setVisible(isBusinessOwner);
-        menu.findItem(R.id.nav_product_overview).setVisible(isBusinessOwner);
+        menu.findItem(R.id.nav_my_products).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_price_list).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_categories_overview).setVisible(isBusinessOwner);
 

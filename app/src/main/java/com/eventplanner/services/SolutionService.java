@@ -1,5 +1,7 @@
 package com.eventplanner.services;
 
+import com.eventplanner.model.responses.PagedResponse;
+import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.solutions.GetPriceListSolutionResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
@@ -46,4 +48,10 @@ public interface SolutionService {
 
     @GET("solutions/favorites")
     Call<Collection<GetSolutionResponse>> getFavoriteSolutionsForCurrentUser();
+
+    @GET("solutions/top-solutions")
+    Call<PagedResponse<GetSolutionResponse>> getTopSolutions();
+
+    @GET("solutions/filter")
+    Call<PagedResponse<GetSolutionResponse>> filterSolutions();
 }

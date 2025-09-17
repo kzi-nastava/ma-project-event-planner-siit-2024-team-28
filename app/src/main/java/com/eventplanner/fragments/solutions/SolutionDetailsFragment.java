@@ -609,24 +609,26 @@ public class SolutionDetailsFragment extends Fragment {
         binding.textAuthor.setText(solution.getBusinessOwnerName());
 
         // Image
-        if (solution.getImageBase64().isEmpty()) {
-            // Glide is a library for efficient loading and displaying of images from various sources (URL, Base64, files, etc.),
-            // which automatically caches images and optimizes memory usage. It helps load images quickly and smoothly without blocking the UI.
-            Glide.with(requireContext())
-                    .load(Base64Util.DEFAULT_IMAGE_URI)
-                    .into(binding.imageSolution);
-        } else {
-            // Set first picture as current one
-            Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImageBase64().get(globalImageIndex));
-            binding.imageSolution.setImageBitmap(bitmap);
-            // Listeners for buttons that cycle through pictures
-            binding.buttonPreviousImage.setOnClickListener(this::changeImage);
-            binding.buttonNextImage.setOnClickListener(this::changeImage);
-        }
-        // If there is no more than one picture hide buttons for cycling
-        if (!(solution.getImageBase64().size() > 1)) {
-            binding.buttonPreviousImage.setVisibility(View.GONE);
-            binding.buttonNextImage.setVisibility(View.GONE);
+        if (solution.getImageBase64() != null) {
+            if (solution.getImageBase64().isEmpty()) {
+                // Glide is a library for efficient loading and displaying of images from various sources (URL, Base64, files, etc.),
+                // which automatically caches images and optimizes memory usage. It helps load images quickly and smoothly without blocking the UI.
+                Glide.with(requireContext())
+                        .load(Base64Util.DEFAULT_IMAGE_URI)
+                        .into(binding.imageSolution);
+            } else {
+                // Set first picture as current one
+                Bitmap bitmap = Base64Util.decodeBase64ToBitmap(solution.getImageBase64().get(globalImageIndex));
+                binding.imageSolution.setImageBitmap(bitmap);
+                // Listeners for buttons that cycle through pictures
+                binding.buttonPreviousImage.setOnClickListener(this::changeImage);
+                binding.buttonNextImage.setOnClickListener(this::changeImage);
+            }
+            // If there is no more than one picture hide buttons for cycling
+            if (!(solution.getImageBase64().size() > 1)) {
+                binding.buttonPreviousImage.setVisibility(View.GONE);
+                binding.buttonNextImage.setVisibility(View.GONE);
+            }
         }
 
         String availabilityStatus = (solution.getIsAvailable()) ? "Available" : "Unavailable";

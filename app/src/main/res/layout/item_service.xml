@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Product Images ViewPager -->
+        <!-- Service Images ViewPager -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/image_view_pager"
             android:layout_width="match_parent"
@@ -22,19 +22,19 @@
             android:layout_marginBottom="12dp"
             android:background="@drawable/edit_text_background" />
 
-        <!-- Product Info -->
+        <!-- Service Info -->
         <TextView
-            android:id="@+id/product_name"
+            android:id="@+id/service_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
             android:layout_marginBottom="4dp"
-            tools:text="Product Name" />
+            tools:text="Service Name" />
 
         <TextView
-            android:id="@+id/product_description"
+            android:id="@+id/service_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"
@@ -42,7 +42,7 @@
             android:maxLines="2"
             android:ellipsize="end"
             android:layout_marginBottom="8dp"
-            tools:text="Product description goes here..." />
+            tools:text="Service description goes here..." />
 
         <!-- Category and Event Types -->
         <LinearLayout
@@ -52,7 +52,7 @@
             android:layout_marginBottom="8dp">
 
             <TextView
-                android:id="@+id/product_category"
+                android:id="@+id/service_category"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -82,7 +82,7 @@
             android:layout_marginBottom="8dp">
 
             <TextView
-                android:id="@+id/product_price"
+                android:id="@+id/service_price"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -92,7 +92,7 @@
                 tools:text="$99.99" />
 
             <TextView
-                android:id="@+id/product_discount"
+                android:id="@+id/service_discount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/discount_badge"
@@ -118,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_visible"
                 android:padding="6dp"
-                android:text="@string/visible"
+                android:text="Visible"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp"
@@ -130,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_available"
                 android:padding="6dp"
-                android:text="@string/available"
+                android:text="Available"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp"
@@ -142,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_unavailable"
                 android:padding="6dp"
-                android:text="@string/unavailable"
+                android:text="Unavailable"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
                 android:visibility="gone" />
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="@string/edit"
+                android:text="Edit"
                 app:backgroundTint="@color/cool_purple"
                 android:background="@drawable/button_rounded" />
 
@@ -182,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="@string/delete"
+                android:text="Delete"
                 app:backgroundTint="@android:color/holo_red_dark"
                 android:background="@drawable/button_rounded" />
 

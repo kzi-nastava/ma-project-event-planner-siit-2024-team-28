@@ -2,7 +2,7 @@ package com.eventplanner.model.requests.products;
 
 import java.util.List;
 
-public class CreateProductRequest {
+public class CreateProductWithPendingCategoryRequest {
     private String name;
     private String description;
     private Double price;
@@ -10,14 +10,14 @@ public class CreateProductRequest {
     private List<String> imagesBase64;
     private Boolean isVisible;
     private Boolean isAvailable;
-    private Long solutionCategoryId;
+    private String categoryName;
     private Long businessOwnerId;
     private List<Long> eventTypeIds;
 
-    public CreateProductRequest() {
+    public CreateProductWithPendingCategoryRequest() {
     }
 
-    public CreateProductRequest(String name, String description, Double price, Double discount, List<String> imagesBase64, Boolean isVisible, Boolean isAvailable, Long solutionCategoryId, Long businessOwnerId, List<Long> eventTypeIds) {
+    public CreateProductWithPendingCategoryRequest(String name, String description, Double price, Double discount, List<String> imagesBase64, Boolean isVisible, Boolean isAvailable, String categoryName, Long businessOwnerId, List<Long> eventTypeIds) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -25,7 +25,7 @@ public class CreateProductRequest {
         this.imagesBase64 = imagesBase64;
         this.isVisible = isVisible;
         this.isAvailable = isAvailable;
-        this.solutionCategoryId = solutionCategoryId;
+        this.categoryName = categoryName;
         this.businessOwnerId = businessOwnerId;
         this.eventTypeIds = eventTypeIds;
     }
@@ -86,12 +86,12 @@ public class CreateProductRequest {
         isAvailable = available;
     }
 
-    public Long getSolutionCategoryId() {
-        return solutionCategoryId;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setSolutionCategoryId(Long solutionCategoryId) {
-        this.solutionCategoryId = solutionCategoryId;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public Long getBusinessOwnerId() {

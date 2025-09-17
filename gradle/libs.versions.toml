@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.1"
+agp = "8.12.3"
 converterGson = "2.9.0"
 gson = "2.11.0"
 junit = "4.13.2"
@@ -14,6 +14,8 @@ navigationUi = "2.8.4"
 navigationFragment = "2.8.4"
 retrofit = "2.9.0"
 stomp = "1.6.6"
+osmdroid = "6.1.20"
+osmbonuspack = "6.9.0"
 
 [libraries]
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
@@ -37,6 +39,8 @@ glideCompiler = { module = "com.github.bumptech.glide:compiler", version = "4.16
 stomp = { module = "com.github.NaikSoftware:StompProtocolAndroid", version.ref = "stomp" }
 rxjava2 = { module = "io.reactivex.rxjava2:rxjava", version = "2.2.21" }
 rxandroid2 = { module = "io.reactivex.rxjava2:rxandroid", version = "2.1.1" }
+osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
+osmbonuspack = { module = "com.github.MKergall:osmbonuspack", version.ref = "osmbonuspack" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

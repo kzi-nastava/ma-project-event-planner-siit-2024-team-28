@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:text="Add Activity"
+            android:text="@string/add_activity"
             android:layout_marginBottom="16dp" />
 
         <LinearLayout
@@ -47,14 +47,14 @@
                 android:id="@+id/cancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancel" />
+                android:text="@string/cancel" />
 
             <Button
                 android:id="@+id/saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Save" />
+                android:text="@string/save" />
         </LinearLayout>
 
     </LinearLayout>

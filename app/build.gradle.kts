@@ -28,6 +28,7 @@ android {
             "\"${localProperties.getProperty("BACKEND_BASE_URL") ?: "http://10.0.2.2:8080/api/"}\""
         )
     }
+    //  "\"${localProperties.getProperty("BACKEND_BASE_URL") ?: "http://192.168.1.12:8080/api/"}\""
 
     buildTypes {
         release {
@@ -69,4 +70,6 @@ dependencies {
     implementation(libs.stomp)
     implementation(libs.rxjava2)
     implementation(libs.rxandroid2)
+    implementation(libs.osmdroid)
+    implementation(libs.osmbonuspack)
 }

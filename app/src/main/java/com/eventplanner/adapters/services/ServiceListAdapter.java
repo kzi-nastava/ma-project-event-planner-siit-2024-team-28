@@ -1,66 +1,62 @@
-package com.eventplanner.adapters.products;
+package com.eventplanner.adapters.services;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.products.ProductImageAdapter;
-import com.eventplanner.model.responses.products.GetProductResponse;
+import com.eventplanner.model.responses.services.GetServiceResponse;
 import com.eventplanner.utils.AuthUtils;
-import com.eventplanner.utils.Base64Util;
-import androidx.viewpager2.widget.ViewPager2;
-import android.graphics.Bitmap;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.ProductViewHolder> {
-    private List<GetProductResponse> products;
-    private OnProductActionListener listener;
+public class ServiceListAdapter extends RecyclerView.Adapter<ServiceListAdapter.ServiceViewHolder> {
+    private List<GetServiceResponse> services;
+    private OnServiceActionListener listener;
 
-    public interface OnProductActionListener {
-        void onEditProduct(GetProductResponse product);
-        void onDeleteProduct(GetProductResponse product);
+    public interface OnServiceActionListener {
+        void onEditService(GetServiceResponse service);
+        void onDeleteService(GetServiceResponse service);
     }
 
-    public ProductListAdapter(List<GetProductResponse> products, OnProductActionListener listener) {
-        this.products = products;
+    public ServiceListAdapter(List<GetServiceResponse> services, OnServiceActionListener listener) {
+        this.services = services;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ServiceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_product_list, parent, false);
-        return new ProductViewHolder(view);
+                .inflate(R.layout.item_service_list, parent, false);
+        return new ServiceViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        GetProductResponse product = products.get(position);
+    public void onBindViewHolder(@NonNull ServiceViewHolder holder, int position) {
+        GetServiceResponse service = services.get(position);
         
-        holder.nameTextView.setText(product.getName());
-        holder.descriptionTextView.setText(product.getDescription());
+        holder.nameTextView.setText(service.getName());
+        holder.descriptionTextView.setText(service.getDescription());
         
         DecimalFormat df = new DecimalFormat("#.00");
-        holder.priceTextView.setText("$" + df.format(product.getPrice()));
+        holder.priceTextView.setText("$" + df.format(service.getPrice()));
         
-        if (product.getDiscount() != null && product.getDiscount() > 0) {
-            double discountedPrice = product.getPrice() * (1 - product.getDiscount() / 100);
+        if (service.getDiscount() != null && service.getDiscount() > 0) {
+            double discountedPrice = service.getPrice() * (1 - service.getDiscount() / 100);
             if (holder.discountedPriceTextView != null) {
                 holder.discountedPriceTextView.setText("$" + df.format(discountedPrice));
                 holder.discountedPriceTextView.setVisibility(View.VISIBLE);
             }
-            holder.discountTextView.setText(df.format(product.getDiscount()) + "% OFF");
+            holder.discountTextView.setText(df.format(service.getDiscount()) + "% OFF");
             holder.discountTextView.setVisibility(View.VISIBLE);
         } else {
             if (holder.discountedPriceTextView != null) {
@@ -71,18 +67,18 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
         // Set availability and visibility status with null checks
         if (holder.availabilityTextView != null) {
-            holder.availabilityTextView.setText(product.getIsAvailable() ? "Available" : "Unavailable");
+            holder.availabilityTextView.setText(service.getIsAvailable() ? "Available" : "Unavailable");
             holder.availabilityTextView.setTextColor(
-                    product.getIsAvailable() ?
+                    service.getIsAvailable() ?
                     holder.itemView.getContext().getColor(R.color.green) :
                     holder.itemView.getContext().getColor(R.color.red)
             );
         }
 
         if (holder.visibilityTextView != null) {
-            holder.visibilityTextView.setText(product.getIsVisibleForEventOrganizers() ? "Visible" : "Hidden");
+            holder.visibilityTextView.setText(service.getIsVisibleForEventOrganizers() ? "Visible" : "Hidden");
             holder.visibilityTextView.setTextColor(
-                    product.getIsVisibleForEventOrganizers() ?
+                    service.getIsVisibleForEventOrganizers() ?
                     holder.itemView.getContext().getColor(R.color.green) :
                     holder.itemView.getContext().getColor(R.color.orange)
             );
@@ -90,8 +86,8 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
         // Set up image carousel
         if (holder.imageViewPager != null) {
-            if (product.getImagesBase64() != null && !product.getImagesBase64().isEmpty()) {
-                ProductImageAdapter imageAdapter = new ProductImageAdapter(holder.itemView.getContext(), product.getImagesBase64());
+            if (service.getImagesBase64() != null && !service.getImagesBase64().isEmpty()) {
+                ServiceImageAdapter imageAdapter = new ServiceImageAdapter(holder.itemView.getContext(), service.getImagesBase64());
                 holder.imageViewPager.setAdapter(imageAdapter);
                 holder.imageViewPager.setVisibility(View.VISIBLE);
             } else {
@@ -100,14 +96,14 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
                 // Create a single placeholder image list
                 List<String> placeholderList = new ArrayList<>();
                 placeholderList.add(""); // Empty string will show placeholder
-                ProductImageAdapter imageAdapter = new ProductImageAdapter(holder.itemView.getContext(), placeholderList);
+                ServiceImageAdapter imageAdapter = new ServiceImageAdapter(holder.itemView.getContext(), placeholderList);
                 holder.imageViewPager.setAdapter(imageAdapter);
             }
         }
 
         // Show/hide action buttons based on ownership
         Long currentUserId = AuthUtils.getUserId(holder.itemView.getContext());
-        boolean isOwner = currentUserId != null && currentUserId.equals(product.getBusinessOwnerId());
+        boolean isOwner = currentUserId != null && currentUserId.equals(service.getBusinessOwnerId());
         
         if (isOwner) {
             holder.editButton.setVisibility(View.VISIBLE);
@@ -115,13 +111,13 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             
             holder.editButton.setOnClickListener(v -> {
                 if (listener != null) {
-                    listener.onEditProduct(product);
+                    listener.onEditService(service);
                 }
             });
             
             holder.deleteButton.setOnClickListener(v -> {
                 if (listener != null) {
-                    listener.onDeleteProduct(product);
+                    listener.onDeleteService(service);
                 }
             });
         } else {
@@ -130,8 +126,8 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         }
 
         // Show category name if available
-        if (product.getCategoryName() != null && !product.getCategoryName().isEmpty()) {
-            holder.categoryTextView.setText(product.getCategoryName());
+        if (service.getCategoryName() != null && !service.getCategoryName().isEmpty()) {
+            holder.categoryTextView.setText(service.getCategoryName());
             holder.categoryTextView.setVisibility(View.VISIBLE);
         } else {
             holder.categoryTextView.setVisibility(View.GONE);
@@ -140,32 +136,32 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return services.size();
     }
 
 
 
-    static class ProductViewHolder extends RecyclerView.ViewHolder {
+    static class ServiceViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, descriptionTextView, priceTextView, discountedPriceTextView;
         TextView discountTextView, availabilityTextView, visibilityTextView, categoryTextView;
         ViewPager2 imageViewPager;
         Button editButton, deleteButton;
 
-        public ProductViewHolder(@NonNull View itemView) {
+        public ServiceViewHolder(@NonNull View itemView) {
             super(itemView);
-            nameTextView = itemView.findViewById(R.id.product_name);
-            descriptionTextView = itemView.findViewById(R.id.product_description);
-            priceTextView = itemView.findViewById(R.id.product_price);
-            discountTextView = itemView.findViewById(R.id.product_discount);
-            categoryTextView = itemView.findViewById(R.id.product_category);
+            nameTextView = itemView.findViewById(R.id.service_name);
+            descriptionTextView = itemView.findViewById(R.id.service_description);
+            priceTextView = itemView.findViewById(R.id.service_price);
+            discountTextView = itemView.findViewById(R.id.service_discount);
+            categoryTextView = itemView.findViewById(R.id.service_category);
             imageViewPager = itemView.findViewById(R.id.image_view_pager);
             editButton = itemView.findViewById(R.id.button_edit);
             deleteButton = itemView.findViewById(R.id.button_delete);
 
             // Note: Some views may not exist in layout, so we'll handle null checks in binding
-            discountedPriceTextView = itemView.findViewById(R.id.product_discounted_price);
-            availabilityTextView = itemView.findViewById(R.id.product_availability);
-            visibilityTextView = itemView.findViewById(R.id.product_visibility);
+            discountedPriceTextView = itemView.findViewById(R.id.service_discounted_price);
+            availabilityTextView = itemView.findViewById(R.id.service_availability);
+            visibilityTextView = itemView.findViewById(R.id.service_visibility);
         }
     }
 }

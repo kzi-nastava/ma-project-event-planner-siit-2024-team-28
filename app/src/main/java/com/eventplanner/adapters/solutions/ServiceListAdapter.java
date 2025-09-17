@@ -55,12 +55,12 @@ public class ServiceListAdapter extends ArrayAdapter<GetServiceResponse> {
         serviceName.setText(service.getName());
         DecimalFormat df = new DecimalFormat("0.##");
         priceText.setText("Price: " + df.format(service.getPrice()) + "$");
-        if (service.getImageBase64().isEmpty()) {
+        if (service.getImagesBase64().isEmpty()) {
             Glide.with(getContext())
                     .load(Base64Util.DEFAULT_IMAGE_URI)
                     .into(image);
         } else {
-            Bitmap bitmap = Base64Util.decodeBase64ToBitmap(service.getImageBase64().get(0));
+            Bitmap bitmap = Base64Util.decodeBase64ToBitmap(service.getImagesBase64().get(0));
             image.setImageBitmap(bitmap);
         }
 

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,7 +25,7 @@ import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.activities.HomeActivity;
-import com.eventplanner.adapters.events.EventListAdapter;
+import com.eventplanner.adapters.events.TopEventListAdapter;
 import com.eventplanner.adapters.solutions.FavoriteSolutionListAdapter;
 import com.eventplanner.components.CalendarComponent;
 import com.eventplanner.model.constants.UserRoles;
@@ -33,6 +34,7 @@ import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.users.UpdateUserRequest;
 import com.eventplanner.model.responses.events.GetEventResponse;
+import com.eventplanner.model.responses.solutionCateogries.GetSolutionCategoryResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
@@ -63,8 +65,8 @@ public class ProfileFragment extends Fragment {
     private TextView favoriteEventsHeader;
     private TextView noFavoriteEventsText;
     private List<GetEventResponse> favoriteEvents = new ArrayList<>();
-
     private ListView favoriteSolutionsList;
+    private ListView ownerCategoriesListView;
     private TextView favoriteSolutionsHeader;
     private TextView noFavoriteSolutionsText;
     private List<GetSolutionResponse> favoriteSolutions = new ArrayList<>();
@@ -93,6 +95,7 @@ public class ProfileFragment extends Fragment {
         noFavoriteEventsText = view.findViewById(R.id.noFavoriteEventsText);
 
         favoriteSolutionsList = view.findViewById(R.id.favoriteSolutionsList);
+        ownerCategoriesListView = view.findViewById(R.id.ownerCategoriesListView);
         favoriteSolutionsHeader = view.findViewById(R.id.favoriteSolutionsHeader);
         noFavoriteSolutionsText = view.findViewById(R.id.noFavoriteSolutionsText);
 
@@ -105,8 +108,7 @@ public class ProfileFragment extends Fragment {
         currentUserRoles = AuthUtils.getUserRoles(requireContext());
         checkDeactivationStatus();
 
-        // Setup role-based visibility
-        setupRoleBasedViews(view);
+        setupRoleBasedViews();
 
         // Set click listeners
         Button uploadProfilePictureButton = view.findViewById(R.id.uploadProfilePictureButton);
@@ -125,19 +127,15 @@ public class ProfileFragment extends Fragment {
         deactivateButton.setText(getString(R.string.profile_deactivate_button));
         deactivateButton.setOnClickListener(v -> deactivateAccount());
 
-        // Load user data
         loadUserData();
-
-        // Load favorite events
+        loadOwnerCategories();
         loadFavoriteEvents();
-
-        // Load favorite solutions
         loadFavoriteSolutions();
 
         return view;
     }
 
-    private void setupRoleBasedViews(View view) {
+    private void setupRoleBasedViews() {
         if (currentUserRoles == null) {
             return;
         }
@@ -147,12 +145,16 @@ public class ProfileFragment extends Fragment {
         boolean isAdmin = false;
 
         for (String role : currentUserRoles) {
-            if (role.equals(UserRoles.BusinessOwner)) {
-                isBusinessOwner = true;
-            } else if (role.equals(UserRoles.EventOrganizer)) {
-                isEventOrganizer = true;
-            } else if (role.equals(UserRoles.ADMIN)) {
-                isAdmin = true;
+            switch (role) {
+                case UserRoles.BusinessOwner:
+                    isBusinessOwner = true;
+                    break;
+                case UserRoles.EventOrganizer:
+                    isEventOrganizer = true;
+                    break;
+                case UserRoles.ADMIN:
+                    isAdmin = true;
+                    break;
             }
         }
 
@@ -212,7 +214,7 @@ public class ProfileFragment extends Fragment {
             public void onResponse(@NonNull Call<GetUserProfilePictureResponse> call, @NonNull Response<GetUserProfilePictureResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String base64Image = response.body().getProfilePictureBase64();
-                    if (!base64Image.isEmpty()) {
+                    if (base64Image != null && !base64Image.isEmpty()) {
                         profilePictureBase64 = base64Image;
                         Bitmap bitmap = Base64Util.decodeBase64ToBitmap(base64Image);
                         if (bitmap != null) {
@@ -558,7 +560,7 @@ public class ProfileFragment extends Fragment {
             noFavoriteEventsText.setVisibility(View.GONE);
             favoriteEventsList.setVisibility(View.VISIBLE);
 
-            EventListAdapter adapter = new EventListAdapter(requireContext(), favoriteEvents);
+            TopEventListAdapter adapter = new TopEventListAdapter(requireContext(), favoriteEvents);
             favoriteEventsList.setAdapter(adapter);
 
             favoriteEventsList.setOnItemClickListener((parent, view, position, id) -> {
@@ -566,13 +568,6 @@ public class ProfileFragment extends Fragment {
                 navigateToEventDetails(event.getId());
             });
         }
-    }
-
-    private void navigateToEventDetails(long eventId) {
-        NavController navController = Navigation.findNavController(requireView());
-        Bundle args = new Bundle();
-        args.putLong("eventId", eventId);
-        navController.navigate(R.id.action_profile_to_event, args);
     }
 
     private void loadFavoriteSolutions() {
@@ -677,32 +672,32 @@ public class ProfileFragment extends Fragment {
 
         StringBuilder message = new StringBuilder();
         if (event.getDescription() != null && !event.getDescription().isEmpty()) {
-            message.append("Description: ").append(event.getDescription()).append("\n\n");
+            message.append(getString(R.string.profile_description_label)).append(event.getDescription()).append("\n\n");
         }
 
-        message.append("Date: ").append(event.getStartDate());
+        message.append(getString(R.string.profile_date_label)).append(event.getStartDate());
         if (event.getEndDate() != null && !event.getEndDate().equals(event.getStartDate())) {
-            message.append(" - ").append(event.getEndDate());
+            message.append(" ").append(getString(R.string.dash)).append(" ").append(event.getEndDate());
         }
         message.append("\n");
 
         if (event.getStartTime() != null) {
-            message.append("Time: ").append(event.getStartTime());
+            message.append(getString(R.string.profile_time_label)).append(event.getStartTime());
             if (event.getEndTime() != null) {
-                message.append(" - ").append(event.getEndTime());
+                message.append(" ").append(getString(R.string.dash)).append(" ").append(event.getEndTime());
             }
             message.append("\n");
         }
 
         if (event.getLocation() != null && !event.getLocation().isEmpty()) {
-            message.append("Location: ").append(event.getLocation()).append("\n");
+            message.append(getString(R.string.profile_location_label)).append(event.getLocation()).append("\n");
         }
 
         if (event.getStatus() != null && !event.getStatus().isEmpty()) {
-            message.append("Status: ").append(event.getStatus()).append("\n");
+            message.append(getString(R.string.profile_status_label)).append(event.getStatus()).append("\n");
         }
 
-        message.append("Type: ").append(event.getType().toString());
+        message.append(getString(R.string.profile_type_label)).append(event.getType().toString());
 
         builder.setMessage(message.toString());
 
@@ -710,17 +705,52 @@ public class ProfileFragment extends Fragment {
         if (event.getRelatedEntityId() != null) {
             if (event.getType() == com.eventplanner.model.enums.CalendarEventType.EVENT ||
                 event.getType() == com.eventplanner.model.enums.CalendarEventType.CREATED_EVENT) {
-                builder.setPositiveButton("View Event", (dialog, which) ->
+                builder.setPositiveButton(getString(R.string.profile_view_event), (dialog, which) ->
                     navigateToEventDetails(event.getRelatedEntityId()));
             } else if (event.getType() == com.eventplanner.model.enums.CalendarEventType.SERVICE_RESERVATION) {
-                builder.setPositiveButton("View Service", (dialog, which) ->
+                builder.setPositiveButton(getString(R.string.profile_view_service), (dialog, which) ->
                     navigateToServiceDetails(event.getRelatedEntityId()));
             }
-            builder.setNegativeButton("Close", null);
+            builder.setNegativeButton(getString(R.string.close), null);
         } else {
-            builder.setPositiveButton("OK", null);
+            builder.setPositiveButton(getString(R.string.ok), null);
         }
 
         builder.show();
+    }
+
+    private void loadOwnerCategories() {
+        Call<Collection<GetSolutionCategoryResponse>> call = HttpUtils.getSolutionCategoryService().getCurrentBusinessOwnerCategories();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Collection<GetSolutionCategoryResponse>> call,
+                                   @NonNull Response<Collection<GetSolutionCategoryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Collection<GetSolutionCategoryResponse> categories = response.body();
+
+                    List<String> items = new ArrayList<>();
+                    if (categories.isEmpty()) {
+                        items.add(getString(R.string.profile_no_categories_yet));
+                    } else {
+                        for (GetSolutionCategoryResponse c : categories) {
+                            items.add(c.getName() + "\n" + c.getDescription());
+                        }
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_list_item_1,
+                            items
+                    );
+                    ownerCategoriesListView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Collection<GetSolutionCategoryResponse>> call,
+                                  @NonNull Throwable t) {
+                Toast.makeText(getContext(), getString(R.string.profile_failed_to_load_categories), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

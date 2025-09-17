@@ -37,26 +37,26 @@
 
         </FrameLayout>
 
-        <!-- Product Info -->
+        <!-- Service Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Product Name -->
+            <!-- Service Name -->
             <TextView
-                android:id="@+id/product_name"
+                android:id="@+id/service_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:layout_marginBottom="4dp"
-                tools:text="Product Name" />
+                tools:text="Service Name" />
 
-            <!-- Product Category -->
+            <!-- Service Category -->
             <TextView
-                android:id="@+id/product_category"
+                android:id="@+id/service_category"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
@@ -66,9 +66,9 @@
                 android:layout_marginBottom="8dp"
                 tools:text="Category" />
 
-            <!-- Product Description -->
+            <!-- Service Description -->
             <TextView
-                android:id="@+id/product_description"
+                android:id="@+id/service_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
@@ -76,7 +76,7 @@
                 android:maxLines="3"
                 android:ellipsize="end"
                 android:layout_marginBottom="8dp"
-                tools:text="Product description goes here..." />
+                tools:text="Service description goes here..." />
 
             <!-- Price Section -->
             <LinearLayout
@@ -86,7 +86,7 @@
                 android:layout_marginBottom="8dp">
 
                 <TextView
-                    android:id="@+id/product_price"
+                    android:id="@+id/service_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
@@ -95,7 +95,7 @@
                     tools:text="$99.99" />
 
                 <TextView
-                    android:id="@+id/product_discounted_price"
+                    android:id="@+id/service_discounted_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
@@ -105,7 +105,7 @@
                     tools:text="$79.99" />
 
                 <TextView
-                    android:id="@+id/product_discount"
+                    android:id="@+id/service_discount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
@@ -126,7 +126,7 @@
                 android:layout_marginBottom="12dp">
 
                 <TextView
-                    android:id="@+id/product_availability"
+                    android:id="@+id/service_availability"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
@@ -135,7 +135,7 @@
                     tools:text="Available" />
 
                 <TextView
-                    android:id="@+id/product_visibility"
+                    android:id="@+id/service_visibility"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"

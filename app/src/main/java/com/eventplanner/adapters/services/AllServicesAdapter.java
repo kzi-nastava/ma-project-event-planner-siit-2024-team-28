@@ -1,4 +1,4 @@
-package com.eventplanner.adapters.products;
+package com.eventplanner.adapters.services;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,80 +9,79 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.eventplanner.R;
-import com.eventplanner.adapters.products.ProductImageAdapter;
-import com.eventplanner.model.responses.products.GetProductResponse;
+import com.eventplanner.model.responses.services.GetServiceResponse;
 import com.eventplanner.utils.AuthUtils;
-import androidx.viewpager2.widget.ViewPager2;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllProductsAdapter extends RecyclerView.Adapter<AllProductsAdapter.ProductViewHolder> {
+public class AllServicesAdapter extends RecyclerView.Adapter<AllServicesAdapter.ServiceViewHolder> {
     
-    public interface OnProductClickListener {
-        void onProductClick(GetProductResponse product);
-        void onEditProduct(GetProductResponse product);
-        void onDeleteProduct(GetProductResponse product);
+    public interface OnServiceClickListener {
+        void onServiceClick(GetServiceResponse service);
+        void onEditService(GetServiceResponse service);
+        void onDeleteService(GetServiceResponse service);
     }
 
     private Context context;
-    private List<GetProductResponse> products;
-    private OnProductClickListener listener;
+    private List<GetServiceResponse> services;
+    private OnServiceClickListener listener;
 
-    public AllProductsAdapter(Context context, List<GetProductResponse> products) {
+    public AllServicesAdapter(Context context, List<GetServiceResponse> services) {
         this.context = context;
-        this.products = products;
+        this.services = services;
     }
 
-    public void setOnProductClickListener(OnProductClickListener listener) {
+    public void setOnServiceClickListener(OnServiceClickListener listener) {
         this.listener = listener;
     }
 
-    public void updateProducts(List<GetProductResponse> newProducts) {
-        this.products = newProducts;
+    public void updateServices(List<GetServiceResponse> newServices) {
+        this.services = newServices;
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_product, parent, false);
-        return new ProductViewHolder(view);
+    public ServiceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_service, parent, false);
+        return new ServiceViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        GetProductResponse product = products.get(position);
+    public void onBindViewHolder(@NonNull ServiceViewHolder holder, int position) {
+        GetServiceResponse service = services.get(position);
         
-        holder.nameTextView.setText(product.getName());
-        holder.descriptionTextView.setText(product.getDescription());
+        holder.nameTextView.setText(service.getName());
+        holder.descriptionTextView.setText(service.getDescription());
         
         DecimalFormat df = new DecimalFormat("#.00");
-        holder.priceTextView.setText("$" + df.format(product.getPrice()));
+        holder.priceTextView.setText("$" + df.format(service.getPrice()));
         
         // Show category if available
-        if (product.getCategoryName() != null && !product.getCategoryName().isEmpty()) {
-            holder.categoryTextView.setText(product.getCategoryName());
+        if (service.getCategoryName() != null && !service.getCategoryName().isEmpty()) {
+            holder.categoryTextView.setText(service.getCategoryName());
             holder.categoryTextView.setVisibility(View.VISIBLE);
         } else {
             holder.categoryTextView.setVisibility(View.GONE);
         }
         
         // Show discount if available
-        if (product.getDiscount() != null && product.getDiscount() > 0) {
-            double discountedPrice = product.getPrice() * (1 - product.getDiscount() / 100);
-            holder.discountTextView.setText(df.format(product.getDiscount()) + "% OFF");
+        if (service.getDiscount() != null && service.getDiscount() > 0) {
+            double discountedPrice = service.getPrice() * (1 - service.getDiscount() / 100);
+            holder.discountTextView.setText(df.format(service.getDiscount()) + "% OFF");
             holder.discountTextView.setVisibility(View.VISIBLE);
         } else {
             holder.discountTextView.setVisibility(View.GONE);
         }
         
         // Show availability status
-        if (product.getIsAvailable() != null) {
-            if (product.getIsAvailable()) {
+        if (service.getIsAvailable() != null) {
+            if (service.getIsAvailable()) {
                 holder.badgeAvailable.setVisibility(View.VISIBLE);
                 holder.badgeUnavailable.setVisibility(View.GONE);
             } else {
@@ -95,27 +94,27 @@ public class AllProductsAdapter extends RecyclerView.Adapter<AllProductsAdapter.
         }
         
         // Show visibility status
-        if (product.getIsVisibleForEventOrganizers() != null && product.getIsVisibleForEventOrganizers()) {
+        if (service.getIsVisibleForEventOrganizers() != null && service.getIsVisibleForEventOrganizers()) {
             holder.badgeVisible.setVisibility(View.VISIBLE);
         } else {
             holder.badgeVisible.setVisibility(View.GONE);
         }
 
         // Set up image carousel
-        if (product.getImagesBase64() != null && !product.getImagesBase64().isEmpty()) {
-            ProductImageAdapter imageAdapter = new ProductImageAdapter(context, product.getImagesBase64());
+        if (service.getImagesBase64() != null && !service.getImagesBase64().isEmpty()) {
+            ServiceImageAdapter imageAdapter = new ServiceImageAdapter(context, service.getImagesBase64());
             holder.imageViewPager.setAdapter(imageAdapter);
         } else {
             // Show placeholder when no images
             List<String> placeholderList = new ArrayList<>();
             placeholderList.add(""); // Empty string will show placeholder
-            ProductImageAdapter imageAdapter = new ProductImageAdapter(context, placeholderList);
+            ServiceImageAdapter imageAdapter = new ServiceImageAdapter(context, placeholderList);
             holder.imageViewPager.setAdapter(imageAdapter);
         }
 
         // Show/hide action buttons based on ownership
         Long currentUserId = AuthUtils.getUserId(holder.itemView.getContext());
-        boolean isOwner = currentUserId != null && currentUserId.equals(product.getBusinessOwnerId());
+        boolean isOwner = currentUserId != null && currentUserId.equals(service.getBusinessOwnerId());
 
         if (isOwner) {
             holder.editButton.setVisibility(View.VISIBLE);
@@ -123,13 +122,13 @@ public class AllProductsAdapter extends RecyclerView.Adapter<AllProductsAdapter.
 
             holder.editButton.setOnClickListener(v -> {
                 if (listener != null) {
-                    listener.onEditProduct(product);
+                    listener.onEditService(service);
                 }
             });
 
             holder.deleteButton.setOnClickListener(v -> {
                 if (listener != null) {
-                    listener.onDeleteProduct(product);
+                    listener.onDeleteService(service);
                 }
             });
         } else {
@@ -139,29 +138,29 @@ public class AllProductsAdapter extends RecyclerView.Adapter<AllProductsAdapter.
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onProductClick(product);
+                listener.onServiceClick(service);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return services.size();
     }
 
-    static class ProductViewHolder extends RecyclerView.ViewHolder {
+    static class ServiceViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, descriptionTextView, priceTextView, categoryTextView, discountTextView;
         TextView badgeVisible, badgeAvailable, badgeUnavailable;
         ViewPager2 imageViewPager;
         Button editButton, deleteButton;
 
-        public ProductViewHolder(@NonNull View itemView) {
+        public ServiceViewHolder(@NonNull View itemView) {
             super(itemView);
-            nameTextView = itemView.findViewById(R.id.product_name);
-            descriptionTextView = itemView.findViewById(R.id.product_description);
-            priceTextView = itemView.findViewById(R.id.product_price);
-            categoryTextView = itemView.findViewById(R.id.product_category);
-            discountTextView = itemView.findViewById(R.id.product_discount);
+            nameTextView = itemView.findViewById(R.id.service_name);
+            descriptionTextView = itemView.findViewById(R.id.service_description);
+            priceTextView = itemView.findViewById(R.id.service_price);
+            categoryTextView = itemView.findViewById(R.id.service_category);
+            discountTextView = itemView.findViewById(R.id.service_discount);
             badgeVisible = itemView.findViewById(R.id.badge_visible);
             badgeAvailable = itemView.findViewById(R.id.badge_available);
             badgeUnavailable = itemView.findViewById(R.id.badge_unavailable);

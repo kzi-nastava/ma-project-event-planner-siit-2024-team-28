@@ -48,4 +48,15 @@ public interface ServiceService {
             @Query("page") int page,
             @Query("size") int size
     );
+
+    @GET("services/filter")
+    Call<PagedResponse<GetServiceResponse>> filterServices(@Query("name") String name,
+                                                           @Query("categoryId") Long categoryId,
+                                                           @Query("eventTypeId") Long eventTypeId,
+                                                           @Query("minPrice") Double minPrice,
+                                                           @Query("maxPrice") Double maxPrice,
+                                                           @Query("isAvailable") Boolean isAvailable,
+                                                           @Query("page") int page,
+                                                           @Query("size") int size
+    );
 }
