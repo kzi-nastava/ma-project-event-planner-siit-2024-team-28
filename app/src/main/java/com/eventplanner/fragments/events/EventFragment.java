@@ -12,6 +12,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.graphics.Bitmap;
@@ -20,6 +21,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.eventplanner.utils.Base64Util;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +68,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -99,6 +112,11 @@ public class EventFragment extends Fragment {
     private RatingBar ratingBar;
     private Button submitReviewButton, deleteReviewButton;
     private DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+    private boolean isPrivate;
+    private MapView mapView;
+    private Marker locationMarker;
+    private double locationLat = 44.8125; // Default Belgrade
+    private double locationLng = 20.4612;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -158,7 +176,73 @@ public class EventFragment extends Fragment {
             deleteReviewButton.setVisibility(View.GONE);
             binding.favoriteButton.setVisibility(View.GONE);
         }
+
+
+        mapView = binding.locationMap;
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setMultiTouchControls(true);
+        mapView.setOnTouchListener((v, event) -> {
+            // Request parent not to intercept touch events while interacting with the map
+            v.getParent().requestDisallowInterceptTouchEvent(true);
+
+            // Allow MapView to handle touch as usual
+            return false;
+        });
+
+
+// Restore coordinates if location passed
+        if (location != null) {
+            locationLat = location.getLatitude();
+            locationLng = location.getLongitude();
+        }
+
+// Center map
+        GeoPoint startPoint = new GeoPoint(locationLat, locationLng);
+        mapView.getController().setZoom(13.0);
+        mapView.getController().setCenter(startPoint);
+
+// Add at location
+        locationMarker = new Marker(mapView);
+        locationMarker.setPosition(startPoint);
+        locationMarker.setTitle(location != null ? location.getName() : "Location");
+        mapView.getOverlays().add(locationMarker);
+
+        }
+
+    private void updateLocationOnMap() {
+        if (location != null && mapView != null) {
+            locationLat = location.getLatitude();
+            locationLng = location.getLongitude();
+
+            GeoPoint newPoint = new GeoPoint(locationLat, locationLng);
+
+            // Update or create marker
+            if (locationMarker == null) {
+                locationMarker = new Marker(mapView);
+                mapView.getOverlays().add(locationMarker);
+            }
+            locationMarker.setPosition(newPoint);
+            locationMarker.setTitle(location.getName());
+
+            // Center the map on new location
+            mapView.getController().setZoom(13.0);
+            mapView.getController().setCenter(newPoint);
+
+        }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume(); // needed for osmdroid
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause(); // needed for osmdroid
+    }
+
 
     private void setupForm() {
         // Disable form if user is not organizer (for edit mode)
@@ -258,6 +342,8 @@ public class EventFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     GetEventResponse event = response.body();
                     eventOrganizerId = event.getEventOrganizerId();
+                    isPrivate = event.getPrivacyType().equals("PRIVATE");
+                    updateInvitationVisibility();
 
                     // Check if current user is organizer
                     if (!isEventOrganizerAndCreator()) {
@@ -418,6 +504,22 @@ public class EventFragment extends Fragment {
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadDetailsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
 
+        updateInvitationVisibility();
+        binding.emailInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                binding.sendButton.setEnabled(isValidEmail(s.toString()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+        binding.sendButton.setOnClickListener(v -> sendEventInvitation());
+
         // Setup favorite button visibility and functionality
         setupFavoriteButton();
 
@@ -425,6 +527,22 @@ public class EventFragment extends Fragment {
         if (isEditMode && !isEventOrganizerAndCreator()) {
             binding.imageUploadButton.setEnabled(false);
         }
+    }
+
+    private void updateInvitationVisibility()
+    {
+        String TAG = "PrivacyDebug";
+        Log.i(TAG, "isEditMode:" + isEditMode);
+        Log.i(TAG, "eventId:" + eventId);
+        Log.i(TAG, "isPrivate:" + isPrivate);
+
+        binding.invitationTitle.setVisibility((isEditMode && eventId!=null && isPrivate) ? View.VISIBLE : View.GONE);
+        binding.sendButton.setVisibility((isEditMode && eventId!=null && isPrivate) ? View.VISIBLE : View.GONE);
+        binding.emailInput.setVisibility((isEditMode && eventId!=null && isPrivate) ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean isValidEmail(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private void openImagePicker() {
@@ -813,6 +931,7 @@ public class EventFragment extends Fragment {
         } else {
             binding.locationSummary.setVisibility(View.GONE);
         }
+        updateLocationOnMap();
     }
 
     private void updateActivitiesSummary() {
@@ -995,6 +1114,28 @@ public class EventFragment extends Fragment {
                         }
                     });
         }
+    }
+
+    private void sendEventInvitation()
+    {
+        String email = binding.emailInput.getText().toString();
+        if (email.isEmpty() || eventId == 0) return;
+
+        eventService.createEventInvitation(eventId, email)
+                .enqueue(new Callback<Long>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Long> call, @NonNull Response<Long> response) {
+                        if (response.isSuccessful()) {
+                            binding.emailInput.setText("");
+                            Toast.makeText(requireContext(), getString(R.string.email_sent), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Long> call, @NonNull Throwable t) {
+                        Toast.makeText(requireContext(), R.string.error_creating_review, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void deleteReview() {

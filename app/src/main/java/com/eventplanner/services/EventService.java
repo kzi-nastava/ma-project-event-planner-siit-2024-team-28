@@ -76,4 +76,9 @@ public interface EventService {
                                                        @Query("startDate") LocalDate startDate,
                                                        @Query("endDate") LocalDate endDate,
                                                        @Query("sort") String sort);
+
+
+    @POST("events/{eventId}/invitations")
+    Call<Long> createEventInvitation(@Path("eventId") Long eventId,
+                                     @Query("email") String email);
 }
