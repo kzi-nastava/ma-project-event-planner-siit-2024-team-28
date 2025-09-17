@@ -425,4 +425,10 @@
     <string name="failed_to_load_service_reservations">Failed to load service reservations</string>
     <string name="failed_to_load_created_events">Failed to load created events</string>
     <string name="failed_to_load_accepted_events">Failed to load accepted events</string>
+    <string name="send_invitation">Send Invitation</string>
+    <string name="invitation_email">Invitation Email</string>
+    <string name="email_placeholder">Enter email address</string>
+    <string name="send_invitation_button">Send</string>
+    <string name="invalid_email">Invalid email address</string>
+    <string name="email_sent">Email sent successfully</string>
 </resources>

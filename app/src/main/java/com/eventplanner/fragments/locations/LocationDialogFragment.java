@@ -14,10 +14,23 @@ import com.eventplanner.databinding.FragmentLocationDialogBinding;
 import com.eventplanner.model.requests.locations.CreateLocationRequest;
 import com.google.gson.Gson;
 
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
 public class LocationDialogFragment extends DialogFragment {
     private FragmentLocationDialogBinding binding;
     private CreateLocationRequest location;
     private boolean isReadOnly;
+
+    private MapView mapView;
+    private Marker centerMarker;
+    private double currentLat = 44.8125; // Default Belgrade
+    private double currentLng = 20.4612;
 
     public static LocationDialogFragment newInstance(CreateLocationRequest location, boolean isReadOnly) {
         LocationDialogFragment fragment = new LocationDialogFragment();
@@ -76,7 +89,78 @@ public class LocationDialogFragment extends DialogFragment {
         // Setup buttons
         binding.cancelButton.setOnClickListener(v -> dismiss());
         binding.saveButton.setOnClickListener(v -> saveLocation());
+
+        mapView = binding.locationMap;
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setMultiTouchControls(true);
+
+// Restore coordinates if location passed
+        if (location != null) {
+            currentLat = location.getLatitude();
+            currentLng = location.getLongitude();
+        }
+
+// Center map
+        GeoPoint startPoint = new GeoPoint(currentLat, currentLng);
+        mapView.getController().setZoom(13.0);
+        mapView.getController().setCenter(startPoint);
+
+// Add marker at center
+        centerMarker = new Marker(mapView);
+        centerMarker.setPosition(startPoint);
+        if(!isReadOnly)
+        {
+            centerMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            // Listen to map movements
+            mapView.addMapListener(new MapListener() {
+                @Override
+                public boolean onScroll(ScrollEvent event) {
+                    updateCenterMarker();
+                    return true;
+                }
+
+                @Override
+                public boolean onZoom(ZoomEvent event) {
+                    updateCenterMarker();
+                    return true;
+                }
+            });
+
+
+        }
+
+        centerMarker.setTitle(location != null ? location.getName() : "Location");
+        mapView.getOverlays().add(centerMarker);
+
+// Update lat/lon fields initially
+        binding.latitude.setText(String.valueOf(currentLat));
+        binding.longitude.setText(String.valueOf(currentLng));
+
+
     }
+    private void updateCenterMarker() {
+        GeoPoint center = (GeoPoint) mapView.getMapCenter();
+        currentLat = center.getLatitude();
+        currentLng = center.getLongitude();
+
+        centerMarker.setPosition(center);
+
+        binding.latitude.setText(String.format("%.6f", currentLat));
+        binding.longitude.setText(String.format("%.6f", currentLng));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume(); // needed for osmdroid
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause(); // needed for osmdroid
+    }
+
 
     private void saveLocation() {
         if (validateForm()) {
