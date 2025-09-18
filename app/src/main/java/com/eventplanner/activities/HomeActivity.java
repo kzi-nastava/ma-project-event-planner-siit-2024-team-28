@@ -139,6 +139,7 @@ public class HomeActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_event_types).setVisible(isAdmin);
         menu.findItem(R.id.nav_categories_overview).setVisible(isAdmin);
         menu.findItem(R.id.nav_reports).setVisible(isAdmin);
+        menu.findItem(R.id.nav_comments_moderation).setVisible(isAdmin);
 
         // Business owner-only items
         boolean isBusinessOwner = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.BusinessOwner);

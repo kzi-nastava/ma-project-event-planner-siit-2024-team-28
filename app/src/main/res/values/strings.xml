@@ -435,4 +435,11 @@
     <string name="reports">Reports</string>
     <string name="block_user">Block user</string>
     <string name="unblock_user">Unblock user</string>
+    <string name="comment_id">Comment Id: %1$d</string>
+    <string name="comment_content">Comment Content</string>
+    <string name="solution_id">Solution Id: %1$d</string>
+    <string name="user_id">User Id: %1$d</string>
+    <string name="no_comments_available">No comments available</string>
+    <string name="comments_moderation">Comments moderation</string>
+    <string name="is_deleted">Is deleted: %1$s</string>
 </resources>
