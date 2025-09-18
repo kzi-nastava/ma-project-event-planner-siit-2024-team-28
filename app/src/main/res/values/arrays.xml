@@ -6,4 +6,10 @@
         <item>5</item>
         <item>10</item>
     </string-array>
+    <string-array name="comment_statuses">
+        <item>ALL</item>
+        <item>PENDING</item>
+        <item>ACCEPTED</item>
+        <item>REJECTED</item>
+    </string-array>
 </resources>
