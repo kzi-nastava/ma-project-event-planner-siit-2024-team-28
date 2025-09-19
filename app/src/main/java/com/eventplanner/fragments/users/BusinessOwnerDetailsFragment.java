@@ -27,10 +27,12 @@ import com.eventplanner.model.responses.solutionComments.GetSolutionCommentPrevi
 import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewPreviewResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
+import com.eventplanner.services.AuthService;
 import com.eventplanner.services.ReportService;
 import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.SolutionReviewService;
 import com.eventplanner.services.UserService;
+import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -53,6 +55,8 @@ public class BusinessOwnerDetailsFragment extends Fragment {
     private SolutionReviewService solutionReviewService;
     private String businessOwnerId;
     private GetUserResponse businessOwner;
+    private Long currentUserId;
+    private Boolean isBlocked = false;
 
     public BusinessOwnerDetailsFragment() {
         // Required empty public constructor
@@ -73,6 +77,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         reportService = HttpUtils.getReportService();
         solutionCommentService = HttpUtils.getCommentService();
         solutionReviewService = HttpUtils.getReviewService();
+        currentUserId = AuthUtils.getUserId(getContext());
         if (getArguments() != null) {
             businessOwnerId = getArguments().getString(ARG_BUSINESS_OWNER_ID);
         }
@@ -102,6 +107,7 @@ public class BusinessOwnerDetailsFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     businessOwner = response.body();
                     populateViews();
+                    fetchIsBlocked();
                     Log.i("BusinessOwnerDetailsFragment", "Business owner successfully fetched with id: " + businessOwnerId);
                 } else {
                     Log.w("BusinessOwnerDetailsFragment", "Error with fetching business owner: " + response.code());
@@ -116,6 +122,32 @@ public class BusinessOwnerDetailsFragment extends Fragment {
                 showErrorDialog();
             }
         });
+    }
+
+    private void fetchIsBlocked() {
+        if(currentUserId!=null) {
+            Call<Boolean> call = userService.isUserBlocked(currentUserId, businessOwner.getId());
+            call.enqueue(new Callback<Boolean>() {
+                @Override
+                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        isBlocked = response.body();
+                        refreshUserModerationButtons();
+                        Log.i("BusinessOwnerDetailsFragment", "Business owner successfully fetched with id: " + businessOwnerId);
+                    } else {
+                        Log.w("BusinessOwnerDetailsFragment", "Error with fetching business owner: " + response.code());
+                        showErrorDialog();
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Boolean> call, Throwable t) {
+                    Log.e("BusinessOwnerDetailsFragment", "Network failure", t);
+                    showErrorDialog();
+                }
+            });
+        }
     }
 
     // code for editing views separated from main code
@@ -136,6 +168,64 @@ public class BusinessOwnerDetailsFragment extends Fragment {
         // on click opens bottomSheetDialog for displaying comments|reviews
         binding.seeComments.setOnClickListener(v -> showCommentsDialog());
         binding.seeReviews.setOnClickListener(v -> showReviewsDialog());
+        binding.blockUserButton.setOnClickListener(v -> blockUser());
+        binding.unblockUserButton.setOnClickListener(v -> unblockUser());
+
+        refreshUserModerationButtons();
+    }
+
+    private void refreshUserModerationButtons()
+    {
+        binding.userModerationButtons.setVisibility(currentUserId!=null ? View.VISIBLE : View.GONE);
+        binding.blockUserButton.setVisibility(currentUserId!=null && !isBlocked ? View.VISIBLE : View.GONE);
+        binding.unblockUserButton.setVisibility(currentUserId!=null && isBlocked ? View.VISIBLE : View.GONE);
+    }
+
+    private void blockUser() {
+        if(currentUserId!=null)
+        {
+            Call<Void> call = userService.blockUser(currentUserId, businessOwner.getId());
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        isBlocked = true;
+                        refreshUserModerationButtons();
+                    } else {
+                        showErrorDialog();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("BusinessOwnerDetailsFragment", "Network failure", t);
+                    showErrorDialog();
+                }
+            });
+        }
+    }
+    private void unblockUser() {
+        if(currentUserId!=null)
+        {
+            Call<Void> call = userService.unblockUser(currentUserId, businessOwner.getId());
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        isBlocked = false;
+                        refreshUserModerationButtons();
+                    } else {
+                        showErrorDialog();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("BusinessOwnerDetailsFragment", "Network failure", t);
+                    showErrorDialog();
+                }
+            });
+        }
     }
 
     private void fetchAndSetUserProfilePicture() {

@@ -76,6 +76,14 @@
                 android:textSize="18sp"
                 android:textColor="#000000"/>
 
+        <LinearLayout
+            android:id="@+id/userModerationButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
             <Button
                 android:id="@+id/reportUserButton"
                 android:backgroundTint="@null"
@@ -87,6 +95,31 @@
                 android:text="@string/report_user"
                 android:background="@drawable/red_button"
                 android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/blockUserButton"
+                android:backgroundTint="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="12dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/block_user"
+                android:background="@drawable/red_button"
+                android:textColor="@android:color/white" />
+            <Button
+                android:id="@+id/unblockUserButton"
+                android:backgroundTint="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="12dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/unblock_user"
+                android:background="@drawable/red_button"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"

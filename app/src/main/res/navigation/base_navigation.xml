@@ -53,6 +53,12 @@
         <action
             android:id="@+id/action_home_to_product_overview"
             app:destination="@id/nav_my_products" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_reports"
+            app:destination="@id/nav_reports" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_comments_moderation"
+            app:destination="@id/nav_comments_moderation" />
     </fragment>
 
     <fragment
@@ -427,4 +433,23 @@
             android:name="isReadOnly"
             app:argType="boolean" />
     </dialog>
+    <fragment
+        android:id="@+id/nav_reports"
+        android:name="com.eventplanner.fragments.reports.ReportsFragment"
+        android:label="ReportsFragment" >
+        <action
+            android:id="@+id/action_reportsFragment_to_business_owner_details_fragment"
+            app:destination="@id/business_owner_details_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_comments_moderation"
+        android:name="com.eventplanner.fragments.solutionComments.SolutionCommentsModerationFragment"
+        android:label="SolutionCommentsModerationFragment" >
+        <action
+            android:id="@+id/action_nav_comments_moderation_to_nav_solution_details"
+            app:destination="@id/nav_solution_details" />
+        <action
+            android:id="@+id/action_nav_comments_moderation_to_business_owner_details_fragment"
+            app:destination="@id/business_owner_details_fragment" />
+    </fragment>
 </navigation>

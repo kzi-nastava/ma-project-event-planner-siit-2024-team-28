@@ -8,6 +8,8 @@ public class GetReportResponse {
     Long reportedUserId;
     RequestStatus status;
     Boolean isDeleted;
+    Long suspensionTimestamp;
+    Boolean isSuspended;
 
     public Long getId() {
         return id;
@@ -27,5 +29,20 @@ public class GetReportResponse {
 
     public Boolean getDeleted() {
         return isDeleted;
+    }
+    public Long getSuspensionTimestamp() { return suspensionTimestamp;}
+
+    public void setSuspended(Boolean suspended) {
+        isSuspended = suspended;
+    }
+
+    public void setSuspensionTimestamp(Long suspensionTimestamp) {
+        this.suspensionTimestamp = suspensionTimestamp;
+    }
+
+    public Boolean getIsSuspended() { return isSuspended;}
+
+    public void setStatus(String newStatus) {
+        this.status = RequestStatus.valueOf(newStatus);
     }
 }
