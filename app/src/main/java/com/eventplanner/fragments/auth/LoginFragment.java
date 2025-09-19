@@ -86,6 +86,7 @@ public class LoginFragment extends Fragment {
                         // Update navigation menu after login
                         if (getActivity() instanceof HomeActivity) {
                             ((HomeActivity) getActivity()).updateNavMenu();
+                            ((HomeActivity) getActivity()).updateNotifications();
                         }
 
                         // Navigate back to HomeFragment

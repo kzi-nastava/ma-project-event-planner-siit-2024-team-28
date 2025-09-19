@@ -59,6 +59,9 @@
         <action
             android:id="@+id/action_nav_home_to_nav_comments_moderation"
             app:destination="@id/nav_comments_moderation" />
+        <action
+            android:id="@+id/action_nav_home_to_all_notifications_fragment"
+            app:destination="@id/nav_all_notifications_fragment" />
     </fragment>
 
     <fragment
@@ -471,4 +474,8 @@
             android:id="@+id/action_nav_comments_moderation_to_business_owner_details_fragment"
             app:destination="@id/business_owner_details_fragment" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_all_notifications_fragment"
+        android:name="com.eventplanner.fragments.notifications.AllNotificationsFragment"
+        android:label="All Notifications" />
 </navigation>
