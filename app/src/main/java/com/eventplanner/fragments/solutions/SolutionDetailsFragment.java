@@ -34,6 +34,7 @@ import com.eventplanner.model.responses.chats.FindChatResponse;
 import com.eventplanner.model.responses.solutionComments.GetSolutionCommentResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewResponse;
+import com.eventplanner.model.responses.solutions.GetFavoriteSolutionResultResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.services.ChatService;
 import com.eventplanner.services.SolutionCommentService;
@@ -152,17 +153,17 @@ public class SolutionDetailsFragment extends Fragment {
                 .show();
     }
 
-    private void addToFavorites(Long userId, Long serviceId) {
-        Call<String> call = userService.favoriteService(userId, serviceId);
+    private void addToFavorites(Long userId, Long solutionId) {
+        Call<GetFavoriteSolutionResultResponse> call = userService.favoriteSolution(solutionId, userId);
 
-        call.enqueue(new Callback<String>() {
+        call.enqueue(new Callback<GetFavoriteSolutionResultResponse>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<GetFavoriteSolutionResultResponse> call, Response<GetFavoriteSolutionResultResponse> response) {
                 if (response.isSuccessful()) {
-                    String message = response.body();
-                    Log.d("SolutionDetailsFragment", "Successfully added to favorites: " + message);
+                    GetFavoriteSolutionResultResponse resultResponse = response.body();
+                    Log.d("SolutionDetailsFragment", "Successfully added to favorites: " + resultResponse.getResultMessage());
                     // show message from backend
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), resultResponse.getResultMessage(), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.e("SolutionDetailsFragment", "Error: " + response.code());
                     showErrorDialog();
@@ -170,7 +171,7 @@ public class SolutionDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<GetFavoriteSolutionResultResponse> call, Throwable t) {
                 Log.e("SolutionDetailsFragment", "Network failure", t);
                 showErrorDialog();
             }
