@@ -23,10 +23,12 @@ import com.eventplanner.model.requests.requiredSolutions.UpdateRequiredSolutionR
 import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.requiredSolutions.GetRequiredSolutionItemResponse;
+import com.eventplanner.model.responses.solutionHistories.GetSolutionHistoryDetails;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionResponse;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.RequiredSolutionService;
+import com.eventplanner.services.SolutionHistoryService;
 import com.eventplanner.services.SolutionService;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
@@ -48,6 +50,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
     private RequiredSolutionService requiredSolutionService;
     private EventService eventService;
     private SolutionService solutionService;
+    private SolutionHistoryService solutionHistoryService;
     private List<GetRequiredSolutionItemResponse> items;
     private RequiredSolutionRecyclerViewAdapter adapter;
     private NavController navController;
@@ -73,6 +76,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
         requiredSolutionService = HttpUtils.getRequiredSolutionService();
         eventService = HttpUtils.getEventService();
         solutionService = HttpUtils.getSolutionService();
+        solutionHistoryService = HttpUtils.getSolutionHistoryService();
         navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
     }
 
@@ -170,14 +174,16 @@ public class BudgetPlanningItemsFragment extends Fragment {
                         } else {
                             // Item has a bought solution so we just load it nothing more
                             Long solutionId = item.getSolutionId();
-                            Call<GetSolutionResponse> call = solutionService.getSolutionById(solutionId);
-                            call.enqueue(new Callback<GetSolutionResponse>() {
+                            Call<GetSolutionHistoryDetails> call = solutionHistoryService.getSolutionHistoryDetailsById(solutionId);
+                            call.enqueue(new Callback<GetSolutionHistoryDetails>() {
                                 @Override
-                                public void onResponse(Call<GetSolutionResponse> call, Response<GetSolutionResponse> response) {
+                                public void onResponse(Call<GetSolutionHistoryDetails> call, Response<GetSolutionHistoryDetails> response) {
                                     if (response.isSuccessful()) {
-                                        GetSolutionResponse fetchedSolution = response.body();
+                                        GetSolutionHistoryDetails fetchedSolution = response.body();
                                         List<GetSolutionResponse> solutions = new ArrayList<>();
-                                        solutions.add(fetchedSolution);
+                                        solutions.add(
+                                                GetSolutionResponse.mapFromSolutionHistoryToSolutionResponse(fetchedSolution)
+                                        );
                                         // Overriding listener method for solution adapter
                                         SolutionRecyclerViewAdapter.OnItemClickListener solutionAdapterListener =
                                                 new SolutionRecyclerViewAdapter.OnItemClickListener() {
@@ -185,7 +191,8 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                                     public void onItemClick(GetSolutionResponse solution) {
                                                         Bundle args = new Bundle();
                                                         args.putString("solutionId", String.valueOf(solution.getId()));
-                                                        navController.navigate(R.id.action_budget_planning_items_to_solution_details, args);
+                                                        // TODO: change navigation
+                                                        navController.navigate(R.id.action_budget_planning_items_to_solution_history_details, args);
                                                     }
                                                 };
                                         SolutionRecyclerViewAdapter solutionsAdapter = new SolutionRecyclerViewAdapter(solutions, solutionAdapterListener);
@@ -202,7 +209,7 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                 }
 
                                 @Override
-                                public void onFailure(Call<GetSolutionResponse> call, Throwable t) {
+                                public void onFailure(Call<GetSolutionHistoryDetails> call, Throwable t) {
                                     Log.e("BudgetPlanningFragment", "Network failure", t);
                                     Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
                                 }

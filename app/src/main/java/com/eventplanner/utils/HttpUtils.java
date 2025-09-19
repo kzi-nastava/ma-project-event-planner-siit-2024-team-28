@@ -17,6 +17,7 @@ import com.eventplanner.services.EventTypeService;
 import com.eventplanner.services.ProductService;
 import com.eventplanner.services.ReportService;
 import com.eventplanner.services.RequiredSolutionService;
+import com.eventplanner.services.SolutionHistoryService;
 import com.eventplanner.services.SolutionReviewService;
 import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCategoryService;
@@ -128,5 +129,9 @@ public class HttpUtils {
 
     public static CalendarService getCalendarService() {
         return retrofit.create(CalendarService.class);
+    }
+
+    public static SolutionHistoryService getSolutionHistoryService() {
+        return retrofit.create(SolutionHistoryService.class);
     }
 }

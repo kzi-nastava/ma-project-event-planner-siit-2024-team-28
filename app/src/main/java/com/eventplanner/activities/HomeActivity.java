@@ -133,6 +133,7 @@ public class HomeActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_registration).setVisible(!loggedIn);
         menu.findItem(R.id.nav_logout).setVisible(loggedIn);
         menu.findItem(R.id.nav_profile).setVisible(loggedIn);
+        menu.findItem(R.id.nav_chat_list).setVisible(loggedIn);
 
         // Admin-only items
         boolean isAdmin = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.ADMIN);
@@ -146,6 +147,10 @@ public class HomeActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_service_overview).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_my_products).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_price_list).setVisible(isBusinessOwner);
+
+        // Event organizer-only items
+        boolean isEventOrganizer = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.EventOrganizer);
+        menu.findItem(R.id.nav_budget_planning).setVisible(isEventOrganizer);
 
         // All products should be visible to everyone
         menu.findItem(R.id.nav_all_products).setVisible(true);
