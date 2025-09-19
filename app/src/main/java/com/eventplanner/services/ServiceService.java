@@ -1,5 +1,6 @@
 package com.eventplanner.services;
 
+import com.eventplanner.model.requests.services.CreatePendingServiceRequest;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.services.UpdateServiceRequest;
 import com.eventplanner.model.responses.PagedResponse;
@@ -20,6 +21,9 @@ import retrofit2.http.Query;
 public interface ServiceService {
     @POST("services")
     Call<Long> createService(@Body CreateServiceRequest request);
+
+    @POST("services/create-pending-service")
+    Call<Long> createPendingService(@Body CreatePendingServiceRequest request);
 
     @GET("services/{id}")
     Call<GetServiceResponse> getServiceById(@Path("id") Long id);

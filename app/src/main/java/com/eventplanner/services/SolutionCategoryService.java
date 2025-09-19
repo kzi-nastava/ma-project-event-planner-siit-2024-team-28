@@ -21,9 +21,6 @@ public interface SolutionCategoryService {
     @POST("categories")
     Call<Long> createCategory(@Body CreateSolutionCategoryRequest request);
 
-    @POST("categories/pending-category")
-    Call<Long> createPendingCategory(@Body CreatePendingCategoryRequest request);
-
     @GET("categories/{id}")
     Call<GetSolutionCategoryResponse> getSolutionCategoryById(@Path("id") Long id);
 
