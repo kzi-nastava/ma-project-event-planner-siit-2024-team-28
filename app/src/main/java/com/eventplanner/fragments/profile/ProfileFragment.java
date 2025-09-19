@@ -505,6 +505,7 @@ public class ProfileFragment extends Fragment {
                     // Update navigation menu after deactivation
                     if (getActivity() instanceof HomeActivity) {
                         ((HomeActivity) getActivity()).updateNavMenu();
+                        ((HomeActivity) getActivity()).updateNotifications();
                     }
 
                     // Navigate back to HomeFragment

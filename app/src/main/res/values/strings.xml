@@ -442,4 +442,8 @@
     <string name="no_comments_available">No comments available</string>
     <string name="comments_moderation">Comments moderation</string>
     <string name="is_deleted">Is deleted: %1$s</string>
+    <string name="no_notifications">No notifications</string>
+    <string name="notifications">Notifications</string>
+    <string name="view_all_notifications">View All Notifications</string>
+    <string name="mark_all_as_read">Mark All As Read</string>
 </resources>

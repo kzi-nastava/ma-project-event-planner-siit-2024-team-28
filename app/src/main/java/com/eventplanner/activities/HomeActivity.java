@@ -5,11 +5,16 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -23,9 +28,11 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.eventplanner.R;
+import com.eventplanner.fragments.notifications.NotificationsPopup;
 import com.eventplanner.model.constants.UserRoles;
 import com.eventplanner.utils.AuthUtils;
 import com.eventplanner.utils.HttpUtils;
+import com.eventplanner.utils.NotificationManager;
 import com.eventplanner.utils.WebSocketService;
 import com.google.android.material.navigation.NavigationView;
 
@@ -37,6 +44,7 @@ public class HomeActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration mAppBarConfiguration;
     private static final int REQUEST_INTERNET_PERMISSION = 1;
+    private NotificationsPopup notificationsPopup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,19 +54,16 @@ public class HomeActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_PERMISSION);
         } else {
+            // Lazily gets the singleton instance and establishes the WebSocket/STOMP connection
+            // Logs once the connection is successfully opened
+            WebSocketService.getInstance().connect(() -> {
+                Log.d("App", "WebSocket connected!");
+            });
             initializeApp();
         }
-
-        // Lazily gets the singleton instance and establishes the WebSocket/STOMP connection
-        // Logs once the connection is successfully opened
-        WebSocketService.getInstance().connect(() -> {
-            Log.d("App", "WebSocket connected!");
-        });
     }
 
     private void initializeApp() {
-        EdgeToEdge.enable(this);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_home);
 
         HttpUtils.initialize(getApplicationContext());
@@ -104,6 +109,19 @@ public class HomeActivity extends AppCompatActivity {
             }
             return handled;
         });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home,
+                R.id.nav_top_events,
+                R.id.nav_top_solutions,
+                R.id.nav_profile)
+                .setOpenableLayout(drawer)
+                .build();
+
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+
 
         updateNavMenu();
     }
@@ -119,7 +137,33 @@ public class HomeActivity extends AppCompatActivity {
     private void handleLogout() {
         AuthUtils.clearToken(this);
         updateNavMenu();
+        updateNotifications();
+        NotificationManager.getInstance(this).loggedOff();
         navController.navigate(R.id.nav_home);
+    }
+
+    public void updateNotifications()
+    {
+        boolean loggedIn = AuthUtils.getToken(this) != null;
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        Menu menu = toolbar.getMenu();
+        menu.findItem(R.id.action_notifications).setVisible(loggedIn);
+        if(loggedIn) {
+            NotificationManager.getInstance(this).getUnreadCount().observe(this, count -> {
+                MenuItem notificationsItem = menu.findItem(R.id.action_notifications);
+
+                if (notificationsItem != null) {
+                    // Use a custom layout for the bell icon with badge
+                    View actionView = notificationsItem.getActionView();
+                    TextView badge = actionView.findViewById(R.id.unread_badge);
+                    badge.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+                    badge.setText(count > 99 ? "99+" : String.valueOf(count));
+
+                    actionView.setOnClickListener(v -> onOptionsItemSelected(notificationsItem));
+                }
+            });
+        }
     }
 
     public void updateNavMenu() {
@@ -134,6 +178,11 @@ public class HomeActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_logout).setVisible(loggedIn);
         menu.findItem(R.id.nav_profile).setVisible(loggedIn);
         menu.findItem(R.id.nav_chat_list).setVisible(loggedIn);
+
+        if(loggedIn)
+        {
+            notificationsPopup = new NotificationsPopup(this, navController);
+        }
 
         // Admin-only items
         boolean isAdmin = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.ADMIN);
@@ -160,6 +209,11 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_notifications) {
+            View bellIcon = findViewById(R.id.action_notifications);
+            notificationsPopup.show(bellIcon);
+            return true;
+        }
         return NavigationUI.onNavDestinationSelected(item, navController) ||
                 super.onOptionsItemSelected(item);
     }
@@ -181,4 +235,32 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_toolbar, menu);
+
+        if(AuthUtils.getToken(this) != null) {
+            NotificationManager.getInstance(this).getUnreadCount().observe(this, count -> {
+                MenuItem notificationsItem = menu.findItem(R.id.action_notifications);
+
+                if (notificationsItem != null) {
+                    // Use a custom layout for the bell icon with badge
+                    View actionView = notificationsItem.getActionView();
+                    TextView badge = actionView.findViewById(R.id.unread_badge);
+                    badge.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+                    badge.setText(count > 99 ? "99+" : String.valueOf(count));
+
+                    actionView.setOnClickListener(v -> onOptionsItemSelected(notificationsItem));
+                }
+            });
+        }
+        else
+        {
+            menu.findItem(R.id.action_notifications).setVisible(false);
+        }
+        return true;
+    }
+
+
 }
