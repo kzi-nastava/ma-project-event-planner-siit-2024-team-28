@@ -77,43 +77,52 @@ public class ServiceListAdapter extends ArrayAdapter<GetServiceResponse> {
         deleteButton.setOnClickListener(v -> {
             GetServiceResponse serviceToDelete = getItem(position);
 
-            // TODO: refactor so that adapter implements interfaces that handle Http Requests in fragments
-            serviceService.deleteService(serviceToDelete.getId()).enqueue(new Callback<DeleteServiceResponse>() {
-                @Override
-                public void onResponse(Call<DeleteServiceResponse> call, Response<DeleteServiceResponse> response) {
-                    DeleteServiceResponse responseBody = response.body();
+            new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                    .setTitle("Delete Service")
+                    .setMessage("Are you sure you want to delete this service?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // TODO: refactor so that adapter implements interfaces that handle Http Requests in fragments
+                        serviceService.deleteService(serviceToDelete.getId()).enqueue(new Callback<DeleteServiceResponse>() {
+                            @Override
+                            public void onResponse(Call<DeleteServiceResponse> call, Response<DeleteServiceResponse> response) {
+                                DeleteServiceResponse responseBody = response.body();
 
-                    if (responseBody != null) {
-                        if (responseBody.getSuccess()) {
-                            remove(serviceToDelete);
-                            notifyDataSetChanged();
-                        }
-                        Toast.makeText(getContext(), responseBody.getMessage(), Toast.LENGTH_SHORT).show();
-                    } else if (response.errorBody() != null) {
-                        try {
-                            Gson gson = new Gson();
-                            DeleteServiceResponse errorResponse = gson.fromJson(
-                                    response.errorBody().charStream(), DeleteServiceResponse.class
-                            );
+                                if (responseBody != null) {
+                                    if (responseBody.getSuccess()) {
+                                        remove(serviceToDelete);
+                                        notifyDataSetChanged();
+                                    }
+                                    Toast.makeText(getContext(), responseBody.getMessage(), Toast.LENGTH_SHORT).show();
+                                } else if (response.errorBody() != null) {
+                                    try {
+                                        Gson gson = new Gson();
+                                        DeleteServiceResponse errorResponse = gson.fromJson(
+                                                response.errorBody().charStream(), DeleteServiceResponse.class
+                                        );
 
-                            Toast.makeText(getContext(), errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
 
-                        } catch (Exception e) {
-                            Toast.makeText(getContext(), "Unexpected error while deleting service.", Toast.LENGTH_SHORT).show();
-                            Log.e("ServiceListAdapter", "Error parsing errorBody: " + e.getMessage());
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Unexpected error while deleting service.", Toast.LENGTH_SHORT).show();
-                        Log.i("ServiceListAdapter", "Unexpected response code: " + response.code());
-                    }
-                }
+                                    } catch (Exception e) {
+                                        Toast.makeText(getContext(), "Unexpected error while deleting service.", Toast.LENGTH_SHORT).show();
+                                        Log.e("ServiceListAdapter", "Error parsing errorBody: " + e.getMessage());
+                                    }
+                                } else {
+                                    Toast.makeText(getContext(), "Unexpected error while deleting service.", Toast.LENGTH_SHORT).show();
+                                    Log.i("ServiceListAdapter", "Unexpected response code: " + response.code());
+                                }
+                            }
 
-                @Override
-                public void onFailure(Call<DeleteServiceResponse> call, Throwable t) {
-                    Log.i("ServiceListAdapter", "Network failure: " + t.getMessage());
-                    Toast.makeText(getContext(), "There has been an error while deleting service.", Toast.LENGTH_SHORT).show();
-                }
-            });
+                            @Override
+                            public void onFailure(Call<DeleteServiceResponse> call, Throwable t) {
+                                Log.i("ServiceListAdapter", "Network failure: " + t.getMessage());
+                                Toast.makeText(getContext(), "There has been an error while deleting service.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    })
+                    .setNegativeButton("No", (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
         });
 
         return convertView;
