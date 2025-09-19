@@ -1,23 +1,25 @@
-package com.eventplanner.model.responses.solutions;
+package com.eventplanner.model.responses.solutionHistories;
+
+import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.ReservationType;
-import com.eventplanner.model.responses.solutionHistories.GetSolutionHistoryDetails;
 
 import java.util.Collection;
 import java.util.List;
 
-
-public class GetSolutionResponse {
+public class GetSolutionHistoryDetails {
     private Long id;
+    private Long solutionId;
     private String type;
     private String name;
     private String description;
     private Double price;
     private Double discount;
-    private List<String> imageBase64;
+    private List<String> imagesBase64;
     private Boolean isDeleted;
     private Boolean isVisibleForEventOrganizers;
     private Boolean isAvailable;
     private String specifics;
+    private DurationType durationType;
     private Integer fixedDurationInSeconds;
     private Integer minDurationInSeconds;
     private Integer maxDurationInSeconds;
@@ -25,11 +27,18 @@ public class GetSolutionResponse {
     private Integer cancellationDeadlineDays;
     private ReservationType reservationType;
     private Long categoryId;
+    private String categoryName;
     private Long businessOwnerId;
+    private String businessOwnerName;
     private Collection<Long> eventTypeIds;
+    private Collection<String> eventTypeNames;
 
     public Long getId() {
         return id;
+    }
+
+    public Long getSolutionId() {
+        return solutionId;
     }
 
     public String getType() {
@@ -52,15 +61,15 @@ public class GetSolutionResponse {
         return discount;
     }
 
-    public List<String> getImageBase64() {
-        return imageBase64;
+    public List<String> getImagesBase64() {
+        return imagesBase64;
     }
 
-    public Boolean getIsDeleted() {
+    public Boolean getDeleted() {
         return isDeleted;
     }
 
-    public Boolean getIsVisibleForEventOrganizers() {
+    public Boolean getVisibleForEventOrganizers() {
         return isVisibleForEventOrganizers;
     }
 
@@ -70,6 +79,10 @@ public class GetSolutionResponse {
 
     public String getSpecifics() {
         return specifics;
+    }
+
+    public DurationType getDurationType() {
+        return durationType;
     }
 
     public Integer getFixedDurationInSeconds() {
@@ -100,43 +113,23 @@ public class GetSolutionResponse {
         return categoryId;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
     public Long getBusinessOwnerId() {
         return businessOwnerId;
+    }
+
+    public String getBusinessOwnerName() {
+        return businessOwnerName;
     }
 
     public Collection<Long> getEventTypeIds() {
         return eventTypeIds;
     }
 
-
-    public static GetSolutionResponse mapFromSolutionHistoryToSolutionResponse(GetSolutionHistoryDetails history) {
-        if (history == null) {
-            return null;
-        }
-
-        GetSolutionResponse response = new GetSolutionResponse();
-
-        response.id = history.getId();
-        response.type = history.getType();
-        response.name = history.getName();
-        response.description = history.getDescription();
-        response.price = history.getPrice();
-        response.discount = history.getDiscount();
-        response.imageBase64 = history.getImagesBase64();
-        response.isDeleted = false;
-        response.isVisibleForEventOrganizers = true;
-        response.isAvailable = false;
-        response.specifics = history.getSpecifics();
-        response.fixedDurationInSeconds = history.getFixedDurationInSeconds();
-        response.minDurationInSeconds = history.getMinDurationInSeconds();
-        response.maxDurationInSeconds = history.getMaxDurationInSeconds();
-        response.reservationDeadlineDays = history.getReservationDeadlineDays();
-        response.cancellationDeadlineDays = history.getCancellationDeadlineDays();
-        response.reservationType = history.getReservationType();
-        response.categoryId = history.getCategoryId();
-        response.businessOwnerId = history.getBusinessOwnerId();
-        response.eventTypeIds = history.getEventTypeIds();
-
-        return response;
+    public Collection<String> getEventTypeNames() {
+        return eventTypeNames;
     }
 }

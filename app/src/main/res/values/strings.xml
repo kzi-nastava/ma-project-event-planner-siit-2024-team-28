@@ -242,6 +242,7 @@
     <string name="items_title">Items for:</string>
     <string name="maximum_budget">Maximum budget:</string>
     <string name="budget_planning">Budget planning</string>
+    <string name="see_current_solution">See current solution</string>
 
     <!-- fragment chat -->
     <string name="my_conversations">My conversations</string>
@@ -296,7 +297,6 @@
     <string name="pagination_page_size">Page size:</string>
 
 
-
     <!-- fragment_location_dialog -->
     <string name="location_name">Location name</string>
     <string name="address">Address</string>
@@ -312,7 +312,7 @@
     <string name="end_time">End time</string>
     <string name="download_event_reviews">Download event reviews</string>
     <string name="manage_activities">Manage Activities</string>
-    
+
     <!-- Added for fragment_event hardcoded text replacements -->
     <!-- fragment_event (additional) -->
     <string name="all">All</string>
