@@ -34,6 +34,7 @@ import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.enums.RequestStatus;
 import com.eventplanner.model.enums.ReservationType;
 import com.eventplanner.model.enums.SolutionStatus;
+import com.eventplanner.model.requests.services.CreatePendingServiceRequest;
 import com.eventplanner.model.requests.services.CreateServiceRequest;
 import com.eventplanner.model.requests.solutionCategories.CreatePendingCategoryRequest;
 import com.eventplanner.model.requests.solutionCategories.CreateSolutionCategoryRequest;
@@ -346,7 +347,27 @@ public class ServiceCreationFragment extends Fragment {
         if(!customCategoryCreation) {
             createService(request);
         } else {
-            createCustomCategory(request, customCategory);
+            CreatePendingServiceRequest pendingRequest = CreatePendingServiceRequest.builder()
+                    .name(name)
+                    .description(description)
+                    .price(price)
+                    .discount(discount)
+                    .imageBase64(this.base64Images)
+                    .specifics(specifics)
+                    .isVisibleForEventOrganizers(isVisible)
+                    .isAvailable(isAvailable)
+                    .durationType(durationType)
+                    .fixedDurationInSeconds(fixedDuration)
+                    .minDurationInSeconds(minDuration)
+                    .maxDurationInSeconds(maxDuration)
+                    .reservationDeadlineDays(reservationDeadlineDays)
+                    .cancellationDeadlineDays(cancellationDeadlineDays)
+                    .reservationType(reservationType)
+                    .categoryName(customCategory)
+                    .businessOwnerId(AuthUtils.getUserId(requireContext()))
+                    .eventTypeIds(selectedEventTypeIds)
+                    .build();
+            createPendingService(pendingRequest);
         }
     }
 
@@ -381,9 +402,33 @@ public class ServiceCreationFragment extends Fragment {
     }
 
     // Function for making request to backend for creating new Category and then for creating new Service
-    private void createCustomCategory(CreateServiceRequest serviceRequest, String customCategoryName) {
-        CreatePendingCategoryRequest request = new CreatePendingCategoryRequest(customCategoryName);
-        // TODO: implement endpoint for creating pending service
+    private void createPendingService(CreatePendingServiceRequest serviceRequest) {
+        serviceService.createPendingService(serviceRequest).enqueue(new Callback<Long>() {
+            @Override
+            public void onResponse(Call<Long> call, Response<Long> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Long newServiceId = response.body();
+                    Toast.makeText(getContext(), "Pending service created! ID: " + newServiceId, Toast.LENGTH_SHORT).show();
+                } else {
+                    String message = "Unknown error.";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorString = response.errorBody().string();
+                            Log.e("ServiceCreationFragment", "Error body: " + errorString);
+                            message = new JSONObject(errorString).optString("error", message);
+                        } catch (Exception ignored) {}
+                    }
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Log.e("ServiceCreationFragment", "Error: " + message);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Long> call, Throwable t) {
+                Toast.makeText(getContext(), "An error has occured while creating service.", Toast.LENGTH_SHORT).show();
+                Log.i("ServiceCreationFragment", "Network failure: " + t.getMessage());
+            }
+        });
     }
 
     // populating Category spinner with possible categories

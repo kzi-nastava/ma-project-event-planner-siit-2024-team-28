@@ -191,7 +191,6 @@ public class BudgetPlanningItemsFragment extends Fragment {
                                                     public void onItemClick(GetSolutionResponse solution) {
                                                         Bundle args = new Bundle();
                                                         args.putString("solutionId", String.valueOf(solution.getId()));
-                                                        // TODO: change navigation
                                                         navController.navigate(R.id.action_budget_planning_items_to_solution_history_details, args);
                                                     }
                                                 };
@@ -307,7 +306,9 @@ public class BudgetPlanningItemsFragment extends Fragment {
         Double maximumBudget = 0.0;
         for(GetRequiredSolutionItemResponse item : items)
             maximumBudget += item.getBudget();
-        binding.textBudget.setText(getString(R.string.maximum_budget) + " " + String.valueOf(maximumBudget) + "$");
+        binding.textBudget.setText(
+                getString(R.string.maximum_budget) + " " + String.format("%.2f", maximumBudget) + "$"
+        );
     }
 
     private void fetchEvent() {
