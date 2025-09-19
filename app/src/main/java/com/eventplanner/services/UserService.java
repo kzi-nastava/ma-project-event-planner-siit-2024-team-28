@@ -21,9 +21,9 @@ public interface UserService {
     @GET("users/{id}")
     Call<GetUserResponse> getUserById(@Path("id") Long id);
 
-    @PUT("users/favorite-service/{serviceId}")
-    Call<GetFavoriteSolutionResultResponse> favoriteService(
-            @Path("serviceId") Long serviceId,
+    @PUT("users/favorite-solution/{solutionId}")
+    Call<GetFavoriteSolutionResultResponse> favoriteSolution(
+            @Path("solutionId") Long solutionId,
             @Query("userId") Long userId
     );
 

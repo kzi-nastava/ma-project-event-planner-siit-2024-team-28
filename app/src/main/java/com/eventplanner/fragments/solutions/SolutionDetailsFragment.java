@@ -153,8 +153,8 @@ public class SolutionDetailsFragment extends Fragment {
                 .show();
     }
 
-    private void addToFavorites(Long userId, Long serviceId) {
-        Call<GetFavoriteSolutionResultResponse> call = userService.favoriteService(userId, serviceId);
+    private void addToFavorites(Long userId, Long solutionId) {
+        Call<GetFavoriteSolutionResultResponse> call = userService.favoriteSolution(solutionId, userId);
 
         call.enqueue(new Callback<GetFavoriteSolutionResultResponse>() {
             @Override
