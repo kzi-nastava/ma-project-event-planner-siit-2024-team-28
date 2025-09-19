@@ -4,6 +4,7 @@ import com.eventplanner.model.requests.users.UpdateBusinessOwnerRequest;
 import com.eventplanner.model.requests.users.UpdateEventOrganizerRequest;
 import com.eventplanner.model.requests.users.UpdatePasswordRequest;
 import com.eventplanner.model.requests.users.UpdateUserRequest;
+import com.eventplanner.model.responses.solutions.GetFavoriteSolutionResultResponse;
 import com.eventplanner.model.responses.users.GetUserProfilePictureResponse;
 import com.eventplanner.model.responses.users.GetUserResponse;
 
@@ -21,7 +22,7 @@ public interface UserService {
     Call<GetUserResponse> getUserById(@Path("id") Long id);
 
     @PUT("users/favorite-service/{serviceId}")
-    Call<String> favoriteService(
+    Call<GetFavoriteSolutionResultResponse> favoriteService(
             @Path("serviceId") Long serviceId,
             @Query("userId") Long userId
     );
