@@ -429,6 +429,10 @@
         <action
             android:id="@+id/action_event_to_activities_dialog"
             app:destination="@id/nav_activities_dialog" />
+
+        <action
+            android:id="@+id/action_event_to_chat"
+            app:destination="@id/nav_chat" />
     </fragment>
 
     <!-- Location Dialog Fragment -->

@@ -683,7 +683,7 @@ public class SolutionDetailsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<FindChatResponse> call, Throwable t) {
-                Log.e("SolutionDetailsFragmentt", "Network failure: " + t.getMessage());
+                Log.e("SolutionDetailsFragment", "Network failure: " + t.getMessage());
                 Toast.makeText(getContext(), "Network error: " + t.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }

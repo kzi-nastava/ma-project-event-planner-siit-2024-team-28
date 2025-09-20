@@ -432,6 +432,13 @@
                 android:text="@string/add_to_favorites" />
 
             <Button
+                android:id="@+id/chatWithOrganizerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/chat_with_organizer" />
+
+            <Button
                 android:id="@+id/downloadReviewsButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
