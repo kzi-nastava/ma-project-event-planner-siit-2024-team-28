@@ -76,6 +76,7 @@ public class CategoryCreationFragment extends Fragment {
                     Long categoryId = response.body();
                     Toast.makeText(getContext(), "Category successfully created", Toast.LENGTH_SHORT).show();
                     Log.d("CategoryCreationFragment", "Category successfully created, ID: " + categoryId);
+                    refreshInputs();
                 } else {
                     String message = "Unknown error.";
                     if (response.errorBody() != null) {
@@ -96,6 +97,11 @@ public class CategoryCreationFragment extends Fragment {
                 Log.e("CategoryCreationFragment", "Network failure: " + t.getMessage());
             }
         });
+    }
+
+    void refreshInputs() {
+        binding.editTextName.setText("");
+        binding.editTextDescription.setText("");
     }
 
 
