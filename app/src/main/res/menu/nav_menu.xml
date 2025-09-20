@@ -25,6 +25,9 @@
             android:id="@+id/nav_reports"
             android:title="@string/reports" />
         <item
+            android:id="@+id/nav_reservations"
+            android:title="@string/reservations" />
+        <item
             android:id="@+id/nav_comments_moderation"
             android:title="@string/comments_moderation" />
         <item android:id="@+id/nav_registration"

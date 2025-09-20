@@ -196,6 +196,7 @@ public class HomeActivity extends AppCompatActivity {
         menu.findItem(R.id.nav_service_overview).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_my_products).setVisible(isBusinessOwner);
         menu.findItem(R.id.nav_price_list).setVisible(isBusinessOwner);
+        menu.findItem(R.id.nav_reservations).setVisible(isBusinessOwner);
 
         // Event organizer-only items
         boolean isEventOrganizer = loggedIn && AuthUtils.getUserRoles(this).contains(UserRoles.EventOrganizer);

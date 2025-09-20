@@ -62,6 +62,9 @@
         <action
             android:id="@+id/action_nav_home_to_all_notifications_fragment"
             app:destination="@id/nav_all_notifications_fragment" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_reservations"
+            app:destination="@id/nav_reservations" />
     </fragment>
 
     <fragment
@@ -478,4 +481,8 @@
         android:id="@+id/nav_all_notifications_fragment"
         android:name="com.eventplanner.fragments.notifications.AllNotificationsFragment"
         android:label="All Notifications" />
+    <fragment
+        android:id="@+id/nav_reservations"
+        android:name="com.eventplanner.fragments.serviceReservationRequests.ServiceReservationRequestsFragment"
+        android:label="Service Reservation Requests" />
 </navigation>
