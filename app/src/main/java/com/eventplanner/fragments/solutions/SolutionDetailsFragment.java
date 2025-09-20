@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RatingBar;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,16 +29,21 @@ import com.eventplanner.model.enums.ChatTheme;
 import com.eventplanner.model.enums.DurationType;
 import com.eventplanner.model.requests.chats.CreateChatRequest;
 import com.eventplanner.model.requests.chats.FindChatRequest;
+import com.eventplanner.model.requests.serviceReservationRequests.CreateServiceReservationRequestRequest;
 import com.eventplanner.model.requests.solutionComments.CreateSolutionCommentRequest;
 import com.eventplanner.model.requests.solutionReviews.CreateSolutionReviewRequest;
 import com.eventplanner.model.responses.ErrorResponse;
 import com.eventplanner.model.responses.chats.FindChatResponse;
+import com.eventplanner.model.responses.serviceReservationRequests.GetServiceReservationRequestResponse;
+import com.eventplanner.model.responses.services.GetServiceResponse;
 import com.eventplanner.model.responses.solutionComments.GetSolutionCommentResponse;
 import com.eventplanner.model.responses.events.GetEventResponse;
 import com.eventplanner.model.responses.solutionReviews.GetSolutionReviewResponse;
 import com.eventplanner.model.responses.solutions.GetFavoriteSolutionResultResponse;
 import com.eventplanner.model.responses.solutions.GetSolutionDetailsResponse;
 import com.eventplanner.services.ChatService;
+import com.eventplanner.services.ServiceReservationRequestService;
+import com.eventplanner.services.ServiceService;
 import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.ProductService;
@@ -48,9 +55,14 @@ import com.eventplanner.utils.Base64Util;
 import com.eventplanner.utils.HttpUtils;
 import com.google.gson.Gson;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -67,6 +79,8 @@ public class SolutionDetailsFragment extends Fragment {
     private UserService userService;
     private EventService eventService;
     private ProductService productService;
+    private ServiceService serviceService;
+    private ServiceReservationRequestService serviceReservationRequestService;
     private SolutionCommentService solutionCommentService;
     private SolutionReviewService solutionReviewService;
     private ChatService chatService;
@@ -92,6 +106,8 @@ public class SolutionDetailsFragment extends Fragment {
         userService = HttpUtils.getUserService();
         eventService = HttpUtils.getEventService();
         productService = HttpUtils.getProductService();
+        serviceService = HttpUtils.getServiceService();
+        serviceReservationRequestService = HttpUtils.getServiceReservationRequestService();
         solutionCommentService = HttpUtils.getCommentService();
         solutionReviewService = HttpUtils.getReviewService();
         chatService = HttpUtils.getChatService();
@@ -304,8 +320,176 @@ public class SolutionDetailsFragment extends Fragment {
      * Function for making call to backend for buying a service
      */
     private void buyService(Long selectedEventId) {
-        // TODO: make call to backend
+        Long serviceId = solution.getId();
+
+        // fetch event
+        eventService.getEventById(selectedEventId).enqueue(new Callback<GetEventResponse>() {
+            @Override
+            public void onResponse(Call<GetEventResponse> call, Response<GetEventResponse> response) {
+                if (response.isSuccessful()) {
+                    GetEventResponse selectedEvent = response.body();
+
+                    // fetch service
+                    serviceService.getServiceById(serviceId).enqueue(new Callback<GetServiceResponse>() {
+                        @Override
+                        public void onResponse(Call<GetServiceResponse> call, Response<GetServiceResponse> resp) {
+                            if (resp.isSuccessful()) {
+                                GetServiceResponse service = resp.body();
+                                showReservationDialog(selectedEvent, service);
+                            } else {
+                                Toast.makeText(getContext(), "Failed to load service details", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<GetServiceResponse> call, Throwable t) {
+                            Toast.makeText(getContext(), "Network error loading service", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(getContext(), "Failed to load event", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetEventResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Network error loading event", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    private void showReservationDialog(GetEventResponse event, GetServiceResponse service) {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialogue_reservation, null);
+        DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
+        TimePicker startPicker = dialogView.findViewById(R.id.startTimePicker);
+        TimePicker endPicker = dialogView.findViewById(R.id.endTimePicker);
+        startPicker.setIs24HourView(true);
+        endPicker.setIs24HourView(true);
+
+        // Restrict selectable dates
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date startDate = sdf.parse(event.getStartDate());
+            Date endDate = sdf.parse(event.getEndDate());
+            if (startDate != null && endDate != null) {
+                datePicker.setMinDate(startDate.getTime());
+                datePicker.setMaxDate(endDate.getTime());
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // Will hold calculated end time if fixed duration
+        final String[] selectedEndTime = {null};
+
+        // If service has fixed duration → hide end picker & auto-calc end
+        if (service.getFixedDurationInSeconds() != null) {
+            endPicker.setVisibility(View.GONE);
+
+            startPicker.setOnTimeChangedListener((view, hourOfDay, minute) -> {
+                Calendar start = Calendar.getInstance();
+                start.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                start.set(Calendar.MINUTE, minute);
+
+                Calendar end = (Calendar) start.clone();
+                end.add(Calendar.MINUTE, service.getFixedDurationInSeconds());
+
+                selectedEndTime[0] = String.format("%02d:%02d",
+                        end.get(Calendar.HOUR_OF_DAY), end.get(Calendar.MINUTE));
+            });
+        }
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Reserve Service")
+                .setView(dialogView)
+                .setPositiveButton("Reserve", (dialog, which) -> {
+                    // date
+                    int year = datePicker.getYear();
+                    int month = datePicker.getMonth() + 1;
+                    int day = datePicker.getDayOfMonth();
+                    String date = String.format("%04d-%02d-%02d", year, month, day);
+
+                    // start time
+                    int sh = startPicker.getHour();
+                    int sm = startPicker.getMinute();
+                    String startTime = String.format("%02d:%02d", sh, sm);
+
+                    // end time
+                    String endTime;
+                    if (service.getFixedDurationInSeconds() != null) {
+                        endTime = selectedEndTime[0];
+                        if (endTime == null) {
+                            Toast.makeText(getContext(), "Please pick a start time", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    } else {
+                        int eh = endPicker.getHour();
+                        int em = endPicker.getMinute();
+                        endTime = String.format("%02d:%02d", eh, em);
+
+                        // validate min/max duration
+                        int dur = durationSeconds(startTime, endTime);
+                        if (service.getMinDurationInSeconds() != null && dur < service.getMinDurationInSeconds()) {
+                            Toast.makeText(getContext(), "Duration too short (" + dur + " min)", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (service.getMaxDurationInSeconds() != null && dur > service.getMaxDurationInSeconds()) {
+                            Toast.makeText(getContext(), "Duration too long (" + dur + " min)", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+
+                    // Build request
+                    CreateServiceReservationRequestRequest request =
+                            new CreateServiceReservationRequestRequest(date, startTime, endTime,
+                                    service.getId(), event.getId());
+
+                    sendReservationRequest(request);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /** helper: convert HH:mm difference into minutes (wraps midnight) */
+    private int durationSeconds(String start, String end) {
+        String[] sParts = start.split(":");
+        String[] eParts = end.split(":");
+        int sh = Integer.parseInt(sParts[0]), sm = Integer.parseInt(sParts[1]);
+        int eh = Integer.parseInt(eParts[0]), em = Integer.parseInt(eParts[1]);
+        int startMin = sh * 60 + sm;
+        int endMin = eh * 60 + em;
+        int diff = endMin - startMin;
+        if (diff < 0) diff += 24 * 60; // wrap to next day
+        return diff * 60;
+    }
+
+
+    private void sendReservationRequest(CreateServiceReservationRequestRequest request) {
+        Toast.makeText(getContext(), "Processing service reservation request...", Toast.LENGTH_LONG).show();
+        serviceReservationRequestService.createServiceReservationRequest(request).enqueue(new Callback<GetServiceReservationRequestResponse>() {
+            @Override
+            public void onResponse(Call<GetServiceReservationRequestResponse> call, Response<GetServiceReservationRequestResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Service reservation request created!", Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), "Reservation failed: " + errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Reservation failed: unknown error", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetServiceReservationRequestResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Network error while reserving service", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void commentAndReview() {
         if(!AuthUtils.getUserRoles(getContext()).contains(UserRoles.EventOrganizer))

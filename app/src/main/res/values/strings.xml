@@ -446,4 +446,6 @@
     <string name="notifications">Notifications</string>
     <string name="view_all_notifications">View All Notifications</string>
     <string name="mark_all_as_read">Mark All As Read</string>
+    <string name="reservations">Reservations</string>
+    <string name="failed_to_update_status">Failed to update status!</string>
 </resources>

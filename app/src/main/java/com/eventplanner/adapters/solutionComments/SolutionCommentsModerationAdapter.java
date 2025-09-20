@@ -10,7 +10,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.eventplanner.model.enums.RequestStatus;
@@ -98,7 +97,7 @@ public class SolutionCommentsModerationAdapter extends RecyclerView.Adapter<Solu
             deleteButton = itemView.findViewById(R.id.deleteCommentButton);
 
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(itemView.getContext(),
-                    R.array.comment_statuses, android.R.layout.simple_spinner_item);
+                    R.array.filter_statuses, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             statusSpinner.setAdapter(adapter);
         }

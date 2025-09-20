@@ -12,6 +12,7 @@ import com.eventplanner.services.ChatMessageService;
 import com.eventplanner.services.ChatService;
 import com.eventplanner.services.EventReviewService;
 import com.eventplanner.services.NotificationService;
+import com.eventplanner.services.ServiceReservationRequestService;
 import com.eventplanner.services.SolutionCommentService;
 import com.eventplanner.services.EventService;
 import com.eventplanner.services.EventTypeService;
@@ -139,5 +140,9 @@ public class HttpUtils {
     public static NotificationService getNotificationService()
     {
         return retrofit.create(NotificationService.class);
+    }
+
+    public static ServiceReservationRequestService getServiceReservationRequestService() {
+        return retrofit.create(ServiceReservationRequestService.class);
     }
 }
