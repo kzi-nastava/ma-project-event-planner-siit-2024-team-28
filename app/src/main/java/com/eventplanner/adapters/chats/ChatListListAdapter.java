@@ -16,6 +16,7 @@ import com.eventplanner.model.responses.chatMessages.GetNewChatMessageResponse;
 import com.eventplanner.model.responses.chats.GetChatListResponse;
 import com.eventplanner.utils.Base64Util;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class ChatListListAdapter extends ArrayAdapter<GetChatListResponse> {
     public ChatListListAdapter(Context context, List<GetChatListResponse> chatList, OnClickListener listener) {
         super(context, 0, chatList);
         this.listener = listener;
+        sortChats();
     }
 
     @Override
@@ -59,6 +61,10 @@ public class ChatListListAdapter extends ArrayAdapter<GetChatListResponse> {
         chatterName.setText(chat.participantName());
         chatSubject.setText(chat.themeName());
         lastMessage.setText(chat.lastMessage() != null ? "\"" + chat.lastMessage() + "\"" : "No messages");
+
+        if(chat.getHasUnreadMessages()) {
+            rootLayout.setBackgroundColor(getContext().getColor(R.color.cool_dark_purple));
+        }
 
         // Setting on click listener
         convertView.setOnClickListener(v -> {
@@ -95,5 +101,18 @@ public class ChatListListAdapter extends ArrayAdapter<GetChatListResponse> {
     // Listener user for resolving onClick event in fragments
     public interface OnClickListener {
         void onChatClickListener(GetChatListResponse chat);
+    }
+
+    private void sortChats() {
+        sort((c1, c2) -> {
+            LocalDateTime t1 = c1.getLastMessageTimeStamp();
+            LocalDateTime t2 = c2.getLastMessageTimeStamp();
+
+            if (t1 == null && t2 == null) return 0;
+            if (t1 == null) return 1;
+            if (t2 == null) return -1;
+
+            return t2.compareTo(t1);
+        });
     }
 }

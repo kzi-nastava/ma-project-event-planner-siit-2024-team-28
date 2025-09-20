@@ -2,7 +2,9 @@ package com.eventplanner.services;
 
 import android.util.Log;
 
+import com.eventplanner.model.requests.chatMessages.UpdateChatMessageAsSeenRequest;
 import com.eventplanner.utils.WebSocketService;
+import com.google.gson.Gson;
 
 import java.util.function.Consumer;
 
@@ -47,6 +49,18 @@ public class ChatWebSocketService {
             stompClient.send(destination, message)
                     .subscribe(() -> { if (onComplete != null) onComplete.run(); },
                             throwable -> Log.e("ChatWebSocketService", "Failed to send STOMP message", throwable));
+        }
+    }
+
+    public void markMessageAsSeen(Long chatMessageId, Long recipientId, Runnable onComplete) {
+        if (stompClient != null && stompClient.isConnected()) {
+            UpdateChatMessageAsSeenRequest payload = new UpdateChatMessageAsSeenRequest(chatMessageId, recipientId);
+            String json = new Gson().toJson(payload);
+
+            stompClient.send("/app/mark-message-as-seen", json)
+                    .subscribe(() -> {
+                        if (onComplete != null) onComplete.run();
+                    }, throwable -> Log.e("ChatWebSocketService", "Failed to mark message as seen", throwable));
         }
     }
 

@@ -39,6 +39,8 @@ public class RequiredSolutionRecyclerViewAdapter extends RecyclerView.Adapter<Re
 
         if (requiredSolution.getSolutionId() != null) {
             holder.rootLayout.setBackgroundResource(R.drawable.rounded_green_card);
+//            holder.editTextAmount.setEnabled(false);
+//            holder.editButton.setEnabled(false);
         } else {
             holder.rootLayout.setBackgroundResource(R.drawable.rounded_purple_card);
         }
