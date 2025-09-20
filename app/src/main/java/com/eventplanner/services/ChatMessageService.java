@@ -10,6 +10,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ChatMessageService {
     @POST("chat-messages")
@@ -17,4 +18,10 @@ public interface ChatMessageService {
 
     @GET("chat-messages/chat/{chatId}/messages")
     Call<List<GetChatMessageResponse>> getMessagesByChatId(@Path("chatId") Long chatId);
+
+    @POST("chat-messages/{chatId}/mark-as-seen")
+    Call<Void> markMessagesAsSeen(
+            @Path("chatId") Long chatId,
+            @Query("userId") Long userId
+    );
 }

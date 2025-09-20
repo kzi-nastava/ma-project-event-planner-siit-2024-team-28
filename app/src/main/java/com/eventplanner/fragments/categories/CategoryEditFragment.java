@@ -3,6 +3,8 @@ package com.eventplanner.fragments.categories;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +40,8 @@ public class CategoryEditFragment extends Fragment {
     private static final String ARG_CATEGORY_ID = "categoryId";
     private static Long categoryId;
 
+    NavController navController;
+
     public CategoryEditFragment() {
         // Required empty public constructor
     }
@@ -54,6 +58,7 @@ public class CategoryEditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         categoryService = HttpUtils.getSolutionCategoryService();
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
         if(getArguments() != null) {
             categoryId = getArguments().getLong(ARG_CATEGORY_ID);
         }
@@ -142,6 +147,7 @@ public class CategoryEditFragment extends Fragment {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Category deleted successfully.", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
                 } else {
                     String message = "Unknown error.";
                     if (response.errorBody() != null) {

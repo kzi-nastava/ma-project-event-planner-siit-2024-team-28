@@ -89,7 +89,15 @@ public class ChatFragment extends Fragment {
 
         // Subscribes to chat with callback that processes incoming messages
         chatWSService.subscribeToChat(chatId, message -> {
-            requireActivity().runOnUiThread(() -> addNewMessage(gson.fromJson(message, GetChatMessageResponse.class)));
+            requireActivity().runOnUiThread(() -> {
+                GetChatMessageResponse chatMessage = gson.fromJson(message, GetChatMessageResponse.class);
+
+                addNewMessage(chatMessage);
+
+                chatWSService.markMessageAsSeen(chatMessage.getId(), AuthUtils.getUserId(getContext()), () -> {
+                    Log.d("ChatFragment", "Message marked as seen: " + chatMessage.getId());
+                });
+            });
         });
     }
 
@@ -109,6 +117,7 @@ public class ChatFragment extends Fragment {
 
         loadChatDetails();
         loadMessages();
+        markMessagesAsSeen();
 
         binding.sendButton.setOnClickListener(v -> {
             if(!binding.messageInput.getText().equals(""))
@@ -186,6 +195,36 @@ public class ChatFragment extends Fragment {
             }
         });
     };
+
+    private void markMessagesAsSeen() {
+        Call<Void> call = chatMessageService.markMessagesAsSeen(chatId, AuthUtils.getUserId(getContext()));
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // Poruke su uspešno obeležene kao pročitane
+                    Log.d("ChatFragment", "Messages marked as seen for chatId: " + chatId);
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Failed to mark messages as seen: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Failed to mark messages as seen", Toast.LENGTH_SHORT).show();
+                        Log.e("ChatFragment", "Failed to mark messages as seen: " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void fetchAndSetParticipantImage(Long participantId) {
         Call<GetUserProfilePictureResponse> call = userService.getUserProfilePictureBase64(participantId);

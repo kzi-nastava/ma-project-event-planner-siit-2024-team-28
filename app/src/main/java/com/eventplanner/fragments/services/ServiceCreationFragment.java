@@ -27,6 +27,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.eventplanner.R;
 import com.eventplanner.databinding.FragmentServiceCreationBinding;
@@ -69,12 +71,15 @@ public class ServiceCreationFragment extends Fragment {
     private EventTypeService eventTypeService;
     private List<String> base64Images;
 
+    private NavController navController;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         serviceService = HttpUtils.getServiceService();
         categoryService = HttpUtils.getSolutionCategoryService();
         eventTypeService = HttpUtils.getEventTypeService();
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
         base64Images = new ArrayList<>();
     }
 
@@ -379,6 +384,7 @@ public class ServiceCreationFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     Long newServiceId = response.body();
                     Toast.makeText(getContext(), "Service created! ID: " + newServiceId, Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
                 } else {
                     String message = "Unknown error.";
                     if (response.errorBody() != null) {
@@ -409,6 +415,7 @@ public class ServiceCreationFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     Long newServiceId = response.body();
                     Toast.makeText(getContext(), "Pending service created! ID: " + newServiceId, Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
                 } else {
                     String message = "Unknown error.";
                     if (response.errorBody() != null) {

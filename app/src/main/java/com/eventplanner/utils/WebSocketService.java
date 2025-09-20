@@ -15,8 +15,8 @@ public class WebSocketService {
     private StompClient stompClient;
     private Disposable lifecycleDisposable;
 
-    //private static final String WS_URL = "ws://10.0.2.2:8080/ws-native";
-    private static final String WS_URL = "ws://192.168.1.12:8080/ws-native";
+    private static final String WS_URL = "ws://10.0.2.2:8080/ws-native";
+    //private static final String WS_URL = "ws://192.168.1.12:8080/ws-native";
 
     private WebSocketService() {
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_URL);

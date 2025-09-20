@@ -20,6 +20,12 @@ import android.graphics.Bitmap;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import com.eventplanner.model.enums.ChatTheme;
+import com.eventplanner.model.requests.chats.CreateChatRequest;
+import com.eventplanner.model.requests.chats.FindChatRequest;
+import com.eventplanner.model.responses.ErrorResponse;
+import com.eventplanner.model.responses.chats.FindChatResponse;
+import com.eventplanner.services.ChatService;
 import com.eventplanner.utils.Base64Util;
 
 import android.text.Editable;
@@ -99,6 +105,8 @@ public class EventFragment extends Fragment {
     private FragmentEventBinding binding;
     private EventService eventService;
     private EventTypeService eventTypeService;
+    private ChatService chatService;
+    private NavController navController;
     private Long eventId;
     private Long eventOrganizerId;
     private boolean isEditMode = false;
@@ -133,6 +141,8 @@ public class EventFragment extends Fragment {
         // Initialize services
         eventService = HttpUtils.getEventService();
         eventTypeService = HttpUtils.getEventTypeService();
+        chatService = HttpUtils.getChatService();
+        navController = Navigation.findNavController(getActivity(), R.id.fragment_nav_content_main);
 
         // Get event ID from arguments if editing
         if (getArguments() != null) {
@@ -158,6 +168,7 @@ public class EventFragment extends Fragment {
         binding.downloadGuestListButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadDetailsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         binding.downloadReviewsButton.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
+        binding.chatWithOrganizerButton.setVisibility(AuthUtils.getUserId(getContext()).equals(eventOrganizerId) || !isEditMode ? View.GONE : View.VISIBLE);
 
         eventReviewService = HttpUtils.getEventReviewService();
 
@@ -487,6 +498,7 @@ public class EventFragment extends Fragment {
         binding.downloadGuestListButton.setOnClickListener(v -> downloadGuestList());
         binding.downloadDetailsButton.setOnClickListener(v -> downloadEventDetails());
         binding.downloadReviewsButton.setOnClickListener(v -> downloadEventReviews());
+        binding.chatWithOrganizerButton.setOnClickListener(v -> chatWithOrganizer());
         binding.favoriteButton.setOnClickListener(v -> toggleFavorite());
         binding.startDate.setOnClickListener(v -> showDatePicker(binding.startDate));
         binding.endDate.setOnClickListener(v -> showDatePicker(binding.endDate));
@@ -1048,6 +1060,97 @@ public class EventFragment extends Fragment {
                 currentDate.getDayOfMonth()
         );
         datePickerDialog.show();
+    }
+
+    private void chatWithOrganizer() {
+        if(AuthUtils.getUserId(getContext()).equals(eventOrganizerId))
+            return;
+
+        findChat();
+    }
+
+    private void findChat() {
+        FindChatRequest request = new FindChatRequest(AuthUtils.getUserId(getContext()), eventOrganizerId, ChatTheme.EVENT, eventId);
+        Call<FindChatResponse> call = chatService.getChatByParticipantsAndTheme(request);
+
+        call.enqueue(new Callback<FindChatResponse>() {
+            @Override
+            public void onResponse(Call<FindChatResponse> call, Response<FindChatResponse> response) {
+                if (response.isSuccessful()) {
+                    FindChatResponse result = response.body();
+                    if(result != null && result.isFound()) {
+                        navigateToChat(result.getChat().getId());
+                    }
+                    else {
+                        createChat();
+                    }
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("EventFragment", "Find chat failed: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Find chat failed: " + response.code(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.e("EventFragment", "Find chat failed", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FindChatResponse> call, Throwable t) {
+                Log.e("EventFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void createChat() {
+        // Creating request
+        CreateChatRequest request = new CreateChatRequest.Builder()
+                .participant1Id(AuthUtils.getUserId(getContext()))
+                .participant2Id(eventOrganizerId)
+                .theme(ChatTheme.EVENT)
+                .themeId(eventId)
+                .build();
+
+        Call<Long> call = chatService.createChat(request);
+
+        call.enqueue(new Callback<Long>() {
+            @Override
+            public void onResponse(Call<Long> call, Response<Long> response) {
+                if (response.isSuccessful()) {
+                    Long chatId = response.body();
+                    Toast.makeText(getContext(), "Chat created with ID: " + chatId, Toast.LENGTH_SHORT).show();
+                    Log.e("EventFragment", "Chat created with ID: " + chatId);
+                    navigateToChat(chatId);
+                } else {
+                    try {
+                        String errorJson = response.errorBody().string();
+                        ErrorResponse errorResponse = new Gson().fromJson(errorJson, ErrorResponse.class);
+                        Toast.makeText(getContext(), errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                        Log.e("EventFragment", "Create failed: " + errorResponse.getError());
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Create failed: Unknown error", Toast.LENGTH_SHORT).show();
+                        Log.e("EventFragment", "Create failed: " + response.code());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Long> call, Throwable t) {
+                Log.e("ChatFragment", "Network failure: " + t.getMessage());
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void navigateToChat(Long chatId) {
+        Bundle bundle = new Bundle();
+        bundle.putLong("chatId", chatId);
+        navController.navigate(R.id.action_event_to_chat, bundle);
     }
 
     private void loadUserReview(Long userId, Long eventId) {

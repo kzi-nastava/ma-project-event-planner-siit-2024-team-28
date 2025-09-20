@@ -168,6 +168,7 @@ public class CategoryAcceptionFragment extends Fragment {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Category accepted successfully.", Toast.LENGTH_SHORT).show();
+                    refreshInputs();
                 } else {
                     String message = "Unknown error.";
                     if (response.errorBody() != null) {
@@ -208,6 +209,7 @@ public class CategoryAcceptionFragment extends Fragment {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Category rejected successfully.", Toast.LENGTH_SHORT).show();
+                    refreshInputs();
                 } else {
                     String message = "Unknown error.";
                     if (response.errorBody() != null) {
@@ -227,5 +229,11 @@ public class CategoryAcceptionFragment extends Fragment {
                 Toast.makeText(getContext(), "Network failure: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    void refreshInputs() {
+        binding.editTextName.setText("");
+        binding.editTextDescription.setText("");
+        fetchPendingCategories();
     }
 }

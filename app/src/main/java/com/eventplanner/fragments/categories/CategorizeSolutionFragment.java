@@ -191,6 +191,7 @@ public class CategorizeSolutionFragment extends Fragment {
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
                             Toast.makeText(getContext(), "Solution categorized successfully", Toast.LENGTH_SHORT).show();
+                            refreshInputs();
                         } else {
                             Toast.makeText(getContext(), "Failed to categorize solution.", Toast.LENGTH_SHORT).show();
                             Log.i("CategorizeSolutionFragment", "Error while categorizing soluiton: " + response.code());
@@ -203,6 +204,11 @@ public class CategorizeSolutionFragment extends Fragment {
                         Log.i("CategorizeSolutionFragment", "Network failure " + t.getMessage());
                     }
                 });
+    }
+
+    void refreshInputs() {
+        fetchCategories();
+        fetchPendingSolutions();
     }
 
 }

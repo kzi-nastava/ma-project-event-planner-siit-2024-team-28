@@ -283,6 +283,7 @@
     <string name="failed_to_load_review">Failed to load review</string>
     <string name="review_deleted">Review deleted</string>
     <string name="error_deleting_review">Error deleting review</string>
+    <string name="chat_with_organizer">Chat with organizer</string>
 
     <!-- item_activity -->
     <string name="remove_activity">Remove activity</string>
