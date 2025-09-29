@@ -166,7 +166,7 @@
                     android:inputType="text" />
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/buttonSelectImages"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
@@ -174,6 +174,15 @@
                     app:backgroundTint="@color/cool_purple"
                     android:background="@drawable/button_rounded"
                     android:text="+ Select your pictures" />
+
+                <TextView
+                    android:id="@+id/number_of_selected_images"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/number_of_selected_images"
+                    android:textColor="@color/cool_purple"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:layout_width="wrap_content"

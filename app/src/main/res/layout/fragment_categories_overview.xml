@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black"
+    tools:context=".fragments.categories.CategoriesOverviewFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/linear_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_create_category"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                app:backgroundTint="@color/cool_purple"
+                android:background="@drawable/button_rounded"
+                android:textColor="@color/white"
+                android:text="@string/create_category"
+                android:maxLines="2"
+                android:ellipsize="none"
+                android:singleLine="false" />
+
+            <Button
+                android:id="@+id/button_accept_category"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:backgroundTint="@color/cool_purple"
+                android:background="@drawable/button_rounded"
+                android:textColor="@color/white"
+                android:text="@string/pending_categories"
+                android:maxLines="2"
+                android:ellipsize="none"
+                android:singleLine="false" />
+
+            <Button
+                android:id="@+id/button_categorize"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:backgroundTint="@color/cool_purple"
+                android:background="@drawable/button_rounded"
+                android:textColor="@color/white"
+                android:text="@string/categorize"
+                android:maxLines="2"
+                android:ellipsize="none"
+                android:singleLine="false" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/categoryListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            tools:listitem="@layout/category_card"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="15dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

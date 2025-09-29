@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:minHeight="120dp"
+    android:orientation="vertical"
+    android:padding="2dp"
+    android:background="@drawable/calendar_day_background">
+
+    <!-- Day Number -->
+    <TextView
+        android:id="@+id/tvDayNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="2dp"
+        android:padding="2dp" />
+
+    <!-- Events Container -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/llEventsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="1dp" />
+
+    </ScrollView>
+
+    <!-- Event count indicator for overflow -->
+    <TextView
+        android:id="@+id/tvEventCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="8sp"
+        android:gravity="center"
+        android:textColor="@color/cool_dark_purple"
+        android:visibility="gone" />
+
+</LinearLayout>

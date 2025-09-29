@@ -36,4 +36,24 @@ public abstract class Solution {
     {
         return image;
     }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title TextView (dynamic) -->
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:text="@string/create_event_type"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Name input -->
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/event_type_name"
+            android:inputType="textPersonName" />
+
+        <!-- Description input -->
+        <EditText
+            android:id="@+id/descriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:hint="@string/event_type_description"
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:layout_marginTop="12dp" />
+
+        <!-- Recommended Categories label -->
+        <TextView
+            android:id="@+id/categoriesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/recommended_categories"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
+        <!-- Container for checkboxes -->
+        <LinearLayout
+            android:id="@+id/categoriesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" >
+            <!-- Dynamically add checkboxes here -->
+        </LinearLayout>
+
+        <!-- Buttons container -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="24dp">
+
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                android:layout_marginStart="16dp"
+                android:enabled="false" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

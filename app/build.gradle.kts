@@ -1,5 +1,13 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -12,9 +20,16 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BACKEND_BASE_URL",
+            "\"${localProperties.getProperty("BACKEND_BASE_URL") ?: "http://10.0.2.2:8080/api/"}\""
+        )
     }
+    //  "\"${localProperties.getProperty("BACKEND_BASE_URL") ?: "http://192.168.1.12:8080/api/"}\""
+    //  "\"${localProperties.getProperty("BACKEND_BASE_URL") ?: "http://10.0.2.2:8080/api/"}\""
 
     buildTypes {
         release {
@@ -29,6 +44,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -39,8 +59,19 @@ dependencies {
     implementation(libs.navigation.runtime)
     implementation(libs.navigation.ui)
     implementation(libs.navigation.fragment)
-
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.converter.scalars)
+    implementation(libs.gson)
+    implementation(libs.glide)
+    implementation(libs.androidx.appcompat)
+    annotationProcessor(libs.glideCompiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.stomp)
+    implementation(libs.rxjava2)
+    implementation(libs.rxandroid2)
+    implementation(libs.osmdroid)
+    implementation(libs.osmbonuspack)
 }

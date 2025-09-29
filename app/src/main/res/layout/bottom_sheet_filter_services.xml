@@ -39,18 +39,20 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_margin="2dp">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/category"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"/>
-                <RadioGroup
-                    android:id="@+id/radio_group_categories"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
 
-                </RadioGroup>
+                <Spinner
+                    android:id="@+id/spinner_categories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_background"
+                    android:spinnerMode="dropdown"/>
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.5dp"
@@ -63,13 +65,12 @@
                     android:text="@string/event_type"
                     android:textSize="18sp"
                     android:textColor="@android:color/black"/>
-                <LinearLayout
-                    android:id="@+id/event_types_checkboxes"
+                <Spinner
+                    android:id="@+id/spinner_eventTypes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="2dp">
-                </LinearLayout>
+                    android:background="@drawable/edit_text_background"
+                    android:spinnerMode="dropdown"/>
                 <!--
                 <CheckBox
                     android:layout_width="match_parent"
@@ -120,7 +121,7 @@
                             android:textSize="18sp" />
 
                         <EditText
-                            android:id="@+id/editText_reservation_deadline"
+                            android:id="@+id/minPriceInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/edit_text_background"
@@ -152,7 +153,7 @@
                             android:textSize="18sp" />
 
                         <EditText
-                            android:id="@+id/editText_cancellation_deadline"
+                            android:id="@+id/maxPriceInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/edit_text_background"
@@ -181,26 +182,29 @@
                     android:text="@string/availability"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
-                <RadioGroup
-                    android:id="@+id/radio_group_availabilityFilter"
+                <LinearLayout
+                    android:id="@+id/switch_availability_filter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <RadioButton
-                        android:id="@+id/radio_button_available"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <Switch
+                        android:id="@+id/switch_show_available"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/available"
-                        android:buttonTint="@color/cool_purple"
-                        android:layout_marginEnd="16dp"/>
-                    <RadioButton
-                        android:id="@+id/radio_button_unavailable"
+                        android:text="Show available"
+                        android:textColor="@color/black"
+                        android:layout_marginBottom="8dp"/>
+
+                    <Switch
+                        android:id="@+id/switch_show_unavailable"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/unavailable"
-                        android:buttonTint="@color/cool_purple"
-                        android:layout_marginEnd="16dp"/>
-                </RadioGroup>
+                        android:text="Show unavailable"
+                        android:textColor="@color/black"/>
+
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>
